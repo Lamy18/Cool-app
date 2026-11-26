@@ -28,3 +28,7 @@ A helper for "give the most niche answer" games. Type the question or paste a sc
 Each suggestion is checked against Wikipedia page views (sorted rarest first, and flagged if there is no page). Tap an answer to copy it.
 
 Needs your own Anthropic API key (console.anthropic.com), entered once on the page. It is stored only in your browser and sent only to Anthropic. Each question costs roughly 1–3 cents.
+
+# Candle Crawl 🕯️ (`/trader/`)
+
+A day-trading roguelike where the market never closes. Each in-game day is 24 hours (about 100 seconds of real time). Hit the day's net-worth goal to survive, pick 1 of 3 perks (short selling, margin, stop-loss bot, insider tips, extra lives…), and push as deep as you can. Every run has a random set of made-up companies, a daily market mood, and news and rumors that move prices.

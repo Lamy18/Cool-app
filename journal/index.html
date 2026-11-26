@@ -1,0 +1,872 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#050505">
+<title>Dayflow Journal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* Layout: one phone-width column on pure black; neon rounded cards; a floating pill nav at the bottom.
+     Deliberately single-theme (dark), like the reference. */
+  :root {
+    --bg: #050505;
+    --surface: #121212;
+    --surface-2: #1b1b1b;
+    --line: #2a2a2a;
+    --text: #f5f5f5;
+    --muted: #8d8d8d;
+    --ink: #0b0b0b;
+    --yellow: #e8f24c;
+    --lime: #d9f25b;
+    --pink: #f27bc0;
+    --blue: #4f8cff;
+    --green: #3be36e;
+    --coral: #ff7a5c;
+    --teal: #2ec4b6;
+    --display: "Unbounded", "Arial Black", system-ui, sans-serif;
+    --body: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; }
+  body {
+    background: var(--bg); color: var(--text); font-family: var(--body);
+    min-height: 100vh;
+    padding: calc(14px + env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) calc(110px + env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+  }
+  .app { max-width: 480px; margin: 0 auto; display: grid; gap: 14px; }
+  button { font: inherit; color: inherit; border: 0; background: none; cursor: pointer; }
+  button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px solid var(--yellow); outline-offset: 2px; }
+  .hidden { display: none !important; }
+  .num { font-variant-numeric: tabular-nums; }
+  h1, h2, h3 { margin: 0; text-wrap: balance; }
+
+  /* Top bar */
+  .topbar { display: flex; align-items: center; gap: 12px; }
+  .topbar h1 { font-family: var(--display); font-weight: 600; font-size: 1.45rem; letter-spacing: -0.01em; flex: 1; min-width: 0; }
+  .topbar .back { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; }
+  .avatar { width: 42px; height: 42px; border-radius: 50%; background: var(--pink); color: var(--ink); display: grid; place-items: center; font-family: var(--display); font-weight: 700; border: 2px solid #fff; }
+  .sub { color: var(--muted); font-size: .85rem; margin-top: 2px; }
+
+  /* Cards */
+  .card { border-radius: 26px; padding: 18px; position: relative; overflow: hidden; }
+  .card.dark { background: var(--surface); border: 1px solid var(--line); }
+  .card.outline { background: transparent; border: 1.5px solid #3a3a3a; }
+  .c-yellow { background: var(--yellow); color: var(--ink); }
+  .c-pink { background: var(--pink); color: var(--ink); }
+  .c-blue { background: var(--blue); color: var(--ink); }
+  .c-green { background: var(--green); color: var(--ink); }
+  .c-coral { background: var(--coral); color: var(--ink); }
+  .c-teal { background: var(--teal); color: var(--ink); }
+  .c-lime { background: var(--lime); color: var(--ink); }
+  .card h3 { font-family: var(--display); font-weight: 600; font-size: 1.02rem; letter-spacing: -0.01em; }
+  .card .meta { font-size: .78rem; opacity: .75; margin-top: 3px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .stack { display: grid; gap: 12px; }
+  .row { display: flex; align-items: center; gap: 10px; }
+  .spacer { flex: 1; }
+
+  /* Folder-tab card */
+  .folder { --c: var(--lime); position: relative; background: var(--c); color: var(--ink); border-radius: 0 24px 24px 24px; margin-top: 18px; padding: 16px; }
+  .folder::before { content: ""; position: absolute; left: 0; top: -18px; width: 54%; height: 19px; background: var(--c); border-radius: 22px 10px 0 0; }
+  /* concave fillet where the tab meets the body: tab corner (convex 10px) flows into this (concave 10px) */
+  .folder::after { content: ""; position: absolute; left: calc(54% - .5px); top: -8.5px; width: 9.5px; height: 9.5px; background: radial-gradient(circle at 100% 0, transparent 8.5px, var(--c) 9px); }
+  .folder .ic { position: absolute; left: 12px; top: -10px; width: 42px; height: 42px; border-radius: 50%; background: var(--ink); color: #fff; display: grid; place-items: center; z-index: 1; }
+  .folder .ic svg { width: 20px; height: 20px; }
+  .folder .big { font-family: var(--display); font-weight: 700; font-size: 1.55rem; letter-spacing: -0.02em; margin-top: 34px; line-height: 1; }
+  .folder .lbl { font-size: .8rem; font-weight: 600; margin-top: 4px; }
+
+  /* Progress */
+  .bar { height: 8px; border-radius: 999px; background: #262626; overflow: hidden; }
+  .bar div { height: 100%; background: #fff; border-radius: 999px; transition: width .4s; }
+  .dtrack { position: relative; height: 24px; border-radius: 999px; background: var(--ink); display: flex; align-items: center; justify-content: space-between; padding: 0 14px 0 10px; margin-top: 14px; }
+  .dtrack i { width: 4px; height: 4px; border-radius: 50%; background: #fff; opacity: .7; }
+  .dtrack .knob { position: absolute; top: 50%; width: 16px; height: 16px; border-radius: 50%; background: #fff; transform: translate(-50%, -50%); box-shadow: 0 0 0 3px var(--ink); transition: left .4s; }
+  .dtrack .end { position: absolute; right: 3px; top: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff; }
+
+  /* Pills & buttons */
+  .pill { display: inline-flex; align-items: center; gap: 8px; border-radius: 999px; padding: 10px 16px; font-weight: 700; font-size: .9rem; }
+  .pill.white { background: #fff; color: var(--ink); }
+  .pill.ghost { border: 1.5px solid #3a3a3a; }
+  .wide-btn { width: 100%; display: flex; align-items: center; justify-content: space-between; border-radius: 999px; padding: 14px 18px; background: #fff; color: var(--ink); font-weight: 700; }
+  .wide-btn.ghost { background: transparent; color: var(--text); border: 1.5px solid #3a3a3a; }
+  .wide-btn svg { width: 20px; height: 20px; }
+  .add-btn { width: 44px; height: 44px; border-radius: 50%; background: #fff; color: var(--ink); display: grid; place-items: center; font-size: 1.5rem; font-weight: 700; flex-shrink: 0; }
+  .chip { border-radius: 999px; padding: 7px 13px; font-size: .78rem; font-weight: 700; background: #fff; color: var(--ink); }
+  .chip.off { background: transparent; color: var(--text); border: 1.5px solid #3a3a3a; }
+
+  /* Home */
+  .greet h1 { font-family: var(--display); font-weight: 600; font-size: 1.7rem; letter-spacing: -0.02em; }
+  .prog-row { display: flex; justify-content: space-between; align-items: baseline; margin: 10px 0 8px; }
+  .prog-row b { font-family: var(--display); font-size: 1.2rem; }
+  .hero .starburst { position: absolute; right: 14px; top: 12px; width: 46px; height: 46px; }
+  .hero .cd-big { font-family: var(--display); font-weight: 700; font-size: 3rem; line-height: 1; letter-spacing: -0.03em; margin-top: 14px; }
+  .hero .cd-big small { font-size: 1rem; font-weight: 600; letter-spacing: 0; margin-left: 6px; }
+  .hero .cd-clock { font-weight: 700; font-size: .95rem; margin-top: 4px; }
+  .mini-list { display: grid; gap: 8px; margin-top: 12px; }
+  .mini-item { display: flex; align-items: center; gap: 8px; font-size: .82rem; font-weight: 600; width: 100%; text-align: left; }
+  .mini-item .dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--ink); flex-shrink: 0; display: grid; place-items: center; font-size: .65rem; }
+  .mini-item.done .dot { background: var(--ink); color: #fff; }
+  .mini-item.done span:last-child { text-decoration: line-through; opacity: .6; }
+  .moodface { font-size: 1.8rem; margin-top: 10px; }
+  svg.spark { width: 100%; height: 44px; margin-top: 8px; display: block; }
+
+  /* Week strip */
+  .week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; }
+  .week button { border-radius: 16px; padding: 8px 0; display: grid; gap: 6px; justify-items: center; font-size: .72rem; color: var(--muted); }
+  .week button b { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; font-size: .85rem; color: var(--text); }
+  .week button.sel b { background: var(--pink); color: var(--ink); }
+  .week button.today:not(.sel) b { border: 1.5px solid var(--pink); }
+  .week button .wdot { width: 5px; height: 5px; border-radius: 50%; background: transparent; }
+  .week button .wdot.on { background: var(--green); }
+
+  /* Habits */
+  .habit { display: flex; align-items: center; gap: 12px; border-radius: 24px; padding: 14px 14px 14px 16px; color: var(--ink); }
+  .habit .emo { width: 46px; height: 46px; border-radius: 50%; background: rgba(255,255,255,.55); display: grid; place-items: center; font-size: 1.4rem; flex-shrink: 0; }
+  .habit .t { flex: 1; min-width: 0; text-align: left; }
+  .habit .t b { display: block; font-weight: 800; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .habit .t span { font-size: .78rem; font-weight: 600; opacity: .75; }
+  .habit .days7 { display: flex; gap: 4px; margin-top: 6px; }
+  .habit .days7 i { width: 8px; height: 8px; border-radius: 50%; background: rgba(11,11,11,.18); }
+  .habit .days7 i.on { background: var(--ink); }
+  .habit .days7 i.na { background: transparent; border: 1.5px dashed rgba(11,11,11,.3); }
+  .check { width: 46px; height: 46px; border-radius: 50%; border: 2.5px solid var(--ink); display: grid; place-items: center; flex-shrink: 0; transition: transform .1s; }
+  .check:active { transform: scale(.9); }
+  .check svg { width: 22px; height: 22px; opacity: 0; }
+  .check.on { background: var(--ink); color: #fff; }
+  .check.on svg { opacity: 1; }
+  .habit.off { background: var(--surface) !important; color: var(--muted); border: 1px dashed #333; }
+  .habit.off .emo { background: #222; }
+  .habit.off .check { border-color: #333; }
+  .heat { display: grid; grid-template-rows: repeat(7, 1fr); grid-auto-flow: column; gap: 4px; margin-top: 12px; }
+  .heat i { aspect-ratio: 1; border-radius: 5px; background: #222; }
+  .heat i.on { background: var(--c); }
+  .heat i.na { background: transparent; border: 1px solid #222; }
+  .heat i.today { outline: 2px solid #fff; outline-offset: 1px; }
+  .stat3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
+  .stat3 div { background: var(--surface-2); border-radius: 16px; padding: 12px 8px; text-align: center; }
+  .stat3 b { display: block; font-family: var(--display); font-size: 1.2rem; }
+  .stat3 span { font-size: .72rem; color: var(--muted); }
+
+  /* Countdowns */
+  .cd { display: grid; gap: 4px; }
+  .cd .top { display: flex; align-items: flex-start; gap: 10px; }
+  .cd .top b { font-family: var(--display); font-weight: 600; font-size: 1rem; flex: 1; min-width: 0; margin-top: 30px; }
+  .cd .days { font-family: var(--display); font-weight: 700; font-size: 2.6rem; letter-spacing: -0.03em; line-height: 1; margin-top: 10px; }
+  .cd .days small { font-size: .9rem; font-weight: 600; margin-left: 6px; letter-spacing: 0; }
+  .cd .clock { display: flex; gap: 6px; margin-top: 8px; }
+  .cd .clock span { background: var(--ink); color: #fff; border-radius: 12px; padding: 6px 9px; font-weight: 800; font-size: .9rem; min-width: 46px; text-align: center; }
+  .cd .clock span small { display: block; font-size: .6rem; font-weight: 600; opacity: .7; }
+  .cd .date { font-size: .8rem; font-weight: 600; opacity: .75; margin-top: 2px; }
+  .kebab { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: rgba(11,11,11,.12); flex-shrink: 0; }
+
+  /* Journal */
+  .daynav { display: flex; align-items: center; gap: 8px; }
+  .daynav .circle { width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid #3a3a3a; display: grid; place-items: center; }
+  .daynav .lbl { flex: 1; text-align: center; }
+  .daynav .lbl b { display: block; font-family: var(--display); font-weight: 600; font-size: 1.05rem; }
+  .moods { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-top: 12px; }
+  .moods button { aspect-ratio: 1; border-radius: 50%; font-size: 1.6rem; background: rgba(11,11,11,.12); transition: transform .15s; }
+  .moods button.on { background: var(--ink); transform: scale(1.08); }
+  .focus-item { display: flex; align-items: center; gap: 10px; padding: 6px 0; }
+  .focus-item input { flex: 1; min-width: 0; background: transparent; border: 0; border-bottom: 1.5px solid rgba(11,11,11,.2); padding: 8px 2px; font: inherit; font-weight: 600; color: var(--ink); }
+  .focus-item input::placeholder { color: rgba(11,11,11,.45); }
+  .focus-item .check { width: 32px; height: 32px; border-width: 2px; }
+  .focus-item .check svg { width: 16px; height: 16px; }
+  textarea, .field input, .field select {
+    width: 100%; font: inherit; color: var(--text); background: var(--surface-2); border: 1.5px solid #2c2c2c; border-radius: 18px; padding: 12px 14px; resize: vertical;
+  }
+  textarea { min-height: 120px; line-height: 1.5; }
+  .field { display: grid; gap: 6px; }
+  .field > span { font-size: .78rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+  .saved { font-size: .75rem; color: var(--muted); }
+  .entry { display: flex; gap: 12px; align-items: center; padding: 12px 14px; border-radius: 20px; background: var(--surface); border: 1px solid var(--line); width: 100%; text-align: left; }
+  .entry .m { font-size: 1.5rem; }
+  .entry .t { flex: 1; min-width: 0; }
+  .entry .t b { display: block; font-size: .9rem; }
+  .entry .t span { font-size: .78rem; color: var(--muted); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .chart-card svg { width: 100%; height: 130px; display: block; margin-top: 8px; }
+  .chart-x { display: flex; justify-content: space-between; font-size: .7rem; color: var(--muted); }
+
+  /* Bottom nav */
+  .nav { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(14px + env(safe-area-inset-bottom)); z-index: 20; display: flex; align-items: center; gap: 4px; padding: 7px; border-radius: 999px; background: #161616; border: 1px solid #2a2a2a; box-shadow: 0 12px 30px rgba(0,0,0,.6); }
+  .nav button { height: 44px; min-width: 44px; border-radius: 999px; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 0 12px; color: #bdbdbd; font-weight: 700; font-size: .85rem; }
+  .nav button svg { width: 20px; height: 20px; }
+  .nav button span { display: none; }
+  .nav button.on { background: #fff; color: var(--ink); }
+  .nav button.on span { display: inline; }
+
+  /* Sheet / modal */
+  .sheet-bg { position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,.7); display: flex; align-items: flex-end; justify-content: center; }
+  .sheet { width: 100%; max-width: 480px; max-height: 92vh; overflow-y: auto; background: #111; border: 1px solid #262626; border-bottom: 0; border-radius: 28px 28px 0 0; padding: 18px 18px calc(22px + env(safe-area-inset-bottom)); display: grid; gap: 14px; animation: up .25s ease-out; }
+  @keyframes up { from { transform: translateY(40px); opacity: 0; } }
+  .sheet .grab { width: 40px; height: 4px; border-radius: 2px; background: #333; justify-self: center; }
+  .sheet h2 { font-family: var(--display); font-weight: 600; font-size: 1.25rem; }
+  .emoji-row, .color-row, .dow-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .emoji-row button { width: 42px; height: 42px; border-radius: 14px; background: var(--surface-2); font-size: 1.3rem; }
+  .emoji-row button.on { background: #fff; }
+  .color-row button { width: 38px; height: 38px; border-radius: 50%; border: 3px solid transparent; }
+  .color-row button.on { border-color: #fff; }
+  .dow-row button { flex: 1; min-width: 38px; height: 40px; border-radius: 14px; background: var(--surface-2); font-weight: 800; font-size: .8rem; }
+  .dow-row button.on { background: var(--green); color: var(--ink); }
+  .btn-row { display: flex; gap: 10px; }
+  .btn-row > * { flex: 1; justify-content: center; }
+  .danger { color: #ff7a7a; }
+
+  /* Intro */
+  .intro { min-height: calc(100vh - 140px); display: flex; flex-direction: column; justify-content: flex-end; gap: 18px; position: relative; }
+  .intro .stars { position: absolute; left: -16px; right: -16px; top: 0; height: 56%; }
+  .intro h1 { font-family: var(--display); font-weight: 700; font-size: clamp(2rem, 9vw, 2.6rem); line-height: 1.05; letter-spacing: -0.01em; text-transform: uppercase; position: relative; }
+  .intro input { width: 100%; font: inherit; font-size: 1.05rem; color: var(--text); background: transparent; border: 1.5px solid #3a3a3a; border-radius: 999px; padding: 14px 18px; position: relative; }
+  .intro .go { width: 100%; border-radius: 999px; padding: 16px; background: #fff; color: var(--ink); font-weight: 800; font-size: 1rem; position: relative; }
+
+  .toast { position: fixed; left: 50%; bottom: calc(90px + env(safe-area-inset-bottom)); transform: translateX(-50%); z-index: 60; background: #fff; color: var(--ink); font-weight: 700; padding: 10px 16px; border-radius: 999px; font-size: .88rem; animation: up .2s ease-out; box-shadow: 0 8px 20px rgba(0,0,0,.5); }
+  .empty { color: var(--muted); font-size: .9rem; text-align: center; padding: 18px 8px; }
+  .section-title { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 6px; }
+  .section-title h2 { font-family: var(--display); font-weight: 600; font-size: 1.1rem; }
+  .footer-links { text-align: center; font-size: .78rem; color: var(--muted); margin-top: 8px; }
+  .footer-links a { color: var(--muted); }
+
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+<nav class="nav hidden" id="nav" aria-label="Sections">
+  <button data-tab="home" aria-label="Home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg><span>Home</span></button>
+  <button data-tab="habits" aria-label="Habits"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg><span>Habits</span></button>
+  <button data-tab="countdowns" aria-label="Countdowns"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/></svg><span>Countdown</span></button>
+  <button data-tab="journal" aria-label="Journal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h11l3 3v15H5z"/><path d="M9 8h6M9 12h6M9 16h4"/></svg><span>Journal</span></button>
+</nav>
+<div id="sheetRoot"></div>
+
+<script>
+(() => {
+'use strict';
+
+// ================= Storage =================
+const KEY = 'dayflow:data';
+const store = {
+  load() { try { return JSON.parse(localStorage.getItem(KEY)); } catch { return null; } },
+  save(d) { try { localStorage.setItem(KEY, JSON.stringify(d)); return true; } catch { return false; } },
+};
+let D = store.load() || { name: '', habits: [], countdowns: [], journal: {} };
+D.habits ||= []; D.countdowns ||= []; D.journal ||= {};
+const save = () => { if (!store.save(D)) toast('Could not save on this device'); };
+
+// ================= Helpers =================
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const uid = () => Math.random().toString(36).slice(2, 10);
+const pad = (n) => String(n).padStart(2, '0');
+const keyOf = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const fromKey = (k) => { const [y, m, d] = k.split('-').map(Number); return new Date(y, m - 1, d); };
+const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
+const todayKey = () => keyOf(new Date());
+const dow = (d) => (d.getDay() + 6) % 7;  // Monday = 0
+const DOW = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+const DOW_LONG = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+const fmtDate = (d, opts) => d.toLocaleDateString('en-US', opts || { weekday: 'short', month: 'short', day: 'numeric' });
+const COLORS = ['yellow', 'pink', 'blue', 'green', 'coral', 'teal', 'lime'];
+const HABIT_EMOJI = ['💧', '📚', '🏋️', '🧘', '🏃', '🥗', '😴', '✍️', '🎸', '💊', '🧹', '📵', '🌱', '💻', '🙏', '🚶'];
+const CD_EMOJI = ['🎯', '🎓', '✈️', '🎂', '🏁', '💼', '🎉', '📅', '🏖️', '🏆', '❤️', '🚀'];
+const MOODS = ['😞', '😕', '😐', '🙂', '😄'];
+const MOOD_NAMES = ['Rough', 'Meh', 'Okay', 'Good', 'Great'];
+const PROMPTS = ['What would make today great?', 'What did you learn today?', 'What drained you, and what energised you?', 'One small win from today:', 'What will you do differently tomorrow?', 'Who helped you today?'];
+
+function toast(msg) {
+  document.querySelectorAll('.toast').forEach(t => t.remove());
+  const el = document.createElement('div');
+  el.className = 'toast'; el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 2200);
+}
+
+function starburst(points, outer, inner, fill, stroke) {
+  const pts = [];
+  for (let i = 0; i < points * 2; i++) {
+    const r = i % 2 ? inner : outer, a = Math.PI * i / points - Math.PI / 2;
+    pts.push(`${(50 + r * Math.cos(a)).toFixed(2)},${(50 + r * Math.sin(a)).toFixed(2)}`);
+  }
+  return `<polygon points="${pts.join(' ')}" fill="${fill || 'none'}" ${stroke ? `stroke="${stroke}" stroke-width=".6"` : ''}/>`;
+}
+
+const ICON = {
+  check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>',
+  arrow: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
+  back: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>',
+  left: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg>',
+  right: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>',
+  dots: '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>',
+  flame: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c4 0 7-3 7-7 0-5-5-7-5-12-3 2-5 5-5 8-1-1-2-2-2-4-2 2-2 5-2 8 0 4 3 7 7 7z"/></svg>',
+  target: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg>',
+  book: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 21V5"/></svg>',
+  clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+};
+
+// ================= Habit logic =================
+const scheduled = (h, d) => h.days.includes(dow(d));
+const isDone = (h, k) => !!h.log[k];
+function streak(h) {
+  let d = new Date(), n = 0;
+  if (scheduled(h, d) && !isDone(h, keyOf(d))) d = addDays(d, -1);   // today still open
+  const start = fromKey(h.created);
+  for (let i = 0; i < 2000 && d >= start; i++, d = addDays(d, -1)) {
+    if (!scheduled(h, d)) continue;
+    if (isDone(h, keyOf(d))) n++; else break;
+  }
+  return n;
+}
+function bestStreak(h) {
+  let best = 0, cur = 0;
+  for (let d = fromKey(h.created); keyOf(d) <= todayKey(); d = addDays(d, 1)) {
+    if (!scheduled(h, d)) continue;
+    if (isDone(h, keyOf(d))) { cur++; best = Math.max(best, cur); } else if (keyOf(d) !== todayKey()) cur = 0;
+  }
+  return best;
+}
+function rate(h, days = 30) {
+  let s = 0, done = 0;
+  const start = fromKey(h.created);
+  for (let i = 0; i < days; i++) {
+    const d = addDays(new Date(), -i);
+    if (d < start) break;
+    if (!scheduled(h, d)) continue;
+    s++; if (isDone(h, keyOf(d))) done++;
+  }
+  return s ? done / s : 0;
+}
+function dayProgress(k) {
+  const d = fromKey(k);
+  const hs = D.habits.filter(h => scheduled(h, d));
+  const j = D.journal[k];
+  const focus = j ? j.focus.map((t, i) => ({ t, done: j.done[i] })).filter(f => f.t.trim()) : [];
+  const total = hs.length + focus.length;
+  const done = hs.filter(h => isDone(h, k)).length + focus.filter(f => f.done).length;
+  return { total, done, pct: total ? done / total : 0 };
+}
+
+// ================= Countdown logic =================
+function cdParts(c) {
+  const ms = new Date(c.target).getTime() - Date.now();
+  const past = ms <= 0;
+  const a = Math.abs(ms);
+  return {
+    past,
+    days: Math.floor(a / 864e5), h: Math.floor(a % 864e5 / 36e5), m: Math.floor(a % 36e5 / 6e4), s: Math.floor(a % 6e4 / 1e3),
+    pct: Math.max(0, Math.min(1, (Date.now() - new Date(c.created).getTime()) / (new Date(c.target).getTime() - new Date(c.created).getTime() || 1))),
+  };
+}
+const upcoming = () => D.countdowns.filter(c => !cdParts(c).past).sort((a, b) => new Date(a.target) - new Date(b.target));
+
+// ================= Journal =================
+function entry(k) { return D.journal[k] || { mood: -1, focus: ['', '', ''], done: [false, false, false], notes: '', grateful: '' }; }
+function putEntry(k, e) {
+  const empty = e.mood < 0 && !e.focus.some(Boolean) && !e.notes.trim() && !e.grateful.trim();
+  if (empty) delete D.journal[k]; else D.journal[k] = e;
+  save();
+}
+const journalStreak = () => { let n = 0, d = new Date(); if (!D.journal[keyOf(d)]) d = addDays(d, -1); while (D.journal[keyOf(d)]) { n++; d = addDays(d, -1); } return n; };
+
+// ================= State / routing =================
+let tab = 'home';
+let habitDay = todayKey();
+let journalDay = todayKey();
+let detail = null;           // {type:'habit', id}
+
+function setTab(t) { tab = t; detail = null; render(); window.scrollTo({ top: 0 }); }
+document.querySelectorAll('#nav button').forEach(b => b.onclick = () => setTab(b.dataset.tab));
+
+function render() {
+  const app = $('app');
+  if (!D.name) { $('nav').classList.add('hidden'); app.innerHTML = introHTML(); bindIntro(); return; }
+  $('nav').classList.remove('hidden');
+  document.querySelectorAll('#nav button').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
+  if (detail && detail.type === 'habit') { app.innerHTML = habitDetailHTML(detail.id); bindHabitDetail(detail.id); return; }
+  app.innerHTML = ({ home: homeHTML, habits: habitsHTML, countdowns: countdownsHTML, journal: journalHTML })[tab]();
+  ({ home: bindHome, habits: bindHabits, countdowns: bindCountdowns, journal: bindJournal })[tab]();
+  tick();
+}
+
+// ================= Intro =================
+function introHTML() {
+  return `<div class="intro">
+    <svg class="stars" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+      <g transform="translate(-14 -4) scale(1.05)">${starburst(12, 46, 9, 'none', '#fff')}</g>
+      <g transform="translate(26 6) scale(.7)">${starburst(10, 46, 10, 'none', '#fff')}</g>
+      <g transform="translate(-8 6) scale(.85)">${starburst(8, 46, 11, '#f27bc0')}</g>
+    </svg>
+    <h1>Plan your days in one place</h1>
+    <p style="margin:0;color:var(--muted);position:relative">Habits, countdowns and a daily journal. Everything stays on this device.</p>
+    <input id="nameIn" placeholder="What should we call you?" autocomplete="given-name" maxlength="24">
+    <button class="go" id="goBtn">Go ahead!</button>
+  </div>`;
+}
+function bindIntro() {
+  const go = () => {
+    const n = $('nameIn').value.trim();
+    if (!n) { $('nameIn').focus(); toast('Type your name first'); return; }
+    D.name = n;
+    if (!D.habits.length && !D.countdowns.length) seed();
+    save(); render();
+  };
+  $('goBtn').onclick = go;
+  $('nameIn').onkeydown = (e) => { if (e.key === 'Enter') go(); };
+}
+function seed() {
+  const created = keyOf(addDays(new Date(), -6));
+  const mk = (name, emoji, color, days, doneMask) => {
+    const h = { id: uid(), name, emoji, color, days, created, log: {} };
+    for (let i = 1; i <= 6; i++) if (doneMask[i - 1]) { const d = addDays(new Date(), -i); if (scheduled(h, d)) h.log[keyOf(d)] = true; }
+    return h;
+  };
+  D.habits.push(mk('Drink 8 glasses of water', '💧', 'blue', [0, 1, 2, 3, 4, 5, 6], [1, 1, 1, 0, 1, 1]));
+  D.habits.push(mk('Read 20 minutes', '📚', 'yellow', [0, 1, 2, 3, 4, 5, 6], [1, 1, 0, 1, 1, 1]));
+  D.habits.push(mk('Workout', '🏋️', 'pink', [0, 2, 4], [1, 1, 1, 1, 1, 1]));
+  const ny = new Date(new Date().getFullYear() + 1, 0, 1);
+  D.countdowns.push({ id: uid(), title: 'New Year', emoji: '🎉', color: 'yellow', target: ny.toISOString(), created: new Date(new Date().getFullYear(), 0, 1).toISOString() });
+}
+
+// ================= Home =================
+function homeHTML() {
+  const tk = todayKey();
+  const p = dayProgress(tk);
+  const next = upcoming()[0];
+  const todays = D.habits.filter(h => scheduled(h, new Date()));
+  const j = D.journal[tk];
+  const bestNow = D.habits.reduce((m, h) => Math.max(m, streak(h)), 0);
+  const last14 = Array.from({ length: 14 }, (_, i) => dayProgress(keyOf(addDays(new Date(), i - 13))).pct);
+  const hour = new Date().getHours();
+  const hello = hour < 12 ? 'Good morning' : hour < 18 ? 'Hi' : 'Good evening';
+  return `
+    <div class="topbar greet">
+      <div style="flex:1;min-width:0"><h1>${hello}, ${esc(D.name)}</h1><div class="sub">${fmtDate(new Date(), { weekday: 'long', month: 'long', day: 'numeric' })}</div></div>
+      <button class="avatar" id="profileBtn" aria-label="Settings">${esc(D.name[0].toUpperCase())}</button>
+    </div>
+    <div>
+      <div class="prog-row"><span class="sub" style="margin:0">Today's progress · ${p.done}/${p.total || 0} done</span><b class="num">${Math.round(p.pct * 100)}%</b></div>
+      <div class="bar"><div style="width:${p.pct * 100}%"></div></div>
+    </div>
+
+    ${next ? `
+    <button class="card c-yellow hero" id="heroCd" style="text-align:left;width:100%">
+      <svg class="starburst" viewBox="0 0 100 100" aria-hidden="true">${starburst(12, 50, 8, '#0b0b0b')}</svg>
+      <h3>${esc(next.emoji)} ${esc(next.title)}</h3>
+      <div class="meta">${fmtDate(new Date(next.target), { weekday: 'short', month: 'long', day: 'numeric', year: 'numeric' })}</div>
+      <div class="cd-big num" data-cd-days="${next.id}">0<small>days</small></div>
+      <div class="cd-clock num" data-cd-clock="${next.id}">00:00:00</div>
+      <div class="dtrack" data-cd-track="${next.id}">${'<i></i>'.repeat(9)}<span class="knob"></span><span class="end"></span></div>
+    </button>` : `
+    <button class="card c-yellow hero" id="heroAdd" style="text-align:left;width:100%">
+      <svg class="starburst" viewBox="0 0 100 100" aria-hidden="true">${starburst(12, 50, 8, '#0b0b0b')}</svg>
+      <h3>No countdown yet</h3><div class="meta">Count down to an exam, a trip or a deadline.</div>
+      <div class="pill white" style="margin-top:16px;background:#0b0b0b;color:#fff">+ Add a countdown</div>
+    </button>`}
+
+    <div class="grid2">
+      <div class="card c-pink">
+        <h3>Today's habits</h3>
+        <div class="meta">${todays.filter(h => isDone(h, tk)).length} of ${todays.length} done</div>
+        <div class="mini-list">${todays.slice(0, 5).map(h => `
+          <button class="mini-item ${isDone(h, tk) ? 'done' : ''}" data-quick="${h.id}"><span class="dot">${isDone(h, tk) ? '✓' : ''}</span><span>${esc(h.emoji)} ${esc(h.name)}</span></button>`).join('') || '<div class="meta">Nothing scheduled today.</div>'}
+          ${todays.length > 5 ? `<div class="meta">+${todays.length - 5} more</div>` : ''}
+        </div>
+      </div>
+      <div class="stack">
+        <button class="card c-blue" id="homeJournal" style="text-align:left">
+          <h3>Journal</h3>
+          <div class="meta">${j ? 'Today\'s entry saved' : esc(PROMPTS[new Date().getDate() % PROMPTS.length])}</div>
+          <div class="moodface">${j && j.mood >= 0 ? MOODS[j.mood] : '✍️'}</div>
+        </button>
+        <div class="card c-green">
+          <h3>Last 14 days</h3>
+          <div class="meta">Daily completion</div>
+          ${sparkline(last14, '#0b0b0b')}
+        </div>
+      </div>
+    </div>
+
+    <div class="grid2">
+      ${folderTile('lime', ICON.flame, bestNow, 'Best active streak')}
+      ${folderTile('coral', ICON.target, `${Math.round(avgRate() * 100)}%`, 'Habit rate (30 days)')}
+      ${folderTile('teal', ICON.book, Object.keys(D.journal).length, 'Journal entries')}
+      ${folderTile('yellow', ICON.clock, upcoming().length, 'Active countdowns')}
+    </div>
+
+    <button class="wide-btn" id="reflectBtn">Write today's reflection ${ICON.arrow}</button>
+    <p class="footer-links"><a href="../">Earshot</a> · <a href="../trader/">Candle Crawl</a> · <a href="../cards/">Holo Pull</a></p>`;
+}
+const avgRate = () => D.habits.length ? D.habits.reduce((a, h) => a + rate(h), 0) / D.habits.length : 0;
+function folderTile(color, icon, big, label) {
+  return `<div class="folder" style="--c:var(--${color})"><span class="ic">${icon}</span><div class="big num">${big}</div><div class="lbl">${label}</div></div>`;
+}
+function sparkline(vals, col) {
+  const w = 100, h = 30;
+  const pts = vals.map((v, i) => `${(i / (vals.length - 1) * w).toFixed(1)},${(h - 3 - v * (h - 6)).toFixed(1)}`);
+  return `<svg class="spark" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" aria-hidden="true"><polyline points="${pts.join(' ')}" fill="none" stroke="${col}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg>`;
+}
+function bindHome() {
+  $('profileBtn').onclick = openSettings;
+  if ($('heroCd')) $('heroCd').onclick = () => setTab('countdowns');
+  if ($('heroAdd')) $('heroAdd').onclick = () => openCountdownSheet();
+  $('homeJournal').onclick = () => { journalDay = todayKey(); setTab('journal'); };
+  $('reflectBtn').onclick = () => { journalDay = todayKey(); setTab('journal'); };
+  document.querySelectorAll('[data-quick]').forEach(b => b.onclick = () => { toggleHabit(b.dataset.quick, todayKey()); render(); });
+}
+
+function toggleHabit(id, k) {
+  const h = D.habits.find(x => x.id === id);
+  if (!h) return;
+  if (h.log[k]) delete h.log[k]; else { h.log[k] = true; if (navigator.vibrate) try { navigator.vibrate(12); } catch { /* unsupported */ } }
+  save();
+  const s = streak(h);
+  if (h.log[k] && k === todayKey() && s > 1 && [3, 7, 14, 21, 30, 50, 100].includes(s)) toast(`🔥 ${s}-day streak on ${h.name}!`);
+}
+
+// ================= Habits =================
+function weekStrip(selKey, markFn) {
+  const sel = fromKey(selKey);
+  const monday = addDays(sel, -dow(sel));
+  return `<div class="week">${Array.from({ length: 7 }, (_, i) => {
+    const d = addDays(monday, i), k = keyOf(d);
+    const future = k > todayKey();
+    return `<button data-day="${k}" class="${k === selKey ? 'sel' : ''} ${k === todayKey() ? 'today' : ''}" ${future ? 'disabled style="opacity:.35"' : ''}>${DOW_LONG[i]}<b class="num">${d.getDate()}</b><span class="wdot ${markFn(k) ? 'on' : ''}"></span></button>`;
+  }).join('')}</div>`;
+}
+function habitsHTML() {
+  const d = fromKey(habitDay);
+  const isToday = habitDay === todayKey();
+  const list = D.habits.slice().sort((a, b) => scheduled(b, d) - scheduled(a, d));
+  return `
+    <div class="topbar"><h1>Habits</h1><button class="add-btn" id="addHabit" aria-label="Add habit">+</button></div>
+    <div class="card dark" style="padding:14px 10px">
+      <div class="row" style="padding:0 6px 8px"><button class="back" id="wkPrev" aria-label="Previous week">${ICON.left}</button><span class="spacer" style="text-align:center;font-weight:700">${fmtDate(d, { month: 'long', year: 'numeric' })}</span><button class="back" id="wkNext" aria-label="Next week" ${addDays(d, 7 - dow(d)) > new Date() ? 'disabled style="opacity:.3"' : ''}>${ICON.right}</button></div>
+      ${weekStrip(habitDay, k => { const p = dayProgress(k); return p.total && p.done === p.total; })}
+    </div>
+    <div class="section-title"><h2>${isToday ? 'Today' : fmtDate(d)}</h2><span class="sub">${D.habits.filter(h => scheduled(h, d) && isDone(h, habitDay)).length}/${D.habits.filter(h => scheduled(h, d)).length} done</span></div>
+    <div class="stack">${list.map(h => habitCard(h, d)).join('') || '<div class="empty">No habits yet. Tap + to create your first one.</div>'}</div>`;
+}
+function habitCard(h, d) {
+  const k = keyOf(d), on = scheduled(h, d);
+  const monday = addDays(d, -dow(d));
+  const s = streak(h);
+  return `<div class="habit c-${h.color} ${on ? '' : 'off'}">
+    <span class="emo">${esc(h.emoji)}</span>
+    <button class="t" data-open="${h.id}">
+      <b>${esc(h.name)}</b>
+      <span>${on ? `🔥 ${s} day${s === 1 ? '' : 's'} · ${daysLabel(h.days)}` : `Rest day · ${daysLabel(h.days)}`}</span>
+      <div class="days7">${Array.from({ length: 7 }, (_, i) => { const x = addDays(monday, i); return `<i class="${!scheduled(h, x) ? 'na' : isDone(h, keyOf(x)) ? 'on' : ''}"></i>`; }).join('')}</div>
+    </button>
+    ${on ? `<button class="check ${isDone(h, k) ? 'on' : ''}" data-toggle="${h.id}" aria-label="Mark ${esc(h.name)} done" aria-pressed="${isDone(h, k)}">${ICON.check}</button>` : ''}
+  </div>`;
+}
+const daysLabel = (days) => days.length === 7 ? 'Every day' : days.length === 5 && !days.includes(5) && !days.includes(6) ? 'Weekdays' : days.slice().sort().map(i => DOW_LONG[i]).join(', ');
+function bindHabits() {
+  $('addHabit').onclick = () => openHabitSheet();
+  document.querySelectorAll('[data-day]').forEach(b => b.onclick = () => { habitDay = b.dataset.day; render(); });
+  $('wkPrev').onclick = () => { habitDay = keyOf(addDays(fromKey(habitDay), -7)); render(); };
+  $('wkNext').onclick = () => { const n = addDays(fromKey(habitDay), 7); habitDay = keyOf(n > new Date() ? new Date() : n); render(); };
+  document.querySelectorAll('[data-toggle]').forEach(b => b.onclick = () => { toggleHabit(b.dataset.toggle, habitDay); render(); });
+  document.querySelectorAll('[data-open]').forEach(b => b.onclick = () => { detail = { type: 'habit', id: b.dataset.open }; render(); window.scrollTo({ top: 0 }); });
+}
+
+function habitDetailHTML(id) {
+  const h = D.habits.find(x => x.id === id);
+  if (!h) { detail = null; return habitsHTML(); }
+  const weeks = 15;
+  const end = new Date();
+  const start = addDays(end, -dow(end) - (weeks - 1) * 7);
+  const cells = [];
+  for (let i = 0; i < weeks * 7; i++) {
+    const d = addDays(start, i), k = keyOf(d);
+    const cls = k > todayKey() ? 'na' : !scheduled(h, d) || d < fromKey(h.created) ? 'na' : isDone(h, k) ? 'on' : '';
+    cells.push(`<i class="${cls} ${k === todayKey() ? 'today' : ''}" title="${fmtDate(d)}"></i>`);
+  }
+  const total = Object.keys(h.log).length;
+  return `
+    <div class="topbar"><button class="back" id="dBack" aria-label="Back">${ICON.back}</button><h1>${esc(h.name)}</h1></div>
+    <div class="card c-${h.color}">
+      <div class="row"><span style="font-size:2rem">${esc(h.emoji)}</span><div class="spacer"><h3>${esc(h.name)}</h3><div class="meta">${daysLabel(h.days)} · since ${fmtDate(fromKey(h.created), { month: 'short', day: 'numeric', year: 'numeric' })}</div></div></div>
+      <div class="dtrack">${'<i></i>'.repeat(9)}<span class="knob" style="left:${Math.max(4, Math.min(96, rate(h) * 100))}%"></span><span class="end"></span></div>
+      <div class="meta" style="margin-top:8px">${Math.round(rate(h) * 100)}% of scheduled days in the last 30</div>
+    </div>
+    <div class="stat3">
+      <div><b class="num">${streak(h)}</b><span>Current streak</span></div>
+      <div><b class="num">${bestStreak(h)}</b><span>Best streak</span></div>
+      <div><b class="num">${total}</b><span>Times done</span></div>
+    </div>
+    <div class="card dark">
+      <h3>Last ${weeks} weeks</h3>
+      <div class="heat" style="--c:var(--${h.color})">${cells.join('')}</div>
+      <div class="row sub" style="margin-top:10px;font-size:.72rem"><span>Each column is a week, Mon at the top</span></div>
+    </div>
+    <div class="btn-row">
+      <button class="wide-btn ghost" id="dEdit">Edit habit</button>
+      <button class="wide-btn ghost danger" id="dDelete">Delete</button>
+    </div>`;
+}
+function bindHabitDetail(id) {
+  $('dBack').onclick = () => { detail = null; render(); };
+  $('dEdit').onclick = () => openHabitSheet(D.habits.find(x => x.id === id));
+  $('dDelete').onclick = () => confirmSheet('Delete this habit?', 'Its whole history will be removed. This can\'t be undone.', 'Delete habit', () => {
+    D.habits = D.habits.filter(x => x.id !== id); save(); detail = null; render(); toast('Habit deleted');
+  });
+}
+
+function openHabitSheet(h) {
+  const edit = !!h;
+  const st = h ? { ...h, days: [...h.days] } : { name: '', emoji: HABIT_EMOJI[0], color: COLORS[D.habits.length % COLORS.length], days: [0, 1, 2, 3, 4, 5, 6] };
+  const draw = () => {
+    openSheet(`
+      <h2>${edit ? 'Edit habit' : 'New habit'}</h2>
+      <label class="field"><span>Name</span><input id="hName" maxlength="40" placeholder="e.g. Meditate 10 minutes" value="${esc(st.name)}"></label>
+      <div class="field"><span>Icon</span><div class="emoji-row">${HABIT_EMOJI.map(e => `<button data-emo="${e}" class="${e === st.emoji ? 'on' : ''}">${e}</button>`).join('')}</div></div>
+      <div class="field"><span>Color</span><div class="color-row">${COLORS.map(c => `<button data-col="${c}" class="${c === st.color ? 'on' : ''}" style="background:var(--${c})" aria-label="${c}"></button>`).join('')}</div></div>
+      <div class="field"><span>Repeat on</span><div class="dow-row">${DOW.map((l, i) => `<button data-dow="${i}" class="${st.days.includes(i) ? 'on' : ''}" aria-label="${DOW_LONG[i]}">${l}</button>`).join('')}</div></div>
+      <div class="row" style="gap:6px"><button class="chip off" data-preset="all">Every day</button><button class="chip off" data-preset="wk">Weekdays</button><button class="chip off" data-preset="we">Weekends</button></div>
+      <button class="wide-btn" id="hSave">${edit ? 'Save changes' : 'Create habit'} ${ICON.arrow}</button>`);
+    const keep = () => { st.name = $('hName').value; };
+    document.querySelectorAll('[data-emo]').forEach(b => b.onclick = () => { keep(); st.emoji = b.dataset.emo; draw(); });
+    document.querySelectorAll('[data-col]').forEach(b => b.onclick = () => { keep(); st.color = b.dataset.col; draw(); });
+    document.querySelectorAll('[data-dow]').forEach(b => b.onclick = () => { keep(); const i = +b.dataset.dow; st.days = st.days.includes(i) ? st.days.filter(x => x !== i) : [...st.days, i]; draw(); });
+    document.querySelectorAll('[data-preset]').forEach(b => b.onclick = () => { keep(); st.days = { all: [0, 1, 2, 3, 4, 5, 6], wk: [0, 1, 2, 3, 4], we: [5, 6] }[b.dataset.preset]; draw(); });
+    $('hSave').onclick = () => {
+      keep();
+      if (!st.name.trim()) { toast('Give your habit a name'); $('hName').focus(); return; }
+      if (!st.days.length) { toast('Pick at least one day'); return; }
+      if (edit) Object.assign(h, { name: st.name.trim(), emoji: st.emoji, color: st.color, days: st.days.sort() });
+      else D.habits.push({ id: uid(), name: st.name.trim(), emoji: st.emoji, color: st.color, days: st.days.sort(), created: todayKey(), log: {} });
+      save(); closeSheet(); render(); toast(edit ? 'Habit updated' : 'Habit created');
+    };
+  };
+  draw();
+  setTimeout(() => !edit && $('hName') && $('hName').focus(), 50);
+}
+
+// ================= Countdowns =================
+function countdownsHTML() {
+  const list = D.countdowns.slice().sort((a, b) => {
+    const pa = cdParts(a).past, pb = cdParts(b).past;
+    return pa - pb || (pa ? new Date(b.target) - new Date(a.target) : new Date(a.target) - new Date(b.target));
+  });
+  return `
+    <div class="topbar"><h1>Countdowns</h1><button class="add-btn" id="addCd" aria-label="Add countdown">+</button></div>
+    ${list.length ? list.map(c => {
+      const p = cdParts(c);
+      return `<div class="folder cd" style="--c:var(--${p.past ? 'lime' : c.color})">
+        <span class="ic" style="font-size:1.2rem">${esc(c.emoji)}</span>
+        <div class="top"><b>${esc(c.title)}</b><button class="kebab" data-cdmenu="${c.id}" aria-label="Options for ${esc(c.title)}">${ICON.dots}</button></div>
+        <div class="date">${fmtDate(new Date(c.target), { weekday: 'short', month: 'long', day: 'numeric', year: 'numeric' })}${hasTime(c) ? ' · ' + new Date(c.target).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) : ''}</div>
+        <div class="days num" data-cd-days="${c.id}">0<small>days</small></div>
+        <div class="clock num" data-cd-clock4="${c.id}"></div>
+        <div class="dtrack" data-cd-track="${c.id}">${'<i></i>'.repeat(9)}<span class="knob"></span><span class="end"></span></div>
+      </div>`;
+    }).join('') : `<div class="card c-yellow"><h3>Count down to something</h3><div class="meta">An exam, a trip, a launch, a birthday. Add one and watch the days drop.</div><button class="pill" id="addCd2" style="margin-top:14px;background:#0b0b0b;color:#fff">+ Add a countdown</button></div>`}`;
+}
+const hasTime = (c) => { const d = new Date(c.target); return d.getHours() || d.getMinutes(); };
+function bindCountdowns() {
+  $('addCd').onclick = () => openCountdownSheet();
+  if ($('addCd2')) $('addCd2').onclick = () => openCountdownSheet();
+  document.querySelectorAll('[data-cdmenu]').forEach(b => b.onclick = () => {
+    const c = D.countdowns.find(x => x.id === b.dataset.cdmenu);
+    openSheet(`<h2>${esc(c.emoji)} ${esc(c.title)}</h2>
+      <button class="wide-btn" id="cdEdit">Edit countdown ${ICON.arrow}</button>
+      <button class="wide-btn ghost danger" id="cdDel">Delete countdown</button>`);
+    $('cdEdit').onclick = () => openCountdownSheet(c);
+    $('cdDel').onclick = () => { D.countdowns = D.countdowns.filter(x => x.id !== c.id); save(); closeSheet(); render(); toast('Countdown deleted'); };
+  });
+}
+function openCountdownSheet(c) {
+  const edit = !!c;
+  const t = c ? new Date(c.target) : addDays(new Date(), 30);
+  const st = c ? { ...c } : { title: '', emoji: CD_EMOJI[0], color: COLORS[(D.countdowns.length + 1) % COLORS.length] };
+  st.date = keyOf(t); st.time = c && hasTime(c) ? `${pad(t.getHours())}:${pad(t.getMinutes())}` : '';
+  const draw = () => {
+    openSheet(`
+      <h2>${edit ? 'Edit countdown' : 'New countdown'}</h2>
+      <label class="field"><span>What are you counting down to?</span><input id="cTitle" maxlength="40" placeholder="e.g. Final exams" value="${esc(st.title)}"></label>
+      <div class="grid2">
+        <label class="field"><span>Date</span><input id="cDate" type="date" value="${st.date}"></label>
+        <label class="field"><span>Time (optional)</span><input id="cTime" type="time" value="${st.time}"></label>
+      </div>
+      <div class="field"><span>Icon</span><div class="emoji-row">${CD_EMOJI.map(e => `<button data-emo="${e}" class="${e === st.emoji ? 'on' : ''}">${e}</button>`).join('')}</div></div>
+      <div class="field"><span>Color</span><div class="color-row">${COLORS.map(x => `<button data-col="${x}" class="${x === st.color ? 'on' : ''}" style="background:var(--${x})" aria-label="${x}"></button>`).join('')}</div></div>
+      <button class="wide-btn" id="cSave">${edit ? 'Save changes' : 'Start countdown'} ${ICON.arrow}</button>`);
+    const keep = () => { st.title = $('cTitle').value; st.date = $('cDate').value; st.time = $('cTime').value; };
+    document.querySelectorAll('[data-emo]').forEach(b => b.onclick = () => { keep(); st.emoji = b.dataset.emo; draw(); });
+    document.querySelectorAll('[data-col]').forEach(b => b.onclick = () => { keep(); st.color = b.dataset.col; draw(); });
+    $('cSave').onclick = () => {
+      keep();
+      if (!st.title.trim()) { toast('Give it a name'); $('cTitle').focus(); return; }
+      if (!st.date) { toast('Pick a date'); return; }
+      const [y, m, d] = st.date.split('-').map(Number);
+      const [hh, mm] = (st.time || '00:00').split(':').map(Number);
+      const target = new Date(y, m - 1, d, hh, mm).toISOString();
+      if (edit) Object.assign(c, { title: st.title.trim(), emoji: st.emoji, color: st.color, target });
+      else D.countdowns.push({ id: uid(), title: st.title.trim(), emoji: st.emoji, color: st.color, target, created: new Date().toISOString() });
+      save(); closeSheet(); if (tab !== 'countdowns') tab = 'countdowns'; render(); toast(edit ? 'Countdown updated' : 'Countdown started');
+    };
+  };
+  draw();
+}
+
+// Live update every second (only the numbers, so typing elsewhere is never interrupted)
+function tick() {
+  for (const c of D.countdowns) {
+    const p = cdParts(c);
+    document.querySelectorAll(`[data-cd-days="${c.id}"]`).forEach(el => { el.innerHTML = p.past ? `Done<small>${p.days ? p.days + ' day' + (p.days === 1 ? '' : 's') + ' ago' : 'today'}</small>` : `${p.days}<small>day${p.days === 1 ? '' : 's'}</small>`; });
+    document.querySelectorAll(`[data-cd-clock="${c.id}"]`).forEach(el => { el.textContent = p.past ? '🎉 It\'s here' : `${pad(p.h)}:${pad(p.m)}:${pad(p.s)} left`; });
+    document.querySelectorAll(`[data-cd-clock4="${c.id}"]`).forEach(el => {
+      el.innerHTML = p.past ? '' : [['days', p.days], ['hrs', p.h], ['min', p.m], ['sec', p.s]].map(([l, v]) => `<span>${l === 'days' ? v : pad(v)}<small>${l}</small></span>`).join('');
+    });
+    document.querySelectorAll(`[data-cd-track="${c.id}"] .knob`).forEach(el => { el.style.left = `calc(${(p.past ? 1 : p.pct) * 100}% * .86 + 7%)`; });
+  }
+}
+setInterval(tick, 1000);
+
+// ================= Journal =================
+function journalHTML() {
+  const k = journalDay, d = fromKey(k), e = entry(k);
+  const isToday = k === todayKey();
+  const recent = Object.keys(D.journal).sort().reverse().slice(0, 12);
+  const moodVals = Array.from({ length: 14 }, (_, i) => { const x = D.journal[keyOf(addDays(new Date(), i - 13))]; return x && x.mood >= 0 ? x.mood : null; });
+  return `
+    <div class="topbar"><h1>Journal</h1><span class="pill ghost num" title="Days in a row with an entry">🔥 ${journalStreak()}</span></div>
+    <div class="daynav">
+      <button class="circle" id="jPrev" aria-label="Previous day">${ICON.left}</button>
+      <div class="lbl"><b>${isToday ? 'Today' : fmtDate(d, { weekday: 'long' })}</b><span class="sub">${fmtDate(d, { month: 'long', day: 'numeric', year: 'numeric' })}</span></div>
+      <button class="circle" id="jNext" aria-label="Next day" ${isToday ? 'disabled style="opacity:.3"' : ''}>${ICON.right}</button>
+    </div>
+
+    <div class="card c-yellow">
+      <svg class="starburst" viewBox="0 0 100 100" style="position:absolute;right:14px;top:12px;width:40px;height:40px" aria-hidden="true">${starburst(12, 50, 8, '#0b0b0b')}</svg>
+      <h3>How was ${isToday ? 'today' : 'this day'}?</h3>
+      <div class="meta" id="moodName">${e.mood >= 0 ? MOOD_NAMES[e.mood] : 'Pick a mood'}</div>
+      <div class="moods">${MOODS.map((m, i) => `<button data-mood="${i}" class="${e.mood === i ? 'on' : ''}" aria-label="${MOOD_NAMES[i]}">${m}</button>`).join('')}</div>
+    </div>
+
+    <div class="card c-pink">
+      <h3>Top 3 focus</h3>
+      <div class="meta">The three things that would make ${isToday ? 'today' : 'this day'} a win</div>
+      ${[0, 1, 2].map(i => `<div class="focus-item">
+        <button class="check ${e.done[i] ? 'on' : ''}" data-fdone="${i}" aria-label="Mark focus ${i + 1} done" aria-pressed="${e.done[i]}">${ICON.check}</button>
+        <input data-focus="${i}" maxlength="80" placeholder="Focus ${i + 1}" value="${esc(e.focus[i])}">
+      </div>`).join('')}
+    </div>
+
+    <div class="card dark stack" style="gap:10px">
+      <label class="field"><span>Notes</span><textarea id="jNotes" placeholder="${esc(PROMPTS[d.getDate() % PROMPTS.length])}">${esc(e.notes)}</textarea></label>
+      <label class="field"><span>Grateful for</span><input id="jGrateful" maxlength="120" placeholder="One thing you're grateful for" value="${esc(e.grateful)}"></label>
+      <div class="saved" id="savedNote">${D.journal[k] ? 'Saved on this device' : 'Saves automatically as you type'}</div>
+    </div>
+
+    <div class="card dark chart-card">
+      <div class="row"><h3 class="spacer">Mood, last 14 days</h3><span class="sub">${moodVals.filter(v => v != null).length} entries</span></div>
+      ${moodChart(moodVals)}
+      <div class="chart-x"><span>${fmtDate(addDays(new Date(), -13), { month: 'short', day: 'numeric' })}</span><span>Today</span></div>
+    </div>
+
+    <div class="section-title"><h2>Past entries</h2></div>
+    <div class="stack" style="gap:8px">${recent.length ? recent.map(rk => {
+      const r = D.journal[rk];
+      const snippet = r.notes.trim() || r.focus.filter(Boolean).join(' · ') || r.grateful || 'Mood only';
+      return `<button class="entry" data-entry="${rk}"><span class="m">${r.mood >= 0 ? MOODS[r.mood] : '📝'}</span><span class="t"><b>${rk === todayKey() ? 'Today' : fmtDate(fromKey(rk), { weekday: 'short', month: 'short', day: 'numeric' })}</b><span>${esc(snippet)}</span></span>${ICON.right}</button>`;
+    }).join('') : '<div class="empty">Your entries will show up here.</div>'}</div>`;
+}
+function moodChart(vals) {
+  const W = 300, H = 120, pts = [];
+  vals.forEach((v, i) => { if (v != null) pts.push([i / (vals.length - 1) * (W - 20) + 10, H - 14 - v / 4 * (H - 28)]); });
+  const grid = [0, 1, 2, 3, 4].map(i => { const y = H - 14 - i / 4 * (H - 28); return `<line x1="0" x2="${W}" y1="${y}" y2="${y}" stroke="#222" stroke-dasharray="3 5"/>`; }).join('');
+  const last = pts[pts.length - 1];
+  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-label="Mood chart">${grid}
+    ${pts.length > 1 ? `<polyline points="${pts.map(p => p.join(',')).join(' ')}" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>` : ''}
+    ${pts.map(p => `<circle cx="${p[0]}" cy="${p[1]}" r="3.5" fill="var(--green)"/>`).join('')}
+    ${last ? `<circle cx="${last[0]}" cy="${last[1]}" r="6" fill="var(--yellow)" stroke="#000" stroke-width="2"/>` : ''}
+  </svg>${pts.length ? '' : '<div class="empty" style="padding:4px">Pick a mood each day to see your trend.</div>'}`;
+}
+let saveTimer = null;
+function bindJournal() {
+  const k = journalDay;
+  const e = entry(k);
+  const commit = (rerender) => {
+    putEntry(k, e);
+    $('savedNote').textContent = D.journal[k] ? 'Saved on this device ✓' : 'Saves automatically as you type';
+    if (rerender) render();
+  };
+  $('jPrev').onclick = () => { journalDay = keyOf(addDays(fromKey(k), -1)); render(); };
+  $('jNext').onclick = () => { if (k < todayKey()) { journalDay = keyOf(addDays(fromKey(k), 1)); render(); } };
+  document.querySelectorAll('[data-mood]').forEach(b => b.onclick = () => { e.mood = e.mood === +b.dataset.mood ? -1 : +b.dataset.mood; commit(true); });
+  document.querySelectorAll('[data-fdone]').forEach(b => b.onclick = () => {
+    const i = +b.dataset.fdone;
+    if (!e.focus[i].trim()) { toast('Write the focus first'); document.querySelector(`[data-focus="${i}"]`).focus(); return; }
+    e.done[i] = !e.done[i]; commit(false);
+    b.classList.toggle('on', e.done[i]); b.setAttribute('aria-pressed', e.done[i]);
+  });
+  const debounced = () => { clearTimeout(saveTimer); $('savedNote').textContent = 'Saving…'; saveTimer = setTimeout(() => commit(false), 400); };
+  document.querySelectorAll('[data-focus]').forEach(inp => inp.oninput = () => { e.focus[+inp.dataset.focus] = inp.value; if (!inp.value.trim()) e.done[+inp.dataset.focus] = false; debounced(); });
+  $('jNotes').oninput = (ev) => { e.notes = ev.target.value; debounced(); };
+  $('jGrateful').oninput = (ev) => { e.grateful = ev.target.value; debounced(); };
+  document.querySelectorAll('[data-entry]').forEach(b => b.onclick = () => { journalDay = b.dataset.entry; render(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+}
+
+// ================= Sheets =================
+function openSheet(html) {
+  $('sheetRoot').innerHTML = `<div class="sheet-bg" id="sheetBg"><div class="sheet" role="dialog" aria-modal="true"><div class="grab"></div>${html}</div></div>`;
+  $('sheetBg').onclick = (e) => { if (e.target.id === 'sheetBg') closeSheet(); };
+}
+function closeSheet() { $('sheetRoot').innerHTML = ''; }
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && $('sheetRoot').innerHTML) closeSheet(); });
+function confirmSheet(title, body, label, fn) {
+  openSheet(`<h2>${esc(title)}</h2><p style="margin:0;color:var(--muted)">${esc(body)}</p>
+    <div class="btn-row"><button class="wide-btn ghost" id="cfNo">Cancel</button><button class="wide-btn" id="cfYes" style="background:#ff6b6b">${esc(label)}</button></div>`);
+  $('cfNo').onclick = closeSheet;
+  $('cfYes').onclick = () => { closeSheet(); fn(); };
+}
+
+function openSettings() {
+  openSheet(`
+    <h2>Settings</h2>
+    <label class="field"><span>Your name</span><input id="sName" maxlength="24" value="${esc(D.name)}"></label>
+    <button class="wide-btn" id="sSave">Save name ${ICON.arrow}</button>
+    <div class="field"><span>Backup</span>
+      <div class="btn-row"><button class="wide-btn ghost" id="sExport">Download backup</button><button class="wide-btn ghost" id="sImport">Restore backup</button></div>
+      <input type="file" id="sFile" accept="application/json,.json" class="hidden">
+    </div>
+    <p style="margin:0;color:var(--muted);font-size:.85rem">Your habits, countdowns and journal are stored only in this browser. Download a backup now and then so you don't lose them.</p>
+    <button class="wide-btn ghost danger" id="sReset">Erase everything</button>`);
+  $('sSave').onclick = () => { const n = $('sName').value.trim(); if (!n) return; D.name = n; save(); closeSheet(); render(); toast('Name updated'); };
+  $('sExport').onclick = () => {
+    const blob = new Blob([JSON.stringify(D, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = `dayflow-backup-${todayKey()}.json`;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+    toast('Backup downloaded');
+  };
+  $('sImport').onclick = () => $('sFile').click();
+  $('sFile').onchange = async (e) => {
+    const f = e.target.files[0]; if (!f) return;
+    try {
+      const data = JSON.parse(await f.text());
+      if (!data || !Array.isArray(data.habits) || !Array.isArray(data.countdowns) || typeof data.journal !== 'object') throw new Error('bad');
+      D = data; save(); closeSheet(); render(); toast('Backup restored');
+    } catch { toast('That file isn\'t a Dayflow backup'); }
+  };
+  $('sReset').onclick = () => confirmSheet('Erase everything?', 'All habits, countdowns and journal entries on this device will be deleted. Download a backup first if you want to keep them.', 'Erase', () => {
+    D = { name: '', habits: [], countdowns: [], journal: {} }; save(); tab = 'home'; render();
+  });
+}
+
+// Re-render at midnight so "today" rolls over
+let lastDay = todayKey();
+setInterval(() => { if (todayKey() !== lastDay) { lastDay = todayKey(); habitDay = journalDay = lastDay; if (!$('sheetRoot').innerHTML && document.activeElement.tagName !== 'TEXTAREA' && document.activeElement.tagName !== 'INPUT') render(); } }, 30000);
+
+window.__dj = { get D() { return D; }, streak, bestStreak, render };
+render();
+})();
+</script>
+</body>
+</html>

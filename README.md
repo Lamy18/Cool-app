@@ -56,3 +56,13 @@ An incremental anime card-collecting game. Character art and names load live fro
 - Pity meters: a guaranteed Legendary+ within 100 cards and Mythic within 400
 - Series sets: own every character from a show for +5% income per completed set
 - A free Premium pack every 4 hours, ×5 multi-opens, favorites with a Showcase, 14 achievements and collection search
+
+# Dayflow Journal 📓 (`/journal/`)
+
+A productivity journal with a dark, neon-card look.
+
+- **Countdowns**: count down to any date and time with live days / hours / minutes / seconds and a progress track
+- **Habit tracker**: create habits with an icon, color and the weekdays they repeat on; tick them off (including past days), see streaks, best streaks, 30-day rate and a 15-week heatmap
+- **Daily journal**: mood picker, top-3 focus tasks you can check off, notes and gratitude, autosaved; a 14-day mood chart and past entries
+- **Home dashboard**: today's progress, next countdown, today's habits, journal prompt and stats
+- Everything is stored in your browser; download or restore a backup from Settings

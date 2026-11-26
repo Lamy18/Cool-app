@@ -1,0 +1,1254 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Holo Pull</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Nunito:wght@400;600;700;800&family=Caveat:wght@700&display=swap" rel="stylesheet">
+<style>
+  /* Layout: sticky header with coins, segmented tabs, then a shop / collection / index view.
+     Pack opening and the 3D viewer are full-screen stages on top. */
+  :root {
+    --bg: #0d0b1e;
+    --panel: #17142e;
+    --panel-2: #221d42;
+    --line: #322b5e;
+    --text: #f3efff;
+    --muted: #a59fc9;
+    --pink: #ff4fa3;
+    --cyan: #5ce1ff;
+    --gold: #ffcf4a;
+    --c-common: #b8c2d6;
+    --c-rare: #4ab3ff;
+    --c-epic: #b06bff;
+    --c-legendary: #ffc93c;
+    --c-mythic: #ff5fb4;
+    --display: "Chakra Petch", "Segoe UI", system-ui, sans-serif;
+    --body: "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --script: "Caveat", "Brush Script MT", cursive;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background:
+      radial-gradient(900px 500px at 15% -10%, rgba(255,79,163,.18), transparent 60%),
+      radial-gradient(800px 500px at 100% 0%, rgba(92,225,255,.14), transparent 55%),
+      var(--bg);
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    min-height: 100vh;
+    padding: 0 max(16px, env(safe-area-inset-right)) 60px max(16px, env(safe-area-inset-left));
+  }
+  button { font: inherit; color: inherit; border: 0; background: none; cursor: pointer; }
+  button:disabled { opacity: .45; cursor: not-allowed; }
+  button:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+  .hidden { display: none !important; }
+  .num { font-family: var(--display); font-variant-numeric: tabular-nums; }
+  main { max-width: 1100px; margin: 0 auto; }
+
+  /* ---------- Header ---------- */
+  header {
+    position: sticky; top: 0; z-index: 30; margin: 0 -16px; padding: 12px 16px;
+    padding-top: calc(12px + env(safe-area-inset-top));
+    background: rgba(13,11,30,.82); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--line);
+  }
+  .hwrap { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .logo { font-family: var(--display); font-weight: 700; font-size: 1.35rem; letter-spacing: .02em; }
+  .logo span { background: linear-gradient(90deg, var(--pink), var(--cyan)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .wallet { margin-left: auto; text-align: right; line-height: 1.1; }
+  .wallet .coins { font-size: 1.5rem; font-weight: 700; color: var(--gold); }
+  .wallet .rate { font-size: .82rem; color: var(--muted); }
+  .icon-btn { width: 38px; height: 38px; border-radius: 12px; background: var(--panel-2); display: grid; place-items: center; font-size: 1.05rem; }
+  .tabs { max-width: 1100px; margin: 12px auto 0; display: flex; gap: 6px; background: var(--panel); padding: 5px; border-radius: 14px; border: 1px solid var(--line); }
+  .tabs button { flex: 1; padding: 9px 6px; border-radius: 10px; font-weight: 700; color: var(--muted); font-size: .95rem; }
+  .tabs button.on { background: var(--panel-2); color: var(--text); box-shadow: inset 0 0 0 1px var(--line); }
+
+  section.view { margin-top: 18px; }
+  h2 { font-family: var(--display); font-size: 1.3rem; margin: 22px 0 12px; letter-spacing: .01em; }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 16px; }
+
+  /* ---------- Tap card ---------- */
+  .tap-row { display: grid; grid-template-columns: auto 1fr; gap: 18px; align-items: center; }
+  .tap-card { width: 116px; aspect-ratio: 63/88; border-radius: 10px; position: relative; transition: transform .08s; touch-action: manipulation; }
+  .tap-card:active { transform: scale(.94) rotate(-2deg); }
+  .tap-card .cardback { position: absolute; inset: 0; }
+  .tap-info b { font-family: var(--display); font-size: 1.15rem; display: block; }
+  .tap-info p { margin: 4px 0 0; color: var(--muted); font-size: .9rem; }
+  .floaty { position: fixed; pointer-events: none; font-family: var(--display); font-weight: 700; color: var(--gold); z-index: 90; animation: floatUp .9s ease-out forwards; text-shadow: 0 2px 8px rgba(0,0,0,.6); }
+  @keyframes floatUp { to { transform: translateY(-60px); opacity: 0; } }
+
+  /* ---------- Packs in shop ---------- */
+  .packs { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px; }
+  .pack-item { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 14px; display: grid; gap: 10px; justify-items: center; text-align: center; }
+  .pack-item .pack { width: 104px; }
+  .pack-item b { font-family: var(--display); font-size: 1.02rem; }
+  .odds { font-size: .72rem; color: var(--muted); line-height: 1.45; }
+  .odds i { font-style: normal; font-weight: 800; }
+  .buy-btn { width: 100%; border-radius: 12px; padding: 10px; font-weight: 800; background: linear-gradient(90deg, var(--pink), #b06bff); }
+  .buy-btn .num { font-weight: 700; }
+
+  /* ---------- Upgrades ---------- */
+  .upgrades { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px; }
+  .upg { display: flex; align-items: center; gap: 12px; background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 12px; text-align: left; width: 100%; }
+  .upg .ic { width: 44px; height: 44px; border-radius: 12px; background: var(--panel-2); display: grid; place-items: center; font-size: 1.35rem; flex-shrink: 0; }
+  .upg .t { flex: 1; min-width: 0; }
+  .upg .t b { display: block; }
+  .upg .t span { font-size: .8rem; color: var(--muted); }
+  .upg .cost { font-family: var(--display); font-weight: 700; color: var(--gold); white-space: nowrap; font-size: .95rem; text-align: right; }
+  .upg .cost small { display: block; color: var(--muted); font-family: var(--body); font-size: .72rem; font-weight: 600; }
+  .upg:not(:disabled):hover { border-color: var(--cyan); }
+
+  /* ---------- Collection ---------- */
+  .toolbar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 14px; }
+  .chip { border-radius: 999px; padding: 7px 12px; background: var(--panel); border: 1px solid var(--line); font-weight: 700; font-size: .82rem; color: var(--muted); }
+  .chip.on { color: var(--text); border-color: var(--text); }
+  select { font: inherit; background: var(--panel); color: var(--text); border: 1px solid var(--line); border-radius: 999px; padding: 7px 12px; font-weight: 700; font-size: .82rem; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
+  @media (max-width: 520px) { .grid { grid-template-columns: repeat(3, 1fr); gap: 8px; } }
+  .slot { position: relative; cursor: pointer; transition: transform .15s; }
+  .slot:hover { transform: translateY(-4px); }
+  .count { position: absolute; top: -6px; right: -6px; z-index: 5; background: var(--text); color: var(--bg); border-radius: 999px; padding: 2px 8px; font-family: var(--display); font-weight: 700; font-size: .78rem; }
+  .new-badge { position: absolute; top: -8px; left: -6px; z-index: 5; background: var(--pink); color: #fff; border-radius: 999px; padding: 2px 8px; font-family: var(--display); font-weight: 700; font-size: .72rem; }
+  .empty { color: var(--muted); padding: 30px 0; text-align: center; }
+
+  /* ---------- Index ---------- */
+  .tiers { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 12px; }
+  .tier-card { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 16px; }
+  .tier-card b { font-family: var(--display); font-size: 1.05rem; }
+  .bar { height: 10px; border-radius: 999px; background: var(--panel-2); overflow: hidden; margin: 10px 0 6px; }
+  .bar div { height: 100%; border-radius: 999px; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+  .stat { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 14px; }
+  .stat b { display: block; font-family: var(--display); font-size: 1.4rem; }
+  .stat span { color: var(--muted); font-size: .82rem; }
+
+  /* ======================================================
+     CARD
+     ====================================================== */
+  .card {
+    --frame: linear-gradient(135deg, #6f7890, #d9e0ee, #7d869e, #eef2fa, #6f7890);
+    --el: #888;
+    --mx: 50%; --my: 50%;
+    position: relative; width: 100%; aspect-ratio: 63/88; border-radius: 6% / 4.3%;
+    padding: 2.6%; background: var(--frame); background-size: 300% 300%;
+    container-type: inline-size; user-select: none; -webkit-user-select: none;
+  }
+  .card-inner {
+    position: relative; height: 100%; border-radius: 4.6% / 3.3%; overflow: hidden;
+    background: linear-gradient(170deg, #1c1838, #0f0c22 60%);
+    display: flex; flex-direction: column; isolation: isolate;
+  }
+  .art { position: relative; flex: 1 1 auto; min-height: 0; margin: 4cqw 4cqw 0; border-radius: 3cqw; overflow: hidden;
+    background: radial-gradient(circle at 50% 30%, color-mix(in srgb, var(--el) 70%, #fff), color-mix(in srgb, var(--el) 40%, #000)); }
+  .art img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 18%; display: block; }
+  .art .fallback { position: absolute; inset: 0; display: grid; place-items: center; font-family: var(--display); font-size: 22cqw; color: rgba(255,255,255,.8); }
+  .top-row { position: absolute; top: 6cqw; left: 6cqw; right: 6cqw; display: flex; justify-content: space-between; z-index: 4; pointer-events: none; }
+  .pip { background: rgba(10,8,25,.72); border-radius: 999px; padding: .8cqw 2.8cqw; font-family: var(--display); font-weight: 700; font-size: 4.6cqw; display: flex; align-items: center; gap: 1cqw; border: .5cqw solid rgba(255,255,255,.2); }
+  .info { position: relative; z-index: 3; padding: 3cqw 5cqw 4.5cqw; display: grid; gap: .8cqw; }
+  .name { font-family: var(--display); font-weight: 700; font-size: 7.6cqw; line-height: 1.08; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .series { font-size: 4.4cqw; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .meta { display: flex; justify-content: space-between; align-items: center; font-size: 4.6cqw; font-weight: 800; }
+  .stars { letter-spacing: .3cqw; }
+  .inc { font-family: var(--display); color: var(--gold); }
+  .tchips { display: flex; flex-wrap: wrap; gap: 1.2cqw; min-height: 6cqw; }
+  .tchip { font-size: 3.6cqw; font-weight: 800; padding: .3cqw 2.2cqw; border-radius: 999px; background: rgba(255,255,255,.12); white-space: nowrap; }
+  .rlabel { font-family: var(--display); font-size: 3.8cqw; letter-spacing: .12em; font-weight: 700; }
+
+  .holo, .glare, .sparkles, .signature, .first-ed { position: absolute; pointer-events: none; }
+  .holo { inset: 0; z-index: 5; opacity: 0; mix-blend-mode: color-dodge;
+    background: repeating-linear-gradient(115deg, #ff0080 0%, #ffd000 7%, #00ffb3 14%, #00b3ff 21%, #b300ff 28%, #ff0080 35%);
+    background-size: 220% 220%; background-position: var(--mx) var(--my); }
+  .glare { inset: 0; z-index: 6; opacity: 0; mix-blend-mode: overlay; transition: opacity .2s;
+    background: radial-gradient(circle at var(--mx) var(--my), rgba(255,255,255,.85), rgba(255,255,255,0) 55%); }
+  .card:hover .glare, .card.lit .glare { opacity: .7; }
+
+  /* Rarity frames */
+  .r-1 { --frame: linear-gradient(135deg, #1d5fa8, #7fd0ff, #2a76c9, #bde8ff, #1d5fa8); box-shadow: 0 0 14px rgba(74,179,255,.35); }
+  .r-2 { --frame: linear-gradient(135deg, #5a1fa8, #d29bff, #7a2fd1, #f0d4ff, #5a1fa8); box-shadow: 0 0 18px rgba(176,107,255,.45); animation: frameShift 5s linear infinite; }
+  .r-3 { --frame: linear-gradient(135deg, #a86b00, #ffe27a, #d18f00, #fff6c8, #a86b00); box-shadow: 0 0 22px rgba(255,201,60,.55); animation: frameShift 3.5s linear infinite; }
+  .r-4 { --frame: linear-gradient(135deg, #ff3d7f, #ffb13d, #f9ff3d, #3dffb1, #3dc5ff, #a03dff, #ff3d7f); box-shadow: 0 0 28px rgba(255,95,180,.6); animation: frameShift 2.2s linear infinite; }
+  .r-4 .holo { opacity: .22; }
+  @keyframes frameShift { 0% { background-position: 0% 50%; } 100% { background-position: 300% 50%; } }
+  .r-0 .rlabel { color: var(--c-common); } .r-1 .rlabel { color: var(--c-rare); } .r-2 .rlabel { color: var(--c-epic); }
+  .r-3 .rlabel { color: var(--c-legendary); } .r-4 .rlabel { background: linear-gradient(90deg, #ff3d7f, #ffd23d, #3dffb1, #3dc5ff, #c03dff); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+  /* Editions (override frames) */
+  .e-holo .holo { opacity: .42; }
+  .e-gold { --frame: linear-gradient(135deg, #7a5200, #ffe58a, #b8860b, #fff3b0, #8a6200); animation: frameShift 3s linear infinite; box-shadow: 0 0 24px rgba(255,207,74,.6); }
+  .e-gold .card-inner { background: linear-gradient(170deg, #3a2a06, #1a1203 60%); }
+  .e-gold .holo { opacity: 1; mix-blend-mode: overlay; background: linear-gradient(115deg, transparent 30%, rgba(255,232,150,.75) 45%, transparent 60%); background-size: 250% 250%; }
+  .e-gold .name, .e-gold .series { color: #ffe9a8; }
+  .e-prismatic { --frame: linear-gradient(135deg, #ff3d7f, #ffb13d, #f9ff3d, #3dffb1, #3dc5ff, #a03dff, #ff3d7f); animation: frameShift 1.4s linear infinite; box-shadow: 0 0 30px rgba(92,225,255,.6), 0 0 60px rgba(255,79,163,.35); }
+  .e-prismatic .holo { opacity: .65; animation: prism 3s linear infinite; }
+  @keyframes prism { to { filter: hue-rotate(360deg); } }
+  .e-negative .art img { filter: invert(1) hue-rotate(180deg) saturate(1.3); }
+  .e-negative .card-inner { background: linear-gradient(170deg, #e9e6f5, #c9c3e3); color: #120f24; }
+  .e-negative .series { color: #4a4470; }
+  .e-shadow .art img { filter: grayscale(1) contrast(1.35) brightness(.8); }
+  .e-shadow .art::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(120,40,255,.15), rgba(60,0,120,.55)); mix-blend-mode: multiply; }
+  .e-shadow { --frame: linear-gradient(135deg, #12002a, #6b2bd6, #12002a, #3a0a7a, #12002a); box-shadow: 0 0 26px rgba(120,40,255,.7); animation: frameShift 4s linear infinite; }
+  .e-glitch .art img { animation: glitch 2.6s steps(1) infinite; }
+  @keyframes glitch {
+    0%, 100% { transform: none; filter: none; clip-path: none; }
+    7% { transform: translate(-3%, 1%); filter: hue-rotate(90deg) saturate(2); clip-path: inset(10% 0 55% 0); }
+    9% { transform: translate(3%, -1%); filter: hue-rotate(-90deg); clip-path: inset(50% 0 20% 0); }
+    11% { transform: none; filter: none; clip-path: none; }
+    61% { transform: translate(2%, 0) skewX(6deg); filter: hue-rotate(180deg) contrast(1.6); }
+    63% { transform: none; filter: none; }
+  }
+  .e-glitch { --frame: repeating-linear-gradient(90deg, #00ffd0 0 6%, #ff00aa 6% 12%, #1b1838 12% 18%); animation: frameShift 1s steps(4) infinite; }
+
+  /* Traits */
+  .t-fullart .art { position: absolute; inset: 0; margin: 0; border-radius: 0; }
+  .t-fullart .info { margin-top: auto; background: linear-gradient(180deg, transparent, rgba(8,6,20,.88) 35%); padding-top: 14cqw; }
+  .t-fullart.e-negative .info { background: linear-gradient(180deg, transparent, rgba(240,238,250,.92) 35%); }
+  .t-misprint .art img { transform: translate(4%, 3%) rotate(-2deg) scale(1.08); }
+  .t-misprint .name { text-shadow: 1cqw 0 0 rgba(255,0,120,.7), -1cqw 0 0 rgba(0,220,255,.7); }
+  .signature { right: 6cqw; bottom: 3cqw; font-family: var(--script); font-size: 11cqw; color: #fff; transform: rotate(-12deg); text-shadow: 0 0 2cqw rgba(0,0,0,.8); z-index: 4; opacity: .92; }
+  .first-ed { left: 6cqw; bottom: 3cqw; z-index: 4; width: 11cqw; height: 11cqw; border-radius: 50%; background: #111; border: .7cqw solid #fff; color: #fff; display: grid; place-items: center; font-family: var(--display); font-weight: 700; font-size: 4cqw; }
+  .sparkles { inset: 0; z-index: 6; }
+  .sparkles i { position: absolute; width: 5cqw; height: 5cqw; background: radial-gradient(circle, #fff 0 18%, transparent 60%); animation: twinkle 2.2s ease-in-out infinite; }
+  .sparkles i::before, .sparkles i::after { content: ""; position: absolute; left: 50%; top: 0; bottom: 0; width: 12%; transform: translateX(-50%); background: linear-gradient(transparent, #fff, transparent); }
+  .sparkles i::after { transform: translateX(-50%) rotate(90deg); }
+  @keyframes twinkle { 0%, 100% { opacity: 0; transform: scale(.3) rotate(0); } 50% { opacity: 1; transform: scale(1) rotate(45deg); } }
+
+  /* Card back */
+  .cardback {
+    width: 100%; aspect-ratio: 63/88; border-radius: 6% / 4.3%; padding: 3%;
+    background: linear-gradient(135deg, #b8c2d6, #ffffff, #7d869e); position: relative; container-type: inline-size;
+  }
+  .cardback > div {
+    height: 100%; border-radius: 5% / 3.6%; position: relative; overflow: hidden;
+    background:
+      repeating-conic-gradient(from 0deg at 50% 50%, rgba(255,255,255,.06) 0 10deg, transparent 10deg 20deg),
+      radial-gradient(circle at 50% 50%, #3b1f7a, #140f30 70%);
+    display: grid; place-items: center;
+  }
+  .cardback .emblem { width: 46cqw; height: 46cqw; border-radius: 50%; display: grid; place-items: center;
+    background: conic-gradient(from 0deg, var(--pink), var(--cyan), #b06bff, var(--pink)); box-shadow: 0 0 10cqw rgba(255,79,163,.5); }
+  .cardback .emblem span { width: 84%; height: 84%; border-radius: 50%; background: #140f30; display: grid; place-items: center; font-family: var(--display); font-weight: 700; font-size: 13cqw; letter-spacing: .04em; }
+  .cardback .ring { position: absolute; inset: 8cqw; border: .8cqw dashed rgba(255,255,255,.18); border-radius: 4cqw; }
+
+  /* ======================================================
+     PACK
+     ====================================================== */
+  .pack { --c1: #4ab3ff; --c2: #7a5cff; position: relative; aspect-ratio: 5/8; border-radius: 10px;
+    background: linear-gradient(150deg, var(--c1), var(--c2)); overflow: visible;
+    box-shadow: 0 14px 30px rgba(0,0,0,.45), inset 0 0 0 2px rgba(255,255,255,.25); container-type: inline-size; }
+  .pack::before { /* foil sheen */
+    content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+    background: linear-gradient(115deg, transparent 20%, rgba(255,255,255,.55) 32%, transparent 44%, transparent 60%, rgba(255,255,255,.3) 68%, transparent 76%);
+    background-size: 300% 100%; animation: sheen 3.5s ease-in-out infinite; mix-blend-mode: overlay; }
+  @keyframes sheen { 0% { background-position: 100% 0; } 100% { background-position: -100% 0; } }
+  .pack .crimp { position: absolute; left: 0; right: 0; height: 6%; background: repeating-linear-gradient(90deg, rgba(255,255,255,.35) 0 4%, rgba(0,0,0,.15) 4% 8%); }
+  .pack .crimp.b { bottom: 0; border-radius: 0 0 10px 10px; }
+  .pack-top { position: absolute; left: 0; right: 0; top: 0; height: 14%; border-radius: 10px 10px 0 0; background: inherit; background: linear-gradient(150deg, var(--c1), var(--c1)); z-index: 2; }
+  .pack-top .crimp { top: 0; height: 43%; }
+  .pack-top::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; border-bottom: 2px dashed rgba(255,255,255,.6); }
+  .pack-label { position: absolute; inset: 20% 8% 12%; display: grid; place-items: center; text-align: center; align-content: center; gap: 4cqw; }
+  .pack-label .em { font-size: 34cqw; line-height: 1; filter: drop-shadow(0 0 6cqw rgba(255,255,255,.6)); }
+  .pack-label b { font-family: var(--display); font-size: 11cqw; line-height: 1.05; text-shadow: 0 2px 8px rgba(0,0,0,.4); }
+  .pack-label small { font-size: 7cqw; font-weight: 800; opacity: .9; }
+
+  /* ======================================================
+     STAGE (pack opening)
+     ====================================================== */
+  .stage { position: fixed; inset: 0; z-index: 70; background: radial-gradient(circle at 50% 45%, #1e1745, #07061a 70%); display: grid; place-items: center; overflow: hidden; }
+  .rays { position: absolute; left: 50%; top: 45%; width: 220vmax; height: 220vmax; transform: translate(-50%, -50%); pointer-events: none; opacity: .25;
+    background: repeating-conic-gradient(from 0deg, var(--ray, #5ce1ff) 0 6deg, transparent 6deg 18deg);
+    animation: spin 30s linear infinite; -webkit-mask: radial-gradient(circle, #000 0, transparent 55%); mask: radial-gradient(circle, #000 0, transparent 55%); transition: opacity .4s; }
+  @keyframes spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
+  .stage.hype .rays { opacity: .6; animation-duration: 8s; }
+  .stage-pack { width: min(230px, 56vw); cursor: pointer; position: relative; z-index: 2; transition: transform .3s; }
+  .stage-pack .pack { width: 100%; }
+  .stage-hint { position: absolute; bottom: calc(40px + env(safe-area-inset-bottom)); left: 0; right: 0; text-align: center; color: var(--muted); font-weight: 700; z-index: 3; }
+  .shake { animation: shake var(--dur, .9s) ease-in both; }
+  @keyframes shake {
+    0% { transform: none; }
+    10% { transform: translate(calc(var(--amp) * -1px), 0) rotate(calc(var(--amp) * -.4deg)); }
+    20% { transform: translate(calc(var(--amp) * 1px), 0) rotate(calc(var(--amp) * .4deg)); }
+    30% { transform: translate(calc(var(--amp) * -1.3px), 0) rotate(calc(var(--amp) * -.6deg)); }
+    40% { transform: translate(calc(var(--amp) * 1.3px), 0) rotate(calc(var(--amp) * .6deg)); }
+    50% { transform: translate(calc(var(--amp) * -1.6px), 0) rotate(calc(var(--amp) * -.8deg)) scale(1.02); }
+    60% { transform: translate(calc(var(--amp) * 1.6px), 0) rotate(calc(var(--amp) * .8deg)) scale(1.03); }
+    70% { transform: translate(calc(var(--amp) * -2px), 0) rotate(calc(var(--amp) * -1deg)) scale(1.04); }
+    80% { transform: translate(calc(var(--amp) * 2px), 0) rotate(calc(var(--amp) * 1deg)) scale(1.05); }
+    90% { transform: translate(calc(var(--amp) * -2.4px), 0) scale(1.06); }
+    100% { transform: scale(1.06); }
+  }
+  .pack-glow { position: absolute; inset: -20%; border-radius: 50%; background: radial-gradient(circle, var(--glow, transparent), transparent 65%); opacity: 0; transition: opacity .6s; z-index: -1; }
+  .charging .pack-glow { opacity: 1; animation: pulseGlow .4s ease-in-out infinite alternate; }
+  @keyframes pulseGlow { to { transform: scale(1.12); } }
+  .torn .pack-top { animation: tearOff .7s cubic-bezier(.3,.6,.4,1) forwards; }
+  @keyframes tearOff { to { transform: translate(120px, -260px) rotate(38deg); opacity: 0; } }
+  .torn .pack { animation: packDrop .7s .35s ease-in forwards; }
+  @keyframes packDrop { to { transform: translateY(70vh) rotate(8deg); opacity: 0; } }
+  .flash { position: fixed; inset: 0; background: #fff; z-index: 80; pointer-events: none; animation: flash .6s ease-out forwards; }
+  @keyframes flash { from { opacity: .95; } to { opacity: 0; } }
+  .screen-shake { animation: screenShake .5s ease-out; }
+  @keyframes screenShake { 0%,100% { transform: none; } 20% { transform: translate(-8px, 4px); } 40% { transform: translate(7px, -5px); } 60% { transform: translate(-5px, 3px); } 80% { transform: translate(3px, -2px); } }
+
+  .reveal { position: relative; z-index: 2; width: min(1000px, 100%); padding: 16px; display: grid; gap: 18px; justify-items: center; }
+  .reveal-cards { display: flex; flex-wrap: wrap; justify-content: center; gap: clamp(8px, 2vw, 18px); perspective: 1200px; width: 100%; }
+  .flip { width: clamp(96px, 28vw, 172px); cursor: pointer; animation: dealIn .5s cubic-bezier(.2,.9,.3,1.2) both; animation-delay: calc(var(--d) * 90ms); }
+  @keyframes dealIn { from { transform: translateY(60vh) rotate(calc(var(--d) * 8deg - 16deg)) scale(.6); opacity: 0; } }
+  .flip-inner { position: relative; transform-style: preserve-3d; transition: transform .65s cubic-bezier(.3,1.4,.5,1); }
+  .flip.flipped .flip-inner { transform: rotateY(180deg); }
+  .flip .face { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+  .flip .front { position: absolute; inset: 0; transform: rotateY(180deg); }
+  .flip:not(.flipped).hint-2 .cardback { box-shadow: 0 0 22px 4px var(--c-epic); animation: hintPulse .9s ease-in-out infinite alternate; }
+  .flip:not(.flipped).hint-3 .cardback { box-shadow: 0 0 28px 6px var(--c-legendary); animation: hintPulse .6s ease-in-out infinite alternate; }
+  .flip:not(.flipped).hint-4 .cardback { box-shadow: 0 0 34px 8px var(--c-mythic); animation: hintPulse .4s ease-in-out infinite alternate; }
+  @keyframes hintPulse { to { transform: translateY(-4px); } }
+  .flip .new-badge { opacity: 0; transition: opacity .3s .5s; }
+  .flip.flipped .new-badge { opacity: 1; }
+  .reveal-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+  .btn { border-radius: 14px; padding: 12px 20px; font-weight: 800; background: var(--panel-2); border: 1px solid var(--line); }
+  .btn.primary { background: linear-gradient(90deg, var(--pink), #b06bff); border: 0; }
+  .pull-title { font-family: var(--display); font-size: 1.4rem; font-weight: 700; text-align: center; min-height: 1.6em; }
+
+  /* ======================================================
+     3D VIEWER
+     ====================================================== */
+  .viewer { position: fixed; inset: 0; z-index: 75; background: radial-gradient(circle at 50% 40%, #241c52, #07061a 75%); overflow-y: auto; }
+  .viewer-wrap { min-height: 100%; display: grid; grid-template-columns: 1fr; place-items: center; gap: 18px; padding: calc(56px + env(safe-area-inset-top)) 16px 30px; max-width: 1000px; margin: 0 auto; }
+  @media (min-width: 820px) { .viewer-wrap { grid-template-columns: 1.1fr 1fr; } }
+  .scene { width: min(330px, 78vw); perspective: 1100px; touch-action: none; cursor: grab; }
+  .scene:active { cursor: grabbing; }
+  .v-card { position: relative; transform-style: preserve-3d; will-change: transform; }
+  .v-card .face { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+  .v-card .front { transform: translateZ(1.5px); }
+  .v-card .back { position: absolute; inset: 0; transform: rotateY(180deg) translateZ(1.5px); }
+  .v-card .edge { position: absolute; inset: 1%; border-radius: 6% / 4.3%; background: #2a2450; }
+  .v-shadow { width: 70%; height: 22px; margin: 26px auto 0; border-radius: 50%; background: radial-gradient(rgba(0,0,0,.6), transparent 70%); }
+  .v-panel { width: 100%; max-width: 420px; }
+  .v-panel h3 { font-family: var(--display); font-size: 1.7rem; margin: 0; line-height: 1.1; }
+  .v-panel .series { font-size: .95rem; margin-top: 4px; }
+  .v-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 16px 0; }
+  .v-stats div { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 10px; text-align: center; }
+  .v-stats b { display: block; font-family: var(--display); font-size: 1.1rem; }
+  .v-stats span { font-size: .72rem; color: var(--muted); }
+  .trait-list { display: grid; gap: 8px; }
+  .trait-row { display: flex; gap: 10px; align-items: center; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 10px 12px; }
+  .trait-row .ic { font-size: 1.3rem; }
+  .trait-row b { display: block; font-size: .95rem; }
+  .trait-row span { font-size: .8rem; color: var(--muted); }
+  .trait-row .x { margin-left: auto; font-family: var(--display); font-weight: 700; color: var(--gold); }
+  .v-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+  .close-x { position: fixed; top: calc(12px + env(safe-area-inset-top)); right: max(12px, env(safe-area-inset-right)); z-index: 80; width: 44px; height: 44px; border-radius: 50%; background: var(--panel-2); font-size: 1.2rem; border: 1px solid var(--line); }
+  .drag-hint { text-align: center; color: var(--muted); font-size: .82rem; margin-top: 6px; }
+
+  /* Modal + toast + loading */
+  .modal { position: fixed; inset: 0; z-index: 85; background: rgba(5,4,15,.7); backdrop-filter: blur(6px); display: grid; place-items: center; padding: 16px; }
+  .modal .panel { max-width: 420px; width: 100%; text-align: center; }
+  .modal h3 { font-family: var(--display); font-size: 1.4rem; margin: 6px 0 8px; }
+  .modal p { color: var(--muted); margin: 0 0 16px; }
+  .toasts { position: fixed; bottom: calc(16px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); z-index: 95; display: grid; gap: 8px; width: min(420px, calc(100% - 32px)); pointer-events: none; }
+  .toast { background: var(--panel-2); border: 1px solid var(--line); border-radius: 14px; padding: 10px 14px; font-weight: 700; font-size: .9rem; animation: toastIn .25s ease-out; }
+  @keyframes toastIn { from { transform: translateY(10px); opacity: 0; } }
+  .loading { min-height: 70vh; display: grid; place-items: center; text-align: center; gap: 14px; align-content: center; }
+  .loading .bar { width: min(320px, 80vw); }
+  .loading .bar div { background: linear-gradient(90deg, var(--pink), var(--cyan)); width: 0; transition: width .3s; }
+  canvas#fx { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 78; }
+  .credit { text-align: center; color: var(--muted); font-size: .78rem; margin-top: 30px; }
+  .credit a { color: var(--muted); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .r-2, .r-3, .r-4, .e-gold, .e-prismatic, .e-shadow, .e-glitch, .e-glitch .art img, .rays, .pack::before, .sparkles i { animation: none !important; }
+  }
+</style>
+</head>
+<body>
+<header id="header" class="hidden">
+  <div class="hwrap">
+    <div class="logo">Holo<span>Pull</span></div>
+    <div class="wallet"><div class="coins num" id="coins">0</div><div class="rate"><span id="rate" class="num">0</span>/sec</div></div>
+    <button class="icon-btn" id="muteBtn" aria-label="Toggle sound">🔊</button>
+    <button class="icon-btn" id="menuBtn" aria-label="Settings">⚙️</button>
+  </div>
+  <nav class="tabs" aria-label="Sections">
+    <button data-tab="shop" class="on">Shop</button>
+    <button data-tab="collection">Collection</button>
+    <button data-tab="index">Index</button>
+  </nav>
+</header>
+<main id="main"></main>
+<p class="credit hidden" id="credit">Character art and data from <a href="https://anilist.co" target="_blank" rel="noopener">AniList</a>. Personal fan project. <a href="../">Earshot</a> · <a href="../trader/">Candle Crawl</a></p>
+<div id="stageRoot"></div>
+<div id="viewerRoot"></div>
+<div id="modalRoot"></div>
+<canvas id="fx"></canvas>
+<div class="toasts" id="toasts"></div>
+
+<script>
+(() => {
+'use strict';
+
+// ======================= Config =======================
+const TIERS = [
+  { name: 'Common', stars: 1, income: .2, color: '#b8c2d6' },
+  { name: 'Rare', stars: 2, income: 1, color: '#4ab3ff' },
+  { name: 'Epic', stars: 3, income: 5, color: '#b06bff' },
+  { name: 'Legendary', stars: 4, income: 25, color: '#ffc93c' },
+  { name: 'Mythic', stars: 5, income: 120, color: '#ff5fb4' },
+];
+// Rank cut-offs by fan favourites: top 8 are Mythic, next 22 Legendary, etc.
+const TIER_CUTS = [8, 30, 90, 200]; // index < cut → higher tier
+
+const ELEMENTS = [
+  { name: 'Fire', icon: '🔥', color: '#ff6b4a' }, { name: 'Water', icon: '💧', color: '#4ab3ff' },
+  { name: 'Wind', icon: '🍃', color: '#5be39a' }, { name: 'Earth', icon: '🪨', color: '#c89b5a' },
+  { name: 'Light', icon: '✨', color: '#ffe066' }, { name: 'Dark', icon: '🌑', color: '#9b6bff' },
+  { name: 'Cosmic', icon: '🌌', color: '#ff6bd6' },
+];
+
+// Editions: at most one per card, rarest checked first
+const EDITIONS = [
+  { id: 'prismatic', name: 'Prismatic', icon: '🌈', chance: .008, mult: 6, desc: 'Rainbow foil that shifts color.' },
+  { id: 'glitch', name: 'Glitch', icon: '👾', chance: .012, mult: 4, desc: 'Corrupted print that flickers.' },
+  { id: 'gold', name: 'Gold', icon: '🥇', chance: .025, mult: 3, desc: 'Solid gold frame and shine.' },
+  { id: 'negative', name: 'Negative', icon: '🎞️', chance: .02, mult: 2.5, desc: 'Inverted colors.' },
+  { id: 'shadow', name: 'Shadow', icon: '🌑', chance: .02, mult: 2, desc: 'Dark aura variant.' },
+  { id: 'holo', name: 'Holo', icon: '💿', chance: .09, mult: 1.5, desc: 'Holographic foil.' },
+];
+// Extra traits: each rolls on its own, max 2
+const EXTRAS = [
+  { id: 'misprint', name: 'Misprint', icon: '🖨️', chance: .015, mult: 1.8, desc: 'Off-center print. Collectors love it.' },
+  { id: 'first', name: '1st Edition', icon: '🥇', chance: .05, mult: 1.5, desc: 'From the very first print run.' },
+  { id: 'fullart', name: 'Full Art', icon: '🖼️', chance: .04, mult: 1.4, desc: 'Art covers the whole card.' },
+  { id: 'signed', name: 'Signed', icon: '✍️', chance: .04, mult: 1.3, desc: 'Autographed.' },
+  { id: 'sparkle', name: 'Sparkle', icon: '✨', chance: .06, mult: 1.2, desc: 'Twinkling stars.' },
+];
+const TRAIT = Object.fromEntries([...EDITIONS, ...EXTRAS].map(t => [t.id, t]));
+
+const PACKS = [
+  { id: 'basic', name: 'Starter Pack', em: '✦', price: 25, c1: '#3a8bff', c2: '#7a5cff', weights: [70, 22, 6.5, 1.3, .2], min: 0 },
+  { id: 'premium', name: 'Premium Pack', em: '💠', price: 400, c1: '#b06bff', c2: '#ff4fa3', weights: [40, 38, 16, 5, 1], min: 0 },
+  { id: 'ultra', name: 'Ultra Pack', em: '🔥', price: 5000, c1: '#ff9a3d', c2: '#ff3d6b', weights: [18, 40, 30, 10, 2], min: 2 },
+  { id: 'celestial', name: 'Celestial Pack', em: '☄️', price: 80000, c1: '#2fe0c0', c2: '#a03dff', weights: [0, 25, 42, 26, 7], min: 3 },
+];
+
+const UPGRADES = [
+  { id: 'tap', name: 'Power Tap', icon: '👆', base: 40, mult: 1.65, max: 60, desc: (l) => `Each tap is stronger (level ${l}).` },
+  { id: 'fan', name: 'Fan Club', icon: '📣', base: 150, mult: 1.9, max: 40, desc: (l) => `+15% income per level (now +${l * 15}%).` },
+  { id: 'luck', name: 'Lucky Charm', icon: '🍀', base: 400, mult: 2.4, max: 10, desc: (l) => `Better rarity odds in every pack (+${l * 12}%).` },
+  { id: 'trait', name: 'Trait Hunter', icon: '🔍', base: 600, mult: 2.4, max: 10, desc: (l) => `Editions and traits show up more (+${l * 25}%).` },
+  { id: 'auto', name: 'Auto-Opener', icon: '🤖', base: 1200, mult: 2.6, max: 6, desc: (l) => l ? `Opens a Starter Pack every ${autoInterval(l).toFixed(0)}s.` : 'Opens Starter Packs for you automatically.' },
+];
+const autoInterval = (l) => 24 / l;
+
+const SAVE_KEY = 'holopull:save';
+const CHAR_KEY = 'holopull:chars';
+const CHAR_MAX_AGE = 7 * 24 * 3600 * 1000;
+
+// ======================= Helpers =======================
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const pick = (a) => a[Math.floor(Math.random() * a.length)];
+const hash = (n) => { let x = Math.imul(n, 2654435761) >>> 0; x ^= x >>> 15; return x >>> 0; };
+function fmt(n) {
+  if (n < 1000) return n < 10 ? (Math.round(n * 10) / 10).toString() : Math.floor(n).toString();
+  const units = ['K', 'M', 'B', 'T', 'Qa', 'Qi', 'Sx'];
+  let i = -1;
+  while (n >= 1000 && i < units.length - 1) { n /= 1000; i++; }
+  return (n < 100 ? n.toFixed(2) : n.toFixed(1)).replace(/\.?0+$/, '') + units[i];
+}
+const store = {
+  get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* storage full or blocked */ } },
+  del(k) { try { localStorage.removeItem(k); } catch { /* ignore */ } },
+};
+
+// ======================= State =======================
+let CHARS = [];          // [{id, name, img, fav, series, tier}]
+let BY_ID = new Map();
+let BY_TIER = [[], [], [], [], []];
+let save = null;
+let tab = 'shop';
+let filter = 'all';
+let sortBy = 'rarity';
+let showLimit = 120;
+let busy = false;        // a pack is being opened
+let autoTimer = 0;
+
+function freshSave() {
+  return { coins: 100, earned: 0, packs: 0, taps: 0, best: -1, up: { tap: 0, fan: 0, luck: 0, trait: 0, auto: 0 }, coll: {}, order: 0, lastTs: Date.now(), muted: false };
+}
+
+// ======================= Character data =======================
+const ANILIST_QUERY = `query ($page: Int) { Page(page: $page, perPage: 50) { characters(sort: FAVOURITES_DESC) {
+  id name { full } image { large } favourites media(perPage: 1, sort: POPULARITY_DESC) { nodes { title { english romaji } } } } } }`;
+
+async function fetchAniList(onProgress) {
+  const out = [];
+  const pages = 8;
+  for (let p = 1; p <= pages; p++) {
+    const r = await fetch('https://graphql.anilist.co', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify({ query: ANILIST_QUERY, variables: { page: p } }),
+    });
+    if (!r.ok) throw new Error('AniList ' + r.status);
+    const d = await r.json();
+    for (const c of d.data.Page.characters) {
+      if (!c.image?.large || /default\.jpg/.test(c.image.large)) continue;
+      const m = c.media?.nodes?.[0]?.title;
+      out.push({ id: c.id, name: c.name.full, img: c.image.large, fav: c.favourites || 0, series: m ? (m.english || m.romaji) : '' });
+    }
+    onProgress(p / pages);
+  }
+  return out;
+}
+
+async function fetchJikan(onProgress) {
+  // Backup source: MyAnimeList via Jikan (25 per page, rate limited)
+  const out = [];
+  const pages = 12;
+  for (let p = 1; p <= pages; p++) {
+    const r = await fetch(`https://api.jikan.moe/v4/top/characters?page=${p}`);
+    if (!r.ok) throw new Error('Jikan ' + r.status);
+    const d = await r.json();
+    for (const c of d.data) {
+      const img = c.images?.webp?.image_url || c.images?.jpg?.image_url;
+      if (!img || /questionmark/.test(img)) continue;
+      out.push({ id: 1e7 + c.mal_id, name: c.name, img, fav: c.favorites || 0, series: '' });
+    }
+    onProgress(p / pages);
+    await new Promise(res => setTimeout(res, 450));
+  }
+  return out;
+}
+
+function indexChars(list) {
+  list.sort((a, b) => b.fav - a.fav);
+  CHARS = list.map((c, i) => ({ ...c, tier: i < TIER_CUTS[0] ? 4 : i < TIER_CUTS[1] ? 3 : i < TIER_CUTS[2] ? 2 : i < TIER_CUTS[3] ? 1 : 0 }));
+  BY_ID = new Map(CHARS.map(c => [c.id, c]));
+  BY_TIER = [[], [], [], [], []];
+  for (const c of CHARS) BY_TIER[c.tier].push(c);
+}
+
+async function loadChars(force) {
+  const cached = store.get(CHAR_KEY);
+  if (!force && cached && cached.list?.length > 50 && Date.now() - cached.ts < CHAR_MAX_AGE) { indexChars(cached.list); return; }
+  const prog = (f) => { const b = $('loadBar'); if (b) b.style.width = Math.round(f * 100) + '%'; };
+  let list;
+  try { list = await fetchAniList(prog); }
+  catch (e) {
+    console.warn('AniList failed, trying Jikan', e);
+    $('loadMsg') && ($('loadMsg').textContent = 'Trying a backup source…');
+    list = await fetchJikan(prog);
+  }
+  if (list.length < 50) throw new Error('Not enough characters');
+  store.set(CHAR_KEY, { ts: Date.now(), list });
+  indexChars(list);
+}
+
+// ======================= Economy =======================
+const charOf = (id) => BY_ID.get(id);
+const traitMult = (traits) => traits.reduce((m, t) => m * (TRAIT[t]?.mult || 1), 1);
+const element = (id) => ELEMENTS[hash(id) % ELEMENTS.length];
+const powerOf = (c, traits) => Math.round((Math.sqrt(c.fav) * 4 + 50) * traitMult(traits));
+const cardIncome = (c, traits) => TIERS[c.tier].income * traitMult(traits);
+
+function uniqueCount() { return new Set(Object.values(save.coll).map(s => s.id)).size; }
+function income() {
+  let base = 0;
+  for (const s of Object.values(save.coll)) { const c = charOf(s.id); if (c) base += cardIncome(c, s.traits) * s.count; }
+  return base * (1 + .15 * save.up.fan) * (1 + .01 * uniqueCount());
+}
+const tapValue = () => (1 + 2 * save.up.tap) * (1 + income() * .03);
+const upgCost = (u) => Math.round(u.base * Math.pow(u.mult, save.up[u.id]));
+const sellValue = (c, traits) => Math.max(1, Math.round(cardIncome(c, traits) * 60));
+
+function packOdds(pack) {
+  const luck = 1 + .12 * save.up.luck;
+  const w = pack.weights.map((x, i) => i === 0 ? x : x * Math.pow(luck, i));
+  const total = w.reduce((a, b) => a + b, 0);
+  return w.map(x => x / total);
+}
+
+function rollTier(pack) {
+  const odds = packOdds(pack);
+  let r = Math.random();
+  for (let i = 0; i < odds.length; i++) { if ((r -= odds[i]) < 0) return i; }
+  return 0;
+}
+
+function rollTraits() {
+  const m = 1 + .25 * save.up.trait;
+  const out = [];
+  for (const e of EDITIONS) { if (Math.random() < e.chance * m) { out.push(e.id); break; } }
+  for (const x of EXTRAS) { if (out.length < 3 && Math.random() < x.chance * m) out.push(x.id); }
+  return out;
+}
+
+function rollPack(pack) {
+  const cards = [];
+  for (let i = 0; i < 5; i++) {
+    let tier = rollTier(pack);
+    if (i === 4) tier = Math.max(tier, pack.min);
+    while (!BY_TIER[tier].length && tier > 0) tier--;
+    const c = pick(BY_TIER[tier]);
+    cards.push({ id: c.id, traits: rollTraits() });
+  }
+  // Best card last for the big finish
+  cards.sort((a, b) => (charOf(a.id).tier + traitMult(a.traits) / 100) - (charOf(b.id).tier + traitMult(b.traits) / 100));
+  return cards;
+}
+
+const keyOf = (inst) => inst.id + '|' + [...inst.traits].sort().join(',');
+
+function addCard(inst) {
+  const k = keyOf(inst);
+  const isNewChar = !Object.values(save.coll).some(s => s.id === inst.id);
+  if (!save.coll[k]) save.coll[k] = { id: inst.id, traits: [...inst.traits].sort(), count: 0, order: ++save.order, fresh: true };
+  save.coll[k].count++;
+  save.coll[k].order = ++save.order;
+  save.coll[k].fresh = true;
+  save.best = Math.max(save.best, charOf(inst.id).tier);
+  return isNewChar;
+}
+
+function persist() { save.lastTs = Date.now(); store.set(SAVE_KEY, save); }
+
+// ======================= Card rendering =======================
+function cardHTML(inst, opts = {}) {
+  const c = charOf(inst.id);
+  if (!c) return '<div class="card"><div class="card-inner"></div></div>';
+  const t = TIERS[c.tier];
+  const el = element(c.id);
+  const ed = inst.traits.find(x => EDITIONS.some(e => e.id === x));
+  const cls = ['card', 'r-' + c.tier, ed ? 'e-' + ed : '', ...inst.traits.filter(x => !EDITIONS.some(e => e.id === x)).map(x => 't-' + x), opts.lit ? 'lit' : ''].join(' ');
+  const initials = c.name.split(' ').map(w => w[0]).slice(0, 2).join('');
+  const sparkles = inst.traits.includes('sparkle')
+    ? `<div class="sparkles">${[[12, 18], [78, 12], [60, 40], [22, 55], [84, 62], [40, 26]].map(([x, y], i) => `<i style="left:${x}%;top:${y}%;animation-delay:${i * .37}s"></i>`).join('')}</div>` : '';
+  return `
+  <div class="${cls}" style="--el:${el.color}">
+    <div class="card-inner">
+      <div class="art">
+        <span class="fallback">${esc(initials)}</span>
+        <img src="${esc(c.img)}" alt="${esc(c.name)}" loading="${opts.eager ? 'eager' : 'lazy'}" draggable="false" referrerpolicy="no-referrer" onerror="this.remove()">
+        ${inst.traits.includes('signed') ? `<span class="signature">${esc(c.name.split(' ')[0])}</span>` : ''}
+        ${inst.traits.includes('first') ? '<span class="first-ed">1st</span>' : ''}
+      </div>
+      <div class="top-row"><span class="pip">⚡${fmt(powerOf(c, inst.traits))}</span><span class="pip" title="${el.name}">${el.icon}</span></div>
+      <div class="info">
+        <div class="name">${esc(c.name)}</div>
+        <div class="series">${esc(c.series || '♡ ' + fmt(c.fav) + ' fans')}</div>
+        <div class="meta"><span class="rlabel">${'★'.repeat(t.stars)} ${t.name.toUpperCase()}</span><span class="inc">+${fmt(cardIncome(c, inst.traits))}/s</span></div>
+        <div class="tchips">${inst.traits.map(x => `<span class="tchip">${TRAIT[x].icon} ${TRAIT[x].name}</span>`).join('')}</div>
+      </div>
+      <div class="holo"></div><div class="glare"></div>${sparkles}
+    </div>
+  </div>`;
+}
+const backHTML = () => `<div class="cardback"><div><span class="ring"></span><div class="emblem"><span>HP</span></div></div></div>`;
+function packHTML(p) {
+  return `<div class="pack" style="--c1:${p.c1};--c2:${p.c2}">
+    <div class="pack-top"><div class="crimp"></div></div>
+    <div class="crimp b"></div>
+    <div class="pack-label"><span class="em">${p.em}</span><b>${esc(p.name)}</b><small>5 CARDS</small></div>
+  </div>`;
+}
+
+// Holo / glare follow the pointer on any card
+document.addEventListener('pointermove', (e) => {
+  const card = e.target.closest && e.target.closest('.grid .card, .reveal .card');
+  if (!card) return;
+  const r = card.getBoundingClientRect();
+  card.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 100).toFixed(1) + '%');
+  card.style.setProperty('--my', ((e.clientY - r.top) / r.height * 100).toFixed(1) + '%');
+});
+
+// ======================= Views =======================
+function render() {
+  document.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
+  const m = $('main');
+  if (tab === 'shop') m.innerHTML = shopHTML();
+  if (tab === 'collection') m.innerHTML = collectionHTML();
+  if (tab === 'index') m.innerHTML = indexHTML();
+  bindView();
+  updateHUD();
+}
+
+function shopHTML() {
+  return `<section class="view">
+    <div class="panel tap-row">
+      <button class="tap-card" id="tapBtn" aria-label="Tap for coins">${backHTML()}</button>
+      <div class="tap-info"><b>Tap the card for coins</b><p>Each tap: <span class="num" id="tapVal" style="color:var(--gold)"></span>. Your cards also earn coins every second, even while you're away.</p></div>
+    </div>
+    <h2>Packs</h2>
+    <div class="packs">${PACKS.map(p => {
+      const odds = packOdds(p);
+      return `<div class="pack-item">
+        ${packHTML(p)}
+        <b>${esc(p.name)}</b>
+        <div class="odds">${odds.map((o, i) => o > 0 ? `<i style="color:${TIERS[i].color}">${TIERS[i].name[0]}</i> ${(o * 100).toFixed(o < .01 ? 2 : 1)}%` : '').filter(Boolean).join(' · ')}${p.min ? `<br>1 ${TIERS[p.min].name}+ guaranteed` : ''}</div>
+        <button class="buy-btn" data-pack="${p.id}">Open · <span class="num">🪙 ${fmt(p.price)}</span></button>
+      </div>`;
+    }).join('')}</div>
+    <h2>Upgrades</h2>
+    <div class="upgrades">${UPGRADES.map(u => {
+      const l = save.up[u.id];
+      const maxed = l >= u.max;
+      return `<button class="upg" data-upg="${u.id}">
+        <span class="ic">${u.icon}</span>
+        <span class="t"><b>${esc(u.name)} <span style="color:var(--muted);font-weight:600">Lv ${l}</span></b><span>${esc(u.desc(l))}</span></span>
+        <span class="cost num">${maxed ? 'MAX' : '🪙 ' + fmt(upgCost(u))}<small>${maxed ? '' : 'upgrade'}</small></span>
+      </button>`;
+    }).join('')}</div>
+  </section>`;
+}
+
+function stacksSorted() {
+  let list = Object.entries(save.coll).map(([k, s]) => ({ k, ...s, c: charOf(s.id) })).filter(s => s.c);
+  if (filter === 'special') list = list.filter(s => s.traits.length);
+  else if (filter !== 'all') list = list.filter(s => s.c.tier === +filter);
+  const inc = (s) => cardIncome(s.c, s.traits) * s.count;
+  if (sortBy === 'rarity') list.sort((a, b) => b.c.tier - a.c.tier || traitMult(b.traits) - traitMult(a.traits) || b.c.fav - a.c.fav);
+  if (sortBy === 'income') list.sort((a, b) => inc(b) - inc(a));
+  if (sortBy === 'newest') list.sort((a, b) => b.order - a.order);
+  if (sortBy === 'name') list.sort((a, b) => a.c.name.localeCompare(b.c.name));
+  return list;
+}
+
+function collectionHTML() {
+  const list = stacksSorted();
+  const total = Object.values(save.coll).reduce((a, s) => a + s.count, 0);
+  const dupes = Object.values(save.coll).filter(s => s.count > 1 && charOf(s.id)?.tier <= 1).reduce((a, s) => a + s.count - 1, 0);
+  const filters = [['all', 'All'], ['4', 'Mythic'], ['3', 'Legendary'], ['2', 'Epic'], ['1', 'Rare'], ['0', 'Common'], ['special', 'Special']];
+  return `<section class="view">
+    <div class="toolbar">
+      ${filters.map(([v, l]) => `<button class="chip ${filter === v ? 'on' : ''}" data-filter="${v}">${l}</button>`).join('')}
+      <select id="sortSel" aria-label="Sort">${[['rarity', 'Rarity'], ['income', 'Income'], ['newest', 'Newest'], ['name', 'Name']].map(([v, l]) => `<option value="${v}" ${sortBy === v ? 'selected' : ''}>Sort: ${l}</option>`).join('')}</select>
+    </div>
+    <div class="toolbar" style="justify-content:space-between">
+      <span style="color:var(--muted);font-size:.9rem">${total} cards · ${uniqueCount()} characters</span>
+      ${dupes ? `<button class="chip" id="sellDupes">Sell ${dupes} Common/Rare duplicates</button>` : ''}
+    </div>
+    ${list.length ? `<div class="grid">${list.slice(0, showLimit).map(s => `
+      <div class="slot" data-key="${esc(s.k)}" role="button" tabindex="0" aria-label="View ${esc(s.c.name)}">
+        ${s.count > 1 ? `<span class="count">×${s.count}</span>` : ''}${s.fresh ? '<span class="new-badge">NEW</span>' : ''}
+        ${cardHTML(s)}
+      </div>`).join('')}</div>
+      ${list.length > showLimit ? `<div style="text-align:center;margin-top:16px"><button class="btn" id="moreBtn">Show more (${list.length - showLimit})</button></div>` : ''}`
+      : `<div class="empty">${total ? 'No cards match this filter.' : 'No cards yet. Open a pack in the Shop!'}</div>`}
+  </section>`;
+}
+
+function indexHTML() {
+  const owned = new Set(Object.values(save.coll).map(s => s.id));
+  const totalCards = Object.values(save.coll).reduce((a, s) => a + s.count, 0);
+  const specials = Object.values(save.coll).filter(s => s.traits.length).reduce((a, s) => a + s.count, 0);
+  return `<section class="view">
+    <h2>Collection progress</h2>
+    <div class="tiers">${TIERS.map((t, i) => {
+      const n = BY_TIER[i].filter(c => owned.has(c.id)).length, tot = BY_TIER[i].length;
+      return `<div class="tier-card"><b style="color:${t.color}">${'★'.repeat(t.stars)} ${t.name}</b>
+        <div class="bar"><div style="width:${tot ? n / tot * 100 : 0}%;background:${t.color}"></div></div>
+        <span class="num">${n} / ${tot}</span> <span style="color:var(--muted);font-size:.8rem">· ${fmt(t.income)}/s each</span></div>`;
+    }).join('')}</div>
+    <h2>Stats</h2>
+    <div class="stats">
+      <div class="stat"><b class="num">${owned.size}/${CHARS.length}</b><span>Characters found</span></div>
+      <div class="stat"><b class="num">+${owned.size}%</b><span>Collection bonus to income</span></div>
+      <div class="stat"><b class="num">${fmt(save.packs)}</b><span>Packs opened</span></div>
+      <div class="stat"><b class="num">${fmt(totalCards)}</b><span>Cards owned</span></div>
+      <div class="stat"><b class="num">${fmt(specials)}</b><span>Special editions</span></div>
+      <div class="stat"><b class="num">${fmt(save.earned)}</b><span>Coins earned</span></div>
+    </div>
+    <h2>Editions & traits</h2>
+    <div class="trait-list">${[...EDITIONS, ...EXTRAS].map(t => `
+      <div class="trait-row"><span class="ic">${t.icon}</span><div><b>${t.name}</b><span>${t.desc} ${(t.chance * (1 + .25 * save.up.trait) * 100).toFixed(1)}% per card</span></div><span class="x">×${t.mult}</span></div>`).join('')}</div>
+  </section>`;
+}
+
+function bindView() {
+  if (tab === 'shop') {
+    const tapBtn = $('tapBtn');
+    tapBtn.onclick = (e) => {
+      const v = tapValue();
+      gain(v); save.taps++;
+      floaty(e.clientX || tapBtn.getBoundingClientRect().left + 50, e.clientY || tapBtn.getBoundingClientRect().top, '+' + fmt(v));
+      sfx.coin();
+    };
+    document.querySelectorAll('[data-pack]').forEach(b => b.onclick = () => openPack(PACKS.find(p => p.id === b.dataset.pack)));
+    document.querySelectorAll('[data-upg]').forEach(b => b.onclick = () => buyUpgrade(UPGRADES.find(u => u.id === b.dataset.upg)));
+  }
+  if (tab === 'collection') {
+    document.querySelectorAll('[data-filter]').forEach(b => b.onclick = () => { filter = b.dataset.filter; showLimit = 120; render(); });
+    $('sortSel').onchange = (e) => { sortBy = e.target.value; render(); };
+    document.querySelectorAll('.slot').forEach(s => {
+      const open = () => { const st = save.coll[s.dataset.key]; if (st) { st.fresh = false; openViewer(s.dataset.key); } };
+      s.onclick = open;
+      s.onkeydown = (e) => { if (e.key === 'Enter') open(); };
+    });
+    if ($('moreBtn')) $('moreBtn').onclick = () => { showLimit += 120; render(); };
+    if ($('sellDupes')) $('sellDupes').onclick = sellDupes;
+  }
+}
+
+function updateHUD() {
+  if (!save) return;
+  $('coins').textContent = '🪙 ' + fmt(save.coins);
+  $('rate').textContent = fmt(income());
+  if ($('tapVal')) $('tapVal').textContent = '+' + fmt(tapValue()) + ' 🪙';
+  document.querySelectorAll('[data-pack]').forEach(b => { b.disabled = busy || save.coins < PACKS.find(p => p.id === b.dataset.pack).price; });
+  document.querySelectorAll('[data-upg]').forEach(b => { const u = UPGRADES.find(x => x.id === b.dataset.upg); b.disabled = save.up[u.id] >= u.max || save.coins < upgCost(u); });
+}
+
+function gain(v) { save.coins += v; save.earned += v; }
+
+function buyUpgrade(u) {
+  const cost = upgCost(u);
+  if (save.coins < cost || save.up[u.id] >= u.max) return;
+  save.coins -= cost;
+  save.up[u.id]++;
+  sfx.upgrade();
+  toast(`${u.icon} ${u.name} → level ${save.up[u.id]}`);
+  persist();
+  render();
+}
+
+function sellDupes() {
+  let got = 0, n = 0;
+  for (const s of Object.values(save.coll)) {
+    const c = charOf(s.id);
+    if (c && c.tier <= 1 && s.count > 1) { got += sellValue(c, s.traits) * (s.count - 1); n += s.count - 1; s.count = 1; }
+  }
+  gain(got);
+  toast(`Sold ${n} duplicates for 🪙 ${fmt(got)}`);
+  persist();
+  render();
+}
+
+function floaty(x, y, text) {
+  const el = document.createElement('div');
+  el.className = 'floaty';
+  el.style.left = (x - 20) + 'px';
+  el.style.top = (y - 20) + 'px';
+  el.textContent = text;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 900);
+}
+
+function toast(msg) {
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.textContent = msg;
+  $('toasts').prepend(el);
+  while ($('toasts').children.length > 3) $('toasts').lastChild.remove();
+  setTimeout(() => el.remove(), 3000);
+}
+
+// ======================= Pack opening =======================
+function preload(urls, ms) {
+  return Promise.race([
+    Promise.all(urls.map(u => new Promise(res => { const i = new Image(); i.referrerPolicy = 'no-referrer'; i.onload = i.onerror = res; i.src = u; }))),
+    new Promise(res => setTimeout(res, ms)),
+  ]);
+}
+
+async function openPack(pack) {
+  if (busy || save.coins < pack.price) return;
+  busy = true;
+  save.coins -= pack.price;
+  save.packs++;
+  const cards = rollPack(pack);
+  const news = cards.map(addCard);     // add right away so a refresh never loses cards
+  persist();
+  updateHUD();
+  const best = Math.max(...cards.map(c => charOf(c.id).tier));
+  const imgs = preload(cards.map(c => charOf(c.id).img), 4000);
+
+  const root = $('stageRoot');
+  root.innerHTML = `<div class="stage" id="stage">
+    <div class="rays" id="rays"></div>
+    <div class="stage-pack" id="stagePack" role="button" aria-label="Open pack"><div class="pack-glow" style="--glow:${best >= 2 ? TIERS[best].color : 'transparent'}"></div>${packHTML(pack)}</div>
+    <div class="stage-hint" id="stageHint">Tap the pack to open it</div>
+  </div>`;
+  sfx.whoosh();
+  const sp = $('stagePack');
+  let opened = false;
+  const doOpen = async () => {
+    if (opened) return;
+    opened = true;
+    $('stageHint').textContent = '';
+    // Shake harder the better the best card is
+    sp.style.setProperty('--amp', 3 + best * 2.5);
+    sp.style.setProperty('--dur', (0.8 + best * .18) + 's');
+    sp.classList.add('shake');
+    if (best >= 2) sp.classList.add('charging');
+    sfx.rumble(best);
+    await new Promise(res => setTimeout(res, 800 + best * 180));
+    await imgs;
+    sp.classList.remove('shake');
+    sp.classList.add('torn');
+    sfx.tear();
+    const flash = document.createElement('div'); flash.className = 'flash'; document.body.appendChild(flash); setTimeout(() => flash.remove(), 650);
+    const r = sp.getBoundingClientRect();
+    fx.burst(r.left + r.width / 2, r.top + r.height * .1, [pack.c1, pack.c2, '#fff'], 50, { speed: 7 });
+    await new Promise(res => setTimeout(res, 650));
+    sp.remove();
+    showReveal(pack, cards, news);
+  };
+  sp.onclick = doOpen;
+  sp.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') doOpen(); };
+  sp.tabIndex = 0;
+  sp.focus();
+}
+
+function showReveal(pack, cards, news) {
+  const stage = $('stage');
+  const wrap = document.createElement('div');
+  wrap.className = 'reveal';
+  wrap.innerHTML = `
+    <div class="pull-title" id="pullTitle">Tap each card to flip it</div>
+    <div class="reveal-cards">${cards.map((c, i) => {
+      const tier = charOf(c.id).tier;
+      return `<div class="flip hint-${tier}" style="--d:${i}" data-i="${i}">
+        ${news[i] ? '<span class="new-badge">NEW</span>' : ''}
+        <div class="flip-inner"><div class="face back">${backHTML()}</div><div class="face front">${cardHTML(c, { eager: true })}</div></div>
+      </div>`;
+    }).join('')}</div>
+    <div class="reveal-actions">
+      <button class="btn" id="revealAll">Reveal all</button>
+      <button class="btn primary hidden" id="againBtn">Open another · 🪙 ${fmt(pack.price)}</button>
+      <button class="btn hidden" id="doneBtn">Collect</button>
+    </div>`;
+  stage.appendChild(wrap);
+  let flipped = 0;
+  const flipOne = (el) => {
+    if (el.classList.contains('flipped')) { openViewer(null, cards[+el.dataset.i]); return; }
+    el.classList.add('flipped');
+    flipped++;
+    const inst = cards[+el.dataset.i];
+    const c = charOf(inst.id);
+    sfx.flip();
+    setTimeout(() => celebrate(el, c.tier, inst), 280);
+    if (flipped === cards.length) finish();
+  };
+  const finish = () => {
+    $('revealAll').classList.add('hidden');
+    $('doneBtn').classList.remove('hidden');
+    if (save.coins >= pack.price) $('againBtn').classList.remove('hidden');
+    $('pullTitle').textContent = 'Tap a card to view it in 3D';
+  };
+  wrap.querySelectorAll('.flip').forEach(el => el.onclick = () => flipOne(el));
+  $('revealAll').onclick = async () => {
+    for (const el of wrap.querySelectorAll('.flip:not(.flipped)')) { flipOne(el); await new Promise(r => setTimeout(r, 380)); }
+  };
+  $('doneBtn').onclick = closeStage;
+  $('againBtn').onclick = () => { closeStage(); openPack(pack); };
+}
+
+function celebrate(el, tier, inst) {
+  const r = el.getBoundingClientRect();
+  const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+  const stage = $('stage');
+  const c = charOf(inst.id);
+  const special = inst.traits.find(t => EDITIONS.some(e => e.id === t));
+  if (tier >= 1) fx.burst(cx, cy, [TIERS[tier].color, '#fff'], 10 + tier * 18, { speed: 3 + tier * 1.5, stars: tier >= 3 });
+  if (tier >= 2) { $('rays').style.setProperty('--ray', TIERS[tier].color); stage.classList.add('hype'); sfx.rare(tier); }
+  if (tier >= 3) { stage.classList.remove('screen-shake'); void stage.offsetWidth; stage.classList.add('screen-shake'); $('pullTitle').textContent = `${TIERS[tier].name}! ${c.name}`; }
+  if (tier === 4) {
+    const flash = document.createElement('div'); flash.className = 'flash'; flash.style.background = 'linear-gradient(90deg,#ff3d7f,#ffd23d,#3dffb1,#3dc5ff,#c03dff)'; document.body.appendChild(flash); setTimeout(() => flash.remove(), 650);
+    fx.burst(cx, cy, ['#ff3d7f', '#ffd23d', '#3dffb1', '#3dc5ff', '#c03dff'], 120, { speed: 10, stars: true });
+  }
+  if (special) { fx.burst(cx, cy, ['#fff', '#5ce1ff', '#ff4fa3'], 30, { speed: 5, stars: true }); toast(`${TRAIT[special].icon} ${TRAIT[special].name} edition!`); if (tier < 2) sfx.rare(2); }
+}
+
+function closeStage() {
+  $('stageRoot').innerHTML = '';
+  busy = false;
+  render();
+}
+
+// Auto-opener: quietly opens Starter Packs in the background
+function autoOpen() {
+  if (!save.up.auto || busy) return;
+  const p = PACKS[0];
+  if (save.coins < p.price) return;
+  save.coins -= p.price;
+  save.packs++;
+  const cards = rollPack(p);
+  cards.forEach(addCard);
+  const best = cards[cards.length - 1];
+  const c = charOf(best.id);
+  toast(`🤖 Auto-opened: best was ${c.name} (${TIERS[c.tier].name})`);
+  if (tab !== 'shop') render(); else updateHUD();
+}
+
+// ======================= 3D viewer =======================
+let viewerState = null;
+
+function openViewer(key, instOverride) {
+  const stack = key ? save.coll[key] : null;
+  const inst = instOverride || stack;
+  const c = charOf(inst.id);
+  if (!c) return;
+  const ownedStack = save.coll[keyOf(inst)];
+  const count = ownedStack ? ownedStack.count : 0;
+  const el = element(c.id);
+  const t = TIERS[c.tier];
+  $('viewerRoot').innerHTML = `<div class="viewer" id="viewer" role="dialog" aria-modal="true" aria-label="${esc(c.name)} card">
+    <button class="close-x" id="vClose" aria-label="Close">✕</button>
+    <div class="viewer-wrap">
+      <div>
+        <div class="scene" id="scene">
+          <div class="v-card" id="vCard">
+            <div class="edge"></div>
+            <div class="face front">${cardHTML(inst, { eager: true, lit: true })}</div>
+            <div class="face back">${backHTML()}</div>
+          </div>
+        </div>
+        <div class="v-shadow"></div>
+        <div class="drag-hint">Drag to spin · double-tap to flip</div>
+      </div>
+      <div class="v-panel">
+        <div class="rlabel" style="color:${t.color};font-family:var(--display);letter-spacing:.12em;font-weight:700">${'★'.repeat(t.stars)} ${t.name.toUpperCase()}</div>
+        <h3>${esc(c.name)}</h3>
+        <div class="series" style="color:var(--muted)">${esc(c.series || 'Anime character')} · ♡ ${fmt(c.fav)} fans</div>
+        <div class="v-stats">
+          <div><b class="num">⚡${fmt(powerOf(c, inst.traits))}</b><span>Power</span></div>
+          <div><b class="num">${el.icon} ${el.name}</b><span>Element</span></div>
+          <div><b class="num">+${fmt(cardIncome(c, inst.traits))}/s</b><span>Income each</span></div>
+        </div>
+        <div class="trait-list">${inst.traits.length ? inst.traits.map(x => `
+          <div class="trait-row"><span class="ic">${TRAIT[x].icon}</span><div><b>${TRAIT[x].name}</b><span>${TRAIT[x].desc}</span></div><span class="x">×${TRAIT[x].mult}</span></div>`).join('')
+          : '<div class="trait-row"><span class="ic">📄</span><div><b>Standard print</b><span>No special traits on this copy.</span></div></div>'}</div>
+        <div class="v-actions">
+          <span class="chip" style="cursor:default">Owned ×<span id="vCount">${count}</span></span>
+          <button class="btn" id="vSpin">Auto-spin</button>
+          <button class="btn" id="vFlip">Flip</button>
+          ${count ? `<button class="btn" id="vSell">Sell 1 · 🪙 ${fmt(sellValue(c, inst.traits))}</button>` : ''}
+        </div>
+      </div>
+    </div>
+  </div>`;
+
+  viewerState = { rx: -8, ry: -18, vx: 0, vy: 0, drag: false, spin: false, lx: 0, ly: 0, raf: 0, inst };
+  const V = viewerState;
+  const scene = $('scene'), card = $('vCard');
+  const front = card.querySelector('.card');
+
+  const apply = () => {
+    card.style.transform = `rotateX(${V.rx}deg) rotateY(${V.ry}deg)`;
+    // Map the angle to light position for holo + glare
+    const ry = ((V.ry % 360) + 360) % 360;
+    const mx = 50 + Math.sin(ry * Math.PI / 180) * 60;
+    const my = 50 - Math.sin(V.rx * Math.PI / 180) * 80;
+    front.style.setProperty('--mx', mx.toFixed(1) + '%');
+    front.style.setProperty('--my', my.toFixed(1) + '%');
+  };
+  const loopFn = () => {
+    if (!V.drag) {
+      if (V.spin) V.ry += .8;
+      V.ry += V.vy; V.rx += V.vx;
+      V.vy *= .92; V.vx *= .9;
+      V.rx += (-8 - V.rx) * .04;      // settle back to a slight tilt
+    }
+    apply();
+    V.raf = requestAnimationFrame(loopFn);
+  };
+  scene.onpointerdown = (e) => { V.drag = true; V.lx = e.clientX; V.ly = e.clientY; V.vx = V.vy = 0; scene.setPointerCapture(e.pointerId); };
+  scene.onpointermove = (e) => {
+    if (!V.drag) return;
+    const dx = e.clientX - V.lx, dy = e.clientY - V.ly;
+    V.lx = e.clientX; V.ly = e.clientY;
+    V.ry += dx * .6; V.rx = Math.max(-60, Math.min(60, V.rx - dy * .5));
+    V.vy = dx * .25; V.vx = -dy * .1;
+  };
+  scene.onpointerup = scene.onpointercancel = () => { V.drag = false; };
+  scene.ondblclick = () => { V.vy = 18; };
+  $('vSpin').onclick = () => { V.spin = !V.spin; $('vSpin').textContent = V.spin ? 'Stop spin' : 'Auto-spin'; };
+  $('vFlip').onclick = () => { V.vy = 18; };
+  $('vClose').onclick = closeViewer;
+  if ($('vSell')) $('vSell').onclick = () => {
+    const k = keyOf(inst);
+    const st = save.coll[k];
+    if (!st) return;
+    gain(sellValue(c, inst.traits));
+    st.count--;
+    if (st.count <= 0) delete save.coll[k];
+    persist();
+    sfx.coin();
+    toast(`Sold ${c.name} for 🪙 ${fmt(sellValue(c, inst.traits))}`);
+    const left = save.coll[k]?.count || 0;
+    $('vCount').textContent = left;
+    if (!left) $('vSell').remove();
+    updateHUD();
+  };
+  document.addEventListener('keydown', viewerKeys);
+  loopFn();
+  $('vClose').focus();
+}
+function viewerKeys(e) { if (e.key === 'Escape') closeViewer(); }
+function closeViewer() {
+  if (viewerState) cancelAnimationFrame(viewerState.raf);
+  viewerState = null;
+  document.removeEventListener('keydown', viewerKeys);
+  $('viewerRoot').innerHTML = '';
+  if (!$('stage')) render();
+}
+
+// ======================= Particles =======================
+const fx = (() => {
+  const cv = $('fx');
+  const ctx = cv.getContext('2d');
+  let parts = [], running = false;
+  const resize = () => { const d = window.devicePixelRatio || 1; cv.width = innerWidth * d; cv.height = innerHeight * d; ctx.setTransform(d, 0, 0, d, 0, 0); };
+  resize(); addEventListener('resize', resize);
+  function star(x, y, r) {
+    ctx.beginPath();
+    for (let i = 0; i < 10; i++) { const a = i * Math.PI / 5 - Math.PI / 2, rr = i % 2 ? r * .45 : r; ctx.lineTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr); }
+    ctx.closePath(); ctx.fill();
+  }
+  function tick() {
+    ctx.clearRect(0, 0, innerWidth, innerHeight);
+    parts = parts.filter(p => p.life > 0);
+    for (const p of parts) {
+      p.x += p.vx; p.y += p.vy; p.vy += p.g; p.vx *= .985; p.life -= p.decay; p.rot += p.vr;
+      ctx.globalAlpha = Math.max(0, p.life);
+      ctx.fillStyle = p.color;
+      if (p.star) star(p.x, p.y, p.size);
+      else { ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot); ctx.fillRect(-p.size / 2, -p.size / 4, p.size, p.size / 2); ctx.restore(); }
+    }
+    ctx.globalAlpha = 1;
+    if (parts.length) requestAnimationFrame(tick); else running = false;
+  }
+  return {
+    burst(x, y, colors, n, o = {}) {
+      if (matchMedia('(prefers-reduced-motion: reduce)').matches) n = Math.min(n, 12);
+      for (let i = 0; i < n; i++) {
+        const a = Math.random() * Math.PI * 2, s = (o.speed || 5) * (.4 + Math.random());
+        parts.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s - 2, g: .12, life: 1, decay: .008 + Math.random() * .012,
+          color: pick(colors), size: 4 + Math.random() * 7, star: o.stars && Math.random() < .5, rot: Math.random() * 6, vr: (Math.random() - .5) * .3 });
+      }
+      if (!running) { running = true; requestAnimationFrame(tick); }
+    },
+  };
+})();
+
+// ======================= Sound =======================
+const sfx = (() => {
+  let ac = null;
+  const ctx = () => { if (save?.muted) return null; try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); if (ac.state === 'suspended') ac.resume(); return ac; } catch { return null; } };
+  function tone(f, d, type = 'sine', v = .06, when = 0, slide) {
+    const a = ctx(); if (!a) return;
+    const o = a.createOscillator(), g = a.createGain(), t = a.currentTime + when;
+    o.type = type; o.frequency.setValueAtTime(f, t);
+    if (slide) o.frequency.exponentialRampToValueAtTime(slide, t + d);
+    g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(.0001, t + d);
+    o.connect(g).connect(a.destination); o.start(t); o.stop(t + d);
+  }
+  function noise(d, v = .08, when = 0, hp = 800) {
+    const a = ctx(); if (!a) return;
+    const buf = a.createBuffer(1, a.sampleRate * d, a.sampleRate), data = buf.getChannelData(0);
+    for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / data.length);
+    const s = a.createBufferSource(), g = a.createGain(), f = a.createBiquadFilter();
+    f.type = 'highpass'; f.frequency.value = hp;
+    s.buffer = buf; g.gain.value = v; s.connect(f).connect(g).connect(a.destination); s.start(a.currentTime + when);
+  }
+  let lastCoin = 0;
+  return {
+    coin() { const n = performance.now(); if (n - lastCoin < 60) return; lastCoin = n; tone(1320, .08, 'square', .025); tone(1760, .1, 'square', .02, .05); },
+    flip() { noise(.12, .07, 0, 2000); },
+    tear() { noise(.35, .12, 0, 600); tone(300, .3, 'sawtooth', .03, 0, 900); },
+    whoosh() { noise(.3, .04, 0, 300); },
+    rumble(tier) { for (let i = 0; i < 6 + tier * 2; i++) tone(70 + i * 6 + tier * 8, .12, 'triangle', .05, i * .11); },
+    rare(tier) { const base = [523, 659, 784, 1047, 1319, 1568]; for (let i = 0; i < tier + 2; i++) tone(base[i], .35, 'triangle', .06, i * .09); },
+    upgrade() { tone(660, .1, 'square', .03); tone(990, .15, 'square', .03, .08); },
+  };
+})();
+
+// ======================= Menu / modals =======================
+function modal(html) {
+  $('modalRoot').innerHTML = `<div class="modal" role="dialog" aria-modal="true"><div class="panel">${html}</div></div>`;
+  const b = $('modalRoot').querySelector('button'); if (b) b.focus();
+}
+const closeModal = () => { $('modalRoot').innerHTML = ''; };
+
+$('menuBtn').onclick = () => {
+  modal(`<h3>Settings</h3><p>Your progress saves automatically on this device.</p>
+    <div style="display:grid;gap:8px">
+      <button class="btn" id="mRefresh">Refresh character list</button>
+      <button class="btn" id="mReset" style="color:#ff8aa8">Reset all progress</button>
+      <button class="btn primary" id="mClose">Close</button>
+    </div>`);
+  $('mClose').onclick = closeModal;
+  $('mRefresh').onclick = async () => { closeModal(); toast('Refreshing characters…'); try { await loadChars(true); toast(`Loaded ${CHARS.length} characters`); render(); } catch { toast('Could not refresh. Try again later.'); } };
+  $('mReset').onclick = () => {
+    modal(`<h3>Reset everything?</h3><p>This deletes all your cards, coins and upgrades. It can't be undone.</p>
+      <div style="display:flex;gap:8px;justify-content:center"><button class="btn" id="rNo">Keep my cards</button><button class="btn" id="rYes" style="background:#c9435d">Reset</button></div>`);
+    $('rNo').onclick = closeModal;
+    $('rYes').onclick = () => { save = freshSave(); persist(); closeModal(); tab = 'shop'; render(); toast('Progress reset'); };
+  };
+};
+$('muteBtn').onclick = () => { save.muted = !save.muted; $('muteBtn').textContent = save.muted ? '🔇' : '🔊'; persist(); };
+document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => { tab = b.dataset.tab; showLimit = 120; render(); window.scrollTo({ top: 0 }); });
+
+// ======================= Main loop =======================
+let last = performance.now();
+let saveTimer = 0;
+setInterval(() => {
+  if (!save || !CHARS.length) return;
+  const now = performance.now();
+  const dt = Math.min(1, (now - last) / 1000);
+  last = now;
+  gain(income() * dt);
+  if (save.up.auto) { autoTimer += dt; if (autoTimer >= autoInterval(save.up.auto)) { autoTimer = 0; autoOpen(); } }
+  saveTimer += dt;
+  if (saveTimer > 5) { saveTimer = 0; persist(); }
+  updateHUD();
+}, 100);
+document.addEventListener('visibilitychange', () => { if (save && document.hidden) persist(); });
+addEventListener('pagehide', () => { if (save) persist(); });
+
+// ======================= Boot =======================
+async function boot() {
+  $('main').innerHTML = `<div class="loading">
+    <div class="logo" style="font-size:2.2rem">Holo<span>Pull</span></div>
+    <div id="loadMsg" style="color:var(--muted)">Summoning characters…</div>
+    <div class="bar"><div id="loadBar"></div></div>
+  </div>`;
+  try { await loadChars(false); }
+  catch (e) {
+    console.error(e);
+    $('main').innerHTML = `<div class="loading"><div class="logo" style="font-size:2rem">Holo<span>Pull</span></div>
+      <p style="color:var(--muted);max-width:32ch">Couldn't load the anime characters. Check your internet connection, then try again.</p>
+      <button class="btn primary" id="retry">Try again</button></div>`;
+    $('retry').onclick = boot;
+    return;
+  }
+  save = Object.assign(freshSave(), store.get(SAVE_KEY) || {});
+  save.up = Object.assign(freshSave().up, save.up || {});
+  // Drop cards whose character is no longer in the list
+  for (const [k, s] of Object.entries(save.coll)) if (!charOf(s.id)) delete save.coll[k];
+  $('muteBtn').textContent = save.muted ? '🔇' : '🔊';
+  $('header').classList.remove('hidden');
+  $('credit').classList.remove('hidden');
+  // Offline earnings: half your income for up to 8 hours away
+  const away = Math.min(8 * 3600, (Date.now() - (save.lastTs || Date.now())) / 1000);
+  const offline = income() * away * .5;
+  render();
+  if (away > 60 && offline >= 1) {
+    gain(offline);
+    modal(`<div style="font-size:2.4rem">🌙</div><h3>Welcome back!</h3><p>Your cards earned <b class="num" style="color:var(--gold)">🪙 ${fmt(offline)}</b> while you were away.</p><button class="btn primary" id="mOk">Collect</button>`);
+    $('mOk').onclick = () => { closeModal(); sfx.coin(); };
+  }
+  persist();
+  last = performance.now();
+}
+
+window.__hp = { get save() { return save; }, get chars() { return CHARS; }, rollPack, openPack, PACKS, openViewer, income };
+boot();
+})();
+</script>
+</body>
+</html>

@@ -32,3 +32,13 @@ Needs your own Anthropic API key (console.anthropic.com), entered once on the pa
 # Candle Crawl 🕯️ (`/trader/`)
 
 A day-trading roguelike where the market never closes. Each in-game day is 24 hours (about 100 seconds of real time). Hit the day's net-worth goal to survive, pick 1 of 3 perks (short selling, margin, stop-loss bot, insider tips, extra lives…), and push as deep as you can. Every run has a random set of made-up companies, a daily market mood, and news and rumors that move prices.
+
+# Holo Pull ✨ (`/cards/`)
+
+An incremental anime card-collecting game. Character art and names load live from the AniList API (top ~400 characters by fan favorites; nothing is stored in this repo). More-loved characters are rarer: Common → Rare → Epic → Legendary → Mythic.
+
+- Tap for coins; cards earn coins every second (and half-rate while you're away, up to 8 hours)
+- Four packs with a shake → tear → flip opening animation, particles, light rays, screen shake and sounds; better pulls shake the pack harder
+- Editions (Holo, Gold, Prismatic, Glitch, Negative, Shadow) and traits (Signed, 1st Edition, Full Art, Sparkle, Misprint) multiply a card's value
+- Drag-to-spin 3D card viewer with holo light that follows the angle
+- Upgrades: Power Tap, Fan Club, Lucky Charm, Trait Hunter, Auto-Opener

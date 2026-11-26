@@ -1,0 +1,50 @@
+name: Build Dayflow Android app
+
+on:
+  push:
+    paths:
+      - 'android/**'
+      - '.github/workflows/android.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Build APK
+        working-directory: android
+        run: gradle assembleDebug --no-daemon --stacktrace
+
+      - name: Rename APK
+        run: cp android/app/build/outputs/apk/debug/app-debug.apk Dayflow.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Dayflow-apk
+          path: Dayflow.apk
+
+      - name: Publish as a downloadable release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG=dayflow-android
+          gh release delete "$TAG" --yes --cleanup-tag || true
+          gh release create "$TAG" Dayflow.apk \
+            --target "${{ github.sha }}" \
+            --title "Dayflow Android app" \
+            --notes "Install Dayflow.apk on your Android phone to get the Dayflow home-screen widgets. Built from ${{ github.sha }}." \
+            --prerelease

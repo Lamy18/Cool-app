@@ -363,7 +363,7 @@ const store = {
   setFlag(k, v) { try { localStorage.setItem('dayflow:' + k, v ? '1' : '0'); } catch { /* ignore */ } },
 };
 
-const APP_VERSION = '5';
+const APP_VERSION = '6';
 // ================= Install / offline =================
 let installEvt = null;
 const isStandalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
@@ -382,7 +382,29 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:') {
 if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
 let D = store.load() || { name: '', habits: [], countdowns: [], journal: {} };
 D.habits ||= []; D.countdowns ||= []; D.journal ||= {};
-const save = () => { if (!store.save(D)) toast('Could not save on this device'); };
+const save = () => { if (!store.save(D)) toast('Could not save on this device'); pushWidget(); };
+
+// ================= Android app bridge (home-screen widget) =================
+const NATIVE = window.DayflowAndroid || null;
+let widgetTimer = null;
+function pushWidget() {
+  if (!NATIVE || !D.name) return;
+  clearTimeout(widgetTimer);
+  widgetTimer = setTimeout(() => {
+    try {
+      const now = new Date(), tk = todayKey();
+      const S = D.habits.filter(h => scheduled(h, now));
+      const next = upcoming()[0];
+      const st = petState();
+      NATIVE.updateWidget(JSON.stringify({
+        date: tk, done: S.filter(h => isDone(h, tk)).length, total: S.length,
+        totalsByDow: [0, 1, 2, 3, 4, 5, 6].map(i => D.habits.filter(h => h.days.includes(i)).length),
+        cdTitle: next ? next.title : '', cdEmoji: next ? next.emoji : '', cdTarget: next ? new Date(next.target).getTime() : 0,
+        petName: D.pet ? D.pet.name : 'Chomp', petMood: st.mood, petHp: st.hp, petLevel: st.level, petFainted: st.fainted,
+      }));
+    } catch (e) { /* widget refresh is best-effort */ }
+  }, 300);
+}
 
 // ================= Helpers =================
 const $ = (id) => document.getElementById(id);
@@ -748,7 +770,7 @@ function sparkline(vals, col) {
   return `<svg class="spark" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" aria-hidden="true"><polyline points="${pts.join(' ')}" fill="none" stroke="${col}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg>`;
 }
 function installCardHTML() {
-  if (isStandalone() || store.flag('installHidden')) return '';
+  if (NATIVE || isStandalone() || store.flag('installHidden')) return '';
   if (!installEvt && !isIOS()) return '';
   return `<div class="card c-blue" id="installCard">
     <div class="row"><img src="icons/icon-192.png" alt="" width="48" height="48" style="border-radius:14px"><div class="spacer"><h3>Put Dayflow on your home screen</h3><div class="meta">${installEvt ? 'Opens full screen and works offline.' : 'Tap the Share button in Safari, then “Add to Home Screen”.'}</div></div></div>
@@ -1366,6 +1388,7 @@ function openSettings() {
     <p style="margin:0;color:var(--muted);font-size:.75rem;text-align:center">Dayflow version ${APP_VERSION}</p>`);
   $('sSave').onclick = () => { const n = $('sName').value.trim(); if (!n) return; D.name = n; save(); closeSheet(); render(); toast('Name updated'); };
   $('sExport').onclick = () => {
+    if (NATIVE && NATIVE.saveBackup) { NATIVE.saveBackup(JSON.stringify(D, null, 2), `dayflow-backup-${todayKey()}.json`); return; }
     const blob = new Blob([JSON.stringify(D, null, 2)], { type: 'application/json' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob); a.download = `dayflow-backup-${todayKey()}.json`;
@@ -1396,6 +1419,8 @@ if (['#journal', '#habits', '#countdowns', '#pet'].includes(location.hash)) tab 
 addEventListener('hashchange', () => { if (['#journal', '#habits', '#countdowns', '#home', '#pet'].includes(location.hash) && D.name) setTab(location.hash.slice(1)); });
 window.__dj = { get D() { return D; }, streak, bestStreak, render, petSVG, petState };
 render();
+pushWidget();
+document.addEventListener('visibilitychange', () => { if (document.hidden) pushWidget(); });
 })();
 </script>
 </body>

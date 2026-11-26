@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Dayflow</string>
+    <string name="widget_medium">Dayflow · Today</string>
+    <string name="widget_small">Dayflow · Habits</string>
+    <string name="widget_medium_desc">Your pet, today\'s habits and your next countdown</string>
+    <string name="widget_small_desc">Your pet and today\'s habit progress</string>
+    <string name="pet_desc">Your Dayflow pet</string>
+    <string name="open_app">Open Dayflow</string>
+</resources>

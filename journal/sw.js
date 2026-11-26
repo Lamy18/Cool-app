@@ -1,5 +1,5 @@
 // Dayflow service worker: keeps the app on the phone so it opens instantly and works offline.
-const VERSION = 'dayflow-v5';
+const VERSION = 'dayflow-v6';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png', './icons/maskable-512.png', './icons/apple-touch-icon.png', './icons/favicon-32.png'];
 
 self.addEventListener('install', (e) => {

@@ -65,4 +65,5 @@ A productivity journal with a dark, neon-card look.
 - **Habit tracker**: create habits with an icon, color and the weekdays they repeat on; tick them off (including past days), see streaks, best streaks, 30-day rate and a 15-week heatmap
 - **Daily journal**: mood picker, top-3 focus tasks you can check off, notes and gratitude, autosaved; a 14-day mood chart and past entries
 - **Home dashboard**: today's progress, next countdown, today's habits, journal prompt and stats
+- **Pet**: Chomp, an original chibi goth-shark. Its health comes from your daily habits (all done heals, misses hurt, 0 = fainted until you finish a full day), its mood follows today's progress, and XP from habits and journaling levels it up to unlock a spiked choker, X clip, lollipop and star halo. Feed it snacks earned from habits and pet it
 - Everything is stored in your browser; download or restore a backup from Settings

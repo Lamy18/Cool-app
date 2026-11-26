@@ -45,6 +45,7 @@ A day-trading roguelike where the market never closes. Each in-game day is 24 ho
 An incremental anime card-collecting game. Character art and names load live from the AniList API (top ~400 characters by fan favorites; nothing is stored in this repo). More-loved characters are rarer: Common → Rare → Epic → Legendary → Mythic.
 
 - Tap for coins; cards earn coins every second (and half-rate while you're away, up to 8 hours)
+- Cinematic rare-pull cutscenes for Legendary and Mythic cards: eerie typewriter text, a star flare, an escalating "1 in N" rarity climb, the name in neon rings, a collapse, and a "YOU FOUND" explosion with the card's real odds (tap to skip)
 - Four packs with a shake → tear → flip opening animation, particles, light rays, screen shake and sounds; better pulls shake the pack harder
 - Holographic glass card design: rarity borders (clear glass, silver foil, holo, gold foil, prismatic), foil that follows your pointer, film-grain noise, frosted info bars
 - Editions (Holo, Silver Foil, Gold Foil, Liquid Glass, Prismatic, Glitch, Negative, Shadow) and traits (Signed, 1st Edition, Full Art, Die-cut Sticker, Sparkle, Misprint) multiply a card's value

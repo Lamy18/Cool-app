@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#050505">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
@@ -266,6 +266,7 @@ const store = {
   setFlag(k, v) { try { localStorage.setItem('dayflow:' + k, v ? '1' : '0'); } catch { /* ignore */ } },
 };
 
+const APP_VERSION = '3';
 // ================= Install / offline =================
 let installEvt = null;
 const isStandalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
@@ -273,7 +274,12 @@ const isIOS = () => /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSS
 addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); installEvt = e; if (tab === 'home' && D.name) render(); });
 addEventListener('appinstalled', () => { installEvt = null; toast('Dayflow installed 🎉'); });
 if ('serviceWorker' in navigator && location.protocol !== 'file:') {
-  addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => { /* offline support unavailable */ }));
+  addEventListener('load', () => navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then(r => r.update()).catch(() => { /* offline support unavailable */ }));
+  let reloaded = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    const typing = ['TEXTAREA', 'INPUT'].includes(document.activeElement && document.activeElement.tagName);
+    if (!reloaded && !typing) { reloaded = true; location.reload(); }
+  });
 }
 // Ask the browser to keep this app's data even when storage runs low
 if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
@@ -872,7 +878,8 @@ function openSettings() {
       <input type="file" id="sFile" accept="application/json,.json" class="hidden">
     </div>
     <p style="margin:0;color:var(--muted);font-size:.85rem">Your habits, countdowns and journal are stored only in this browser. Download a backup now and then so you don't lose them.</p>
-    <button class="wide-btn ghost danger" id="sReset">Erase everything</button>`);
+    <button class="wide-btn ghost danger" id="sReset">Erase everything</button>
+    <p style="margin:0;color:var(--muted);font-size:.75rem;text-align:center">Dayflow version ${APP_VERSION}</p>`);
   $('sSave').onclick = () => { const n = $('sName').value.trim(); if (!n) return; D.name = n; save(); closeSheet(); render(); toast('Name updated'); };
   $('sExport').onclick = () => {
     const blob = new Blob([JSON.stringify(D, null, 2)], { type: 'application/json' });

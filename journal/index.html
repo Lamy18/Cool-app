@@ -39,12 +39,15 @@
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body { margin: 0; overscroll-behavior-y: none; -webkit-text-size-adjust: 100%; }
+  html { overflow-x: clip; }
   body {
     background: var(--bg); color: var(--text); font-family: var(--body);
     min-height: 100vh;
     padding: calc(14px + env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) calc(110px + env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
   }
-  .app { max-width: 480px; margin: 0 auto; display: grid; gap: 14px; }
+  .app { max-width: 480px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  /* Never let long text (entries, habit or countdown names) widen the page */
+  .app > *, .stack > *, .grid2 > *, .week > * { min-width: 0; }
   button { font: inherit; color: inherit; border: 0; background: none; cursor: pointer; }
   button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px solid var(--yellow); outline-offset: 2px; }
   .hidden { display: none !important; }
@@ -69,10 +72,10 @@
   .c-coral { background: var(--coral); color: var(--ink); }
   .c-teal { background: var(--teal); color: var(--ink); }
   .c-lime { background: var(--lime); color: var(--ink); }
-  .card h3 { font-family: var(--display); font-weight: 600; font-size: 1.02rem; letter-spacing: -0.01em; }
+  .card h3 { overflow-wrap: anywhere; font-family: var(--display); font-weight: 600; font-size: 1.02rem; letter-spacing: -0.01em; }
   .card .meta { font-size: .78rem; opacity: .75; margin-top: 3px; }
-  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .stack { display: grid; gap: 12px; }
+  .grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .stack { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
   .row { display: flex; align-items: center; gap: 10px; }
   .spacer { flex: 1; }
 
@@ -114,7 +117,7 @@
   .hero .cd-big small { font-size: 1rem; font-weight: 600; letter-spacing: 0; margin-left: 6px; }
   .hero .cd-clock { font-weight: 700; font-size: .95rem; margin-top: 4px; }
   .mini-list { display: grid; gap: 8px; margin-top: 12px; }
-  .mini-item { display: flex; align-items: center; gap: 8px; font-size: .82rem; font-weight: 600; width: 100%; text-align: left; }
+  .mini-item { min-width: 0; overflow-wrap: anywhere; display: flex; align-items: center; gap: 8px; font-size: .82rem; font-weight: 600; width: 100%; text-align: left; }
   .mini-item .dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--ink); flex-shrink: 0; display: grid; place-items: center; font-size: .65rem; }
   .mini-item.done .dot { background: var(--ink); color: #fff; }
   .mini-item.done span:last-child { text-decoration: line-through; opacity: .6; }
@@ -131,7 +134,7 @@
   .week button .wdot.on { background: var(--green); }
 
   /* Habits */
-  .habit { display: flex; align-items: center; gap: 12px; border-radius: 24px; padding: 14px 14px 14px 16px; color: var(--ink); }
+  .habit { min-width: 0; display: flex; align-items: center; gap: 12px; border-radius: 24px; padding: 14px 14px 14px 16px; color: var(--ink); }
   .habit .emo { width: 46px; height: 46px; border-radius: 50%; background: rgba(255,255,255,.55); display: grid; place-items: center; font-size: 1.4rem; flex-shrink: 0; }
   .habit .t { flex: 1; min-width: 0; text-align: left; }
   .habit .t b { display: block; font-weight: 800; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -161,7 +164,7 @@
   /* Countdowns */
   .cd { display: grid; gap: 4px; }
   .cd .top { display: flex; align-items: flex-start; gap: 10px; }
-  .cd .top b { font-family: var(--display); font-weight: 600; font-size: 1rem; flex: 1; min-width: 0; margin-top: 30px; }
+  .cd .top b { font-family: var(--display); font-weight: 600; font-size: 1rem; flex: 1; min-width: 0; margin-top: 30px; overflow-wrap: anywhere; }
   .cd .days { font-family: var(--display); font-weight: 700; font-size: 2.6rem; letter-spacing: -0.03em; line-height: 1; margin-top: 10px; }
   .cd .days small { font-size: .9rem; font-weight: 600; margin-left: 6px; letter-spacing: 0; }
   .cd .clock { display: flex; gap: 6px; margin-top: 8px; }
@@ -176,7 +179,7 @@
   .daynav .lbl { flex: 1; text-align: center; }
   .daynav .lbl b { display: block; font-family: var(--display); font-weight: 600; font-size: 1.05rem; }
   .moods { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-top: 12px; }
-  .moods button { aspect-ratio: 1; border-radius: 50%; font-size: 1.6rem; background: rgba(11,11,11,.12); transition: transform .15s; }
+  .moods button { aspect-ratio: 1; width: 100%; max-width: 64px; justify-self: center; border-radius: 50%; font-size: 1.6rem; background: rgba(11,11,11,.12); transition: transform .15s; }
   .moods button.on { background: var(--ink); transform: scale(1.08); }
   .focus-item { display: flex; align-items: center; gap: 10px; padding: 6px 0; }
   .focus-item input { flex: 1; min-width: 0; background: transparent; border: 0; border-bottom: 1.5px solid rgba(11,11,11,.2); padding: 8px 2px; font: inherit; font-weight: 600; color: var(--ink); }
@@ -190,7 +193,7 @@
   .field { display: grid; gap: 6px; }
   .field > span { font-size: .78rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
   .saved { font-size: .75rem; color: var(--muted); }
-  .entry { display: flex; gap: 12px; align-items: center; padding: 12px 14px; border-radius: 20px; background: var(--surface); border: 1px solid var(--line); width: 100%; text-align: left; }
+  .entry { min-width: 0; overflow: hidden; display: flex; gap: 12px; align-items: center; padding: 12px 14px; border-radius: 20px; background: var(--surface); border: 1px solid var(--line); width: 100%; text-align: left; }
   .entry .m { font-size: 1.5rem; }
   .entry .t { flex: 1; min-width: 0; }
   .entry .t b { display: block; font-size: .9rem; }
@@ -815,8 +818,8 @@ function moodChart(vals) {
   const last = pts[pts.length - 1];
   return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-label="Mood chart">${grid}
     ${pts.length > 1 ? `<polyline points="${pts.map(p => p.join(',')).join(' ')}" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>` : ''}
-    ${pts.map(p => `<circle cx="${p[0]}" cy="${p[1]}" r="3.5" fill="var(--green)"/>`).join('')}
-    ${last ? `<circle cx="${last[0]}" cy="${last[1]}" r="6" fill="var(--yellow)" stroke="#000" stroke-width="2"/>` : ''}
+    ${pts.map(p => `<line x1="${p[0]}" y1="${p[1]}" x2="${p[0]}" y2="${p[1]}" stroke="var(--green)" stroke-width="8" stroke-linecap="round" vector-effect="non-scaling-stroke"/>`).join('')}
+    ${last ? `<line x1="${last[0]}" y1="${last[1]}" x2="${last[0]}" y2="${last[1]}" stroke="#000" stroke-width="16" stroke-linecap="round" vector-effect="non-scaling-stroke"/><line x1="${last[0]}" y1="${last[1]}" x2="${last[0]}" y2="${last[1]}" stroke="var(--yellow)" stroke-width="11" stroke-linecap="round" vector-effect="non-scaling-stroke"/>` : ''}
   </svg>${pts.length ? '' : '<div class="empty" style="padding:4px">Pick a mood each day to see your trend.</div>'}`;
 }
 let saveTimer = null;

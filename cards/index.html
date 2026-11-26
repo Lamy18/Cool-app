@@ -199,9 +199,9 @@
   .art img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 18%; display: block; }
   .art .fallback { position: absolute; inset: 0; display: grid; place-items: center; font-family: var(--display); font-size: 22cqw; color: rgba(255,255,255,.8); }
   .top-row { position: absolute; top: 6.5cqw; left: 6.5cqw; right: 6.5cqw; display: flex; justify-content: space-between; z-index: 4; pointer-events: none; }
-  .pip { background: rgba(20,18,52,.5); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); border-radius: 999px; padding: .8cqw 2.8cqw; font-family: var(--mono); font-weight: 700; font-size: 4.2cqw; color: #fff; display: flex; align-items: center; gap: 1cqw; border: .45cqw solid rgba(255,255,255,.4); }
+  .pip { background: rgba(20,18,52,.68); border-radius: 999px; padding: .8cqw 2.8cqw; font-family: var(--mono); font-weight: 700; font-size: 4.2cqw; color: #fff; display: flex; align-items: center; gap: 1cqw; border: .45cqw solid rgba(255,255,255,.4); }
   .tchips { position: absolute; left: 3cqw; right: 3cqw; bottom: 3cqw; display: flex; flex-wrap: wrap; gap: 1.2cqw; z-index: 3; }
-  .tchip { font-family: var(--mono); font-size: 3.3cqw; font-weight: 700; padding: .5cqw 2.2cqw; border-radius: 999px; white-space: nowrap; color: #fff; background: rgba(20,18,52,.55); border: .35cqw solid rgba(255,255,255,.35); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+  .tchip { font-family: var(--mono); font-size: 3.3cqw; font-weight: 700; padding: .5cqw 2.2cqw; border-radius: 999px; white-space: nowrap; color: #fff; background: rgba(20,18,52,.7); border: .35cqw solid rgba(255,255,255,.35); }
   .info { position: relative; z-index: 3; padding: 2.4cqw 4cqw 4cqw; display: grid; gap: 1.6cqw; }
   .irow { display: flex; gap: 1.6cqw; min-width: 0; }
   .box { background: rgba(28,30,72,.78); color: #fff; border: .35cqw solid rgba(255,255,255,.26); border-radius: 3.2cqw; padding: 1.3cqw 2.4cqw; box-shadow: inset 0 .4cqw 0 rgba(255,255,255,.12); min-width: 0; }
@@ -258,7 +258,7 @@
   @keyframes prism { to { filter: saturate(1.4) hue-rotate(360deg); } }
   .e-glass { --frame: linear-gradient(155deg, rgba(255,255,255,.95), rgba(255,255,255,.2) 40%, rgba(180,240,255,.7) 65%, rgba(255,255,255,.25)); --noise-o: .2;
     box-shadow: 0 16px 32px -10px rgba(0,0,0,.6), 0 0 22px rgba(160,230,255,.35); }
-  .e-glass .card-inner { background: rgba(255,255,255,.1); backdrop-filter: blur(14px) saturate(170%); -webkit-backdrop-filter: blur(14px) saturate(170%); }
+  .e-glass .card-inner { background: radial-gradient(70% 50% at 20% 10%, rgba(255,255,255,.4), transparent 70%), radial-gradient(60% 50% at 90% 90%, rgba(150,220,255,.3), transparent 70%), linear-gradient(160deg, rgba(225,235,255,.34), rgba(170,190,240,.16) 45%, rgba(230,240,255,.26)); }
   .e-glass .card-inner::after { content: ""; position: absolute; inset: 0; z-index: 6; pointer-events: none; background: linear-gradient(135deg, rgba(255,255,255,.35), rgba(255,255,255,0) 35%, rgba(255,255,255,0) 70%, rgba(255,255,255,.18)); }
   .e-glass .art { margin: 6cqw 6cqw 0; box-shadow: 0 0 0 .8cqw rgba(255,255,255,.6), 0 3cqw 7cqw rgba(0,0,0,.35); }
   .e-negative .art img { filter: invert(1) hue-rotate(180deg) saturate(1.3); }
@@ -371,7 +371,7 @@
   /* ======================================================
      STAGE (pack opening)
      ====================================================== */
-  .stage { position: fixed; inset: 0; z-index: 70; background: rgba(6,5,22,.72); backdrop-filter: blur(24px) saturate(140%); -webkit-backdrop-filter: blur(24px) saturate(140%); display: grid; place-items: center; overflow: hidden; }
+  .stage { position: fixed; inset: 0; z-index: 70; background: radial-gradient(60% 45% at 25% 20%, rgba(150,60,255,.35), transparent 70%), radial-gradient(50% 40% at 80% 85%, rgba(255,60,200,.28), transparent 70%), radial-gradient(45% 40% at 85% 15%, rgba(40,200,255,.22), transparent 70%), #08071d; display: grid; place-items: center; overflow: hidden; }
   .rays { position: absolute; left: 50%; top: 45%; width: 220vmax; height: 220vmax; transform: translate(-50%, -50%); pointer-events: none; opacity: .18;
     background: repeating-conic-gradient(from 0deg, var(--ray, #c6a6ff) 0 6deg, transparent 6deg 18deg);
     animation: spin 30s linear infinite; -webkit-mask: radial-gradient(circle, #000 0, transparent 55%); mask: radial-gradient(circle, #000 0, transparent 55%); transition: opacity .4s; }
@@ -410,10 +410,10 @@
   .reveal-cards { display: flex; flex-wrap: wrap; justify-content: center; gap: clamp(8px, 2vw, 18px); perspective: 1200px; width: 100%; }
   .flip { width: clamp(96px, 28vw, 172px); cursor: pointer; animation: dealIn .5s cubic-bezier(.2,.9,.3,1.2) both; animation-delay: calc(var(--d) * 90ms); position: relative; }
   @keyframes dealIn { from { transform: translateY(60vh) rotate(calc(var(--d) * 8deg - 16deg)) scale(.6); opacity: 0; } }
-  .flip-inner { position: relative; transform-style: preserve-3d; transition: transform .65s cubic-bezier(.3,1.4,.5,1); }
-  .flip.flipped .flip-inner { transform: rotateY(180deg); }
-  .flip .face { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
-  .flip .front { position: absolute; inset: 0; transform: rotateY(180deg); }
+  .flip-inner { position: relative; }
+  .flip .front { display: none; }
+  .flip.flipped .front { display: block; }
+  .flip.flipped .back { display: none; }
   .flip:not(.flipped).hint-2 .cardback { box-shadow: 0 0 22px 4px var(--c-epic); animation: hintPulse .9s ease-in-out infinite alternate; }
   .flip:not(.flipped).hint-3 .cardback { box-shadow: 0 0 28px 6px var(--c-legendary); animation: hintPulse .6s ease-in-out infinite alternate; }
   .flip:not(.flipped).hint-4 .cardback { box-shadow: 0 0 34px 8px var(--c-mythic); animation: hintPulse .4s ease-in-out infinite alternate; }
@@ -427,16 +427,14 @@
   /* ======================================================
      3D VIEWER
      ====================================================== */
-  .viewer { position: fixed; inset: 0; z-index: 75; background: rgba(6,5,22,.6); backdrop-filter: blur(28px) saturate(150%); -webkit-backdrop-filter: blur(28px) saturate(150%); overflow-y: auto; }
+  .viewer { position: fixed; inset: 0; z-index: 75; background: radial-gradient(55% 40% at 30% 25%, rgba(150,60,255,.38), transparent 70%), radial-gradient(50% 40% at 75% 80%, rgba(255,60,200,.26), transparent 70%), radial-gradient(40% 35% at 85% 15%, rgba(40,200,255,.22), transparent 70%), #08071d; overflow-y: auto; }
   .viewer-wrap { min-height: 100%; display: grid; grid-template-columns: 1fr; place-items: center; gap: 18px; padding: calc(56px + env(safe-area-inset-top)) 16px 30px; max-width: 1000px; margin: 0 auto; }
   @media (min-width: 820px) { .viewer-wrap { grid-template-columns: 1.1fr 1fr; } }
-  .scene { width: min(330px, 78vw); perspective: 1100px; touch-action: none; cursor: grab; }
+  .scene { width: min(330px, 78vw); touch-action: none; cursor: grab; }
   .scene:active { cursor: grabbing; }
-  .v-card { position: relative; transform-style: preserve-3d; will-change: transform; }
-  .v-card .face { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
-  .v-card .front { transform: translateZ(1.5px); }
-  .v-card .back { position: absolute; inset: 0; transform: rotateY(180deg) translateZ(1.5px); }
-  .v-card .edge { position: absolute; inset: 1%; border-radius: 7% / 5%; background: linear-gradient(90deg, #c9d0e6, #fff, #a9b2cc); }
+  .v-card { position: relative; will-change: transform; }
+  .v-card .back { transform: scaleX(-1); }
+  .v-card .card, .v-card .cardback { animation: none; }
   .v-shadow { width: 70%; height: 22px; margin: 26px auto 0; border-radius: 50%; background: radial-gradient(rgba(0,0,0,.6), transparent 70%); }
   .v-panel { width: 100%; max-width: 420px; }
   .v-panel h3 { font-family: var(--display); font-size: 1.8rem; margin: 0; line-height: 1.1; letter-spacing: -0.02em; }
@@ -1085,8 +1083,18 @@ function showReveal(pack, cards, news) {
   stage.appendChild(wrap);
   let flipped = 0;
   const flipOne = (el) => {
-    if (el.classList.contains('flipped')) { openViewer(null, cards[+el.dataset.i]); return; }
-    el.classList.add('flipped');
+    if (el.dataset.done) { if (el.classList.contains('flipped')) openViewer(null, cards[+el.dataset.i]); return; }
+    el.dataset.done = '1';
+    const inner = el.querySelector('.flip-inner');
+    const turn = (a, b, ms, easing) => inner.animate([{ transform: `perspective(800px) rotateY(${a}deg)` }, { transform: `perspective(800px) rotateY(${b}deg)` }], { duration: ms, easing }).finished;
+    turn(0, 90, 170, 'ease-in').then(() => {
+      el.classList.add('flipped');
+      return inner.animate([
+        { transform: 'perspective(800px) rotateY(-90deg)' },
+        { transform: 'perspective(800px) rotateY(10deg)', offset: .7 },
+        { transform: 'perspective(800px) rotateY(0deg)' },
+      ], { duration: 420, easing: 'ease-out' }).finished;
+    }).catch(() => el.classList.add('flipped'));
     flipped++;
     const inst = cards[+el.dataset.i];
     const c = charOf(inst.id);
@@ -1102,7 +1110,7 @@ function showReveal(pack, cards, news) {
   };
   wrap.querySelectorAll('.flip').forEach(el => el.onclick = () => flipOne(el));
   $('revealAll').onclick = async () => {
-    for (const el of wrap.querySelectorAll('.flip:not(.flipped)')) { flipOne(el); await new Promise(r => setTimeout(r, 380)); }
+    for (const el of wrap.querySelectorAll('.flip:not([data-done])')) { flipOne(el); await new Promise(r => setTimeout(r, 380)); }
   };
   $('doneBtn').onclick = closeStage;
   $('againBtn').onclick = () => { closeStage(); openPack(pack); };
@@ -1163,9 +1171,8 @@ function openViewer(key, instOverride) {
       <div>
         <div class="scene" id="scene">
           <div class="v-card" id="vCard">
-            <div class="edge"></div>
-            <div class="face front">${cardHTML(inst, { eager: true, lit: true })}</div>
-            <div class="face back">${backHTML()}</div>
+            <div class="front">${cardHTML(inst, { eager: true, lit: true })}</div>
+            <div class="back hidden">${backHTML()}</div>
           </div>
         </div>
         <div class="v-shadow"></div>
@@ -1198,11 +1205,20 @@ function openViewer(key, instOverride) {
   const scene = $('scene'), card = $('vCard');
   const front = card.querySelector('.card');
   const backFace = card.querySelector('.cardback');
+  const frontWrap = card.querySelector('.front'), backWrap = card.querySelector('.back');
+  let showingBack = false;
 
   const apply = () => {
-    card.style.transform = `rotateX(${V.rx}deg) rotateY(${V.ry}deg)`;
+    card.style.transform = `perspective(1100px) rotateX(${V.rx}deg) rotateY(${V.ry}deg)`;
     // Map the angle to light position for holo + glare
     const ry = ((V.ry % 360) + 360) % 360;
+    // One flat card: swap to the back design once it has turned past edge-on
+    const back = ry > 90 && ry < 270;
+    if (back !== showingBack) {
+      showingBack = back;
+      frontWrap.classList.toggle('hidden', back);
+      backWrap.classList.toggle('hidden', !back);
+    }
     const mx = 50 + Math.sin(ry * Math.PI / 180) * 60;
     const my = 50 - Math.sin(V.rx * Math.PI / 180) * 80;
     front.style.setProperty('--mx', mx.toFixed(1) + '%');

@@ -16,3 +16,13 @@ It's a single file with no build step. Either:
 
 - download `index.html` and open it in your browser, or
 - turn on GitHub Pages (repo **Settings → Pages → Deploy from a branch**) and open the URL it gives you.
+
+# DeepCut 🔎 (`/niche/`)
+
+A helper for "give the most niche answer" games. Paste the question (e.g. "Name a fruit") and it:
+
+1. pulls every answer it can find from Wikipedia categories, "List of…" pages, and the Datamuse word database,
+2. ranks them by popularity (Wikipedia page views over 30 days, word frequency),
+3. shows **Primordial picks** (rarest but still real), **Deep cuts**, **Safe niche**, and the popular answers to avoid.
+
+Tap an answer to copy it.

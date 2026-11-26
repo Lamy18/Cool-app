@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Deep Cut — Niche Answer Finder</title>
+<style>
+  :root {
+    --bg: #0b1418;
+    --panel: #12232a;
+    --panel-2: #1a313a;
+    --line: #29464f;
+    --text: #e9f6f4;
+    --muted: #8fb0ad;
+    --accent: #35e0b5;
+    --accent-ink: #062a21;
+    --primordial: #c08bff;
+    --deep: #4fb6ff;
+    --safe: #8fd36b;
+    --common: #ff7a6b;
+    --radius: 14px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: radial-gradient(900px 500px at 80% -10%, #173a3a 0%, var(--bg) 60%);
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    min-height: 100vh;
+    padding: 24px 16px 48px;
+  }
+  main { max-width: 760px; margin: 0 auto; }
+  h1 { margin: 0; font-size: 2rem; letter-spacing: -0.02em; }
+  h1 span { color: var(--accent); }
+  .tagline { color: var(--muted); margin: 4px 0 20px; }
+  .card { background: var(--panel); border-radius: var(--radius); padding: 18px; margin-bottom: 14px; border: 1px solid var(--line); }
+  label { display: block; color: var(--muted); font-size: .85rem; margin-bottom: 6px; }
+  input[type=text] {
+    width: 100%; font: inherit; color: var(--text); background: var(--bg);
+    border: 2px solid var(--line); border-radius: 10px; padding: 12px 14px; outline: none;
+  }
+  input[type=text]:focus { border-color: var(--accent); }
+  .row { display: flex; gap: 8px; }
+  .row input { flex: 1; min-width: 0; }
+  button {
+    font: inherit; font-weight: 600; border: 0; border-radius: 10px; padding: 12px 16px;
+    cursor: pointer; color: var(--text); background: var(--panel-2);
+  }
+  button:hover:not(:disabled) { filter: brightness(1.15); }
+  button:disabled { opacity: .5; cursor: not-allowed; }
+  button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .go { background: var(--accent); color: var(--accent-ink); }
+  .topic-line { margin-top: 12px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; color: var(--muted); font-size: .9rem; }
+  .topic-line input { width: auto; flex: 1; min-width: 140px; padding: 8px 10px; }
+  .sources { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .chip {
+    font-size: .82rem; padding: 6px 10px; border-radius: 999px; background: var(--panel-2);
+    border: 1px solid var(--line); color: var(--muted); cursor: pointer; font-weight: 500;
+  }
+  .chip.on { border-color: var(--accent); color: var(--text); }
+  .status { color: var(--muted); font-size: .9rem; margin-top: 10px; min-height: 1.2em; }
+  .error { color: var(--common); }
+
+  .tiers { display: grid; gap: 14px; }
+  .tier h2 { margin: 0 0 2px; font-size: 1.1rem; display: flex; align-items: center; gap: 8px; }
+  .tier p.hint { margin: 0 0 12px; color: var(--muted); font-size: .85rem; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  .tier.primordial { border-color: var(--primordial); box-shadow: 0 0 0 1px var(--primordial) inset, 0 0 40px rgba(192,139,255,.12); }
+  .tier.primordial .dot { background: var(--primordial); }
+  .tier.deep .dot { background: var(--deep); }
+  .tier.safe .dot { background: var(--safe); }
+  .tier.common .dot { background: var(--common); }
+  .answers { display: flex; flex-wrap: wrap; gap: 8px; }
+  .answer {
+    background: var(--panel-2); border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px;
+    cursor: pointer; text-align: left; font-weight: 500; display: flex; flex-direction: column; gap: 2px;
+  }
+  .answer small { color: var(--muted); font-size: .72rem; font-weight: 400; }
+  .answer.copied { border-color: var(--accent); }
+  .tier.common .answer { cursor: default; opacity: .75; text-decoration: line-through; text-decoration-color: var(--common); }
+  .tier-actions { margin-top: 10px; display: flex; gap: 8px; }
+  .tier-actions button { padding: 8px 12px; font-size: .85rem; }
+  .tips { color: var(--muted); font-size: .88rem; line-height: 1.5; }
+  .tips b { color: var(--text); }
+  .footer { color: var(--muted); font-size: .8rem; text-align: center; margin-top: 20px; }
+  .footer a { color: var(--muted); }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Deep<span>Cut</span></h1>
+  <p class="tagline">Paste the question. Get real answers that almost nobody else will think of.</p>
+
+  <section class="card">
+    <label for="question">Question</label>
+    <div class="row">
+      <input type="text" id="question" placeholder='e.g. "Name a fruit" or "A famous painter"' autocomplete="off">
+      <button class="go" id="goBtn">Find</button>
+    </div>
+    <div class="topic-line hidden" id="topicLine">
+      Searching for: <input type="text" id="topic" aria-label="Topic"> <button id="retopicBtn" style="padding:8px 12px">Update</button>
+    </div>
+    <div class="sources hidden" id="sources"></div>
+    <div class="status" id="status"></div>
+  </section>
+
+  <section class="tiers hidden" id="results">
+    <div class="card tier primordial">
+      <h2><span class="dot"></span>Primordial picks</h2>
+      <p class="hint">Rarest answers that are still real and recognizable. Tap to copy.</p>
+      <div class="answers" id="tier-primordial"></div>
+      <div class="tier-actions"><button data-shuffle="primordial">Show different ones</button></div>
+    </div>
+    <div class="card tier deep">
+      <h2><span class="dot"></span>Deep cuts</h2>
+      <p class="hint">Very uncommon, a little safer.</p>
+      <div class="answers" id="tier-deep"></div>
+      <div class="tier-actions"><button data-shuffle="deep">Show different ones</button></div>
+    </div>
+    <div class="card tier safe">
+      <h2><span class="dot"></span>Safe niche</h2>
+      <p class="hint">Less common than most answers, but everyone will accept them.</p>
+      <div class="answers" id="tier-safe"></div>
+      <div class="tier-actions"><button data-shuffle="safe">Show different ones</button></div>
+    </div>
+    <div class="card tier common">
+      <h2><span class="dot"></span>Avoid: everyone says these</h2>
+      <p class="hint">The most popular answers. Saying one of these won't score.</p>
+      <div class="answers" id="tier-common"></div>
+    </div>
+  </section>
+
+  <section class="card tips">
+    <b>How it ranks answers:</b> it collects every answer it can find for the topic from Wikipedia (category pages and "List of…" pages) and a word database. It then ranks them by popularity, using Wikipedia page views over the last 30 days and how often each word is used in English. Low popularity means few other players will think of it. Answers with almost zero traffic are dropped, because the game may not accept something nobody has heard of.<br><br>
+    <b>Tip:</b> if the results look off, edit the "Searching for" box to a simpler topic (e.g. "painters" instead of "a famous painter") or toggle the Wikipedia categories found.
+  </section>
+
+  <p class="footer"><a href="../">← Back to Earshot</a> · Data from Wikipedia and Datamuse</p>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const $ = (id) => document.getElementById(id);
+  const WIKI = 'https://en.wikipedia.org/w/api.php';
+  const DATAMUSE = 'https://api.datamuse.com/words';
+  const SHOW = { primordial: 12, deep: 12, safe: 10, common: 8 };
+
+  const esc = (s) => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const shuffle = (a) => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+
+  // ---------- Text helpers ----------
+  function topicFromQuestion(q) {
+    let t = ' ' + q.toLowerCase().replace(/[?!.:"“”]/g, ' ') + ' ';
+    const lead = [
+      'can you name', 'name as many', 'name one of the', 'name one', 'name some', 'name an', 'name a', 'name the', 'name',
+      'what is your favorite', "what's your favorite", 'what is a', 'what is an', "what's a", 'what are some', 'what',
+      'give me a', 'give me an', 'give me', 'think of a', 'think of an', 'think of', 'list some', 'list a', 'list',
+      'tell me a', 'tell me an', 'type of', 'types of', 'kind of', 'kinds of', 'sort of', 'example of', 'examples of',
+      'a famous', 'an famous', 'famous', 'popular', 'well known', 'well-known', 'any', 'some', 'one', 'a', 'an', 'the',
+      'favorite', 'favourite', 'your', 'you', 'can', 'that', 'is', 'are'
+    ];
+    let changed = true;
+    while (changed) {
+      changed = false;
+      t = t.trim();
+      for (const p of lead) {
+        if (t === p) break;
+        if (t.startsWith(p + ' ')) { t = t.slice(p.length + 1); changed = true; break; }
+      }
+    }
+    t = t.replace(/\s+(that|which|who|you|in the world|ever|of all time).*$/, '');
+    return t.trim();
+  }
+
+  function plural(w) {
+    const parts = w.split(' '); let last = parts.pop();
+    if (/(s|x|z|ch|sh)$/.test(last)) last += 'es';
+    else if (/[^aeiou]y$/.test(last)) last = last.slice(0, -1) + 'ies';
+    else if (!/s$/.test(last)) last += 's';
+    return [...parts, last].join(' ');
+  }
+  function singular(w) {
+    const parts = w.split(' '); let last = parts.pop();
+    if (/ies$/.test(last)) last = last.slice(0, -3) + 'y';
+    else if (/(ses|xes|zes|ches|shes)$/.test(last)) last = last.slice(0, -2);
+    else if (/[^s]s$/.test(last)) last = last.slice(0, -1);
+    return [...parts, last].join(' ');
+  }
+  const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+  const key = (s) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]/g, '');
+
+  function cleanTitle(title) {
+    if (/^(list|lists|outline|glossary|index|history|timeline|bibliography) of/i.test(title)) return null;
+    if (/:/.test(title)) return null;
+    if (/^\d+$/.test(title)) return null;
+    const t = title.replace(/\s*\(.*?\)\s*/g, ' ').trim();
+    if (!t || t.length > 40) return null;
+    return t;
+  }
+
+  // ---------- API calls ----------
+  async function wiki(params) {
+    const u = new URL(WIKI);
+    for (const [k, v] of Object.entries({ format: 'json', formatversion: '2', origin: '*', ...params })) u.searchParams.set(k, v);
+    const r = await fetch(u);
+    if (!r.ok) throw new Error('wiki ' + r.status);
+    return r.json();
+  }
+
+  function sumViews(pv) {
+    if (!pv) return null;
+    const vals = Object.values(pv).filter(v => typeof v === 'number');
+    return vals.length ? vals.reduce((a, b) => a + b, 0) : null;
+  }
+
+  // Pages (with 30-day views) from a generator, following continuation a few times
+  async function wikiPagesWithViews(genParams, maxRequests = 6) {
+    const out = new Map();
+    let cont = {};
+    for (let i = 0; i < maxRequests; i++) {
+      const d = await wiki({ action: 'query', prop: 'pageviews', pvipdays: '30', redirects: '1', ...genParams, ...cont });
+      for (const p of (d.query && d.query.pages) || []) {
+        if (p.missing || p.ns !== 0) continue;
+        const v = sumViews(p.pageviews);
+        const prev = out.get(p.title);
+        if (v !== null && (prev == null || v > prev)) out.set(p.title, v);
+        else if (prev === undefined) out.set(p.title, v);
+      }
+      if (!d.continue) break;
+      cont = d.continue;
+    }
+    return out;
+  }
+
+  async function findCategories(topic) {
+    const pl = plural(topic);
+    const d = await wiki({ action: 'query', list: 'search', srnamespace: '14', srsearch: pl, srlimit: '8' });
+    const hits = ((d.query && d.query.search) || []).map(s => s.title);
+    // Prefer the exact "Category:<Plural>" when it exists
+    const exact = 'Category:' + cap(pl);
+    const ordered = hits.includes(exact) ? [exact, ...hits.filter(h => h !== exact)] : hits;
+    return ordered.filter(c => !/(stubs|by country|by year|templates|images|people from|lists of|wikipedia|articles)/i.test(c)).slice(0, 5);
+  }
+
+  async function categoryCandidates(cat) {
+    const pages = await wikiPagesWithViews({ generator: 'categorymembers', gcmtitle: cat, gcmnamespace: '0', gcmlimit: '50' }, 4);
+    // One level of sub-categories (e.g. Category:Fruits → Category:Tropical fruit)
+    const sub = await wiki({ action: 'query', list: 'categorymembers', cmtitle: cat, cmtype: 'subcat', cmlimit: '12' });
+    const subs = ((sub.query && sub.query.categorymembers) || []).map(c => c.title)
+      .filter(c => !/(stubs|by country|images|templates|lists|people)/i.test(c)).slice(0, 6);
+    const subResults = await Promise.allSettled(subs.map(s =>
+      wikiPagesWithViews({ generator: 'categorymembers', gcmtitle: s, gcmnamespace: '0', gcmlimit: '50' }, 2)));
+    for (const r of subResults) if (r.status === 'fulfilled') for (const [k, v] of r.value) if (!pages.has(k)) pages.set(k, v);
+    return pages;
+  }
+
+  async function listPageCandidates(topic) {
+    return wikiPagesWithViews({ generator: 'links', titles: 'List of ' + plural(topic), gplnamespace: '0', gpllimit: '50' }, 8);
+  }
+
+  async function datamuseCandidates(topic) {
+    const terms = [...new Set([singular(topic), topic])];
+    const out = new Map();
+    for (const t of terms) {
+      const r = await fetch(`${DATAMUSE}?rel_gen=${encodeURIComponent(t)}&md=f&max=500`);
+      if (!r.ok) continue;
+      for (const w of await r.json()) {
+        const f = (w.tags || []).find(x => x.startsWith('f:'));
+        out.set(w.word, f ? parseFloat(f.slice(2)) : 0);
+      }
+    }
+    return out;
+  }
+
+  // ---------- Ranking ----------
+  // Each source gets ranked on its own scale (page views vs word frequency), then merged by percentile.
+  function rankSource(map, floor) {
+    const items = [...map.entries()].filter(([, v]) => v !== null && v >= floor);
+    items.sort((a, b) => a[1] - b[1]);
+    const n = items.length;
+    return items.map(([name, v], i) => ({ name, value: v, pct: n > 1 ? i / (n - 1) : 0.5 }));
+  }
+
+  function buildTiers(sources, topic) {
+    const merged = new Map();
+    const topicKeys = new Set([key(topic), key(singular(topic)), key(plural(topic))]);
+    for (const { items, label, unit } of sources) {
+      for (const it of items) {
+        const name = label === 'wiki' ? cleanTitle(it.name) : it.name;
+        if (!name) continue;
+        const k = key(name);
+        if (!k || topicKeys.has(k)) continue;
+        const prev = merged.get(k);
+        // Keep the most popular reading of an answer (if it's popular anywhere, others may say it)
+        if (!prev || it.pct > prev.pct) merged.set(k, { name, pct: it.pct, value: it.value, unit, sources: new Set([...(prev ? prev.sources : []), label]) });
+        else prev.sources.add(label);
+      }
+    }
+    const all = [...merged.values()].sort((a, b) => a.pct - b.pct);
+    return {
+      total: all.length,
+      primordial: all.filter(a => a.pct < 0.18),
+      deep: all.filter(a => a.pct >= 0.18 && a.pct < 0.4),
+      safe: all.filter(a => a.pct >= 0.4 && a.pct < 0.7),
+      common: all.filter(a => a.pct >= 0.85).sort((a, b) => b.pct - a.pct),
+    };
+  }
+
+  // ---------- UI ----------
+  let tiers = null;
+  let catState = [];  // {title, on}
+  let lastTopic = '';
+
+  function setStatus(msg, isErr) { $('status').innerHTML = isErr ? `<span class="error">${esc(msg)}</span>` : esc(msg); }
+
+  function fmt(a) {
+    if (a.unit === 'views') return `${a.value.toLocaleString()} views / 30 days`;
+    return a.value < 0.01 ? 'very rare word' : `${a.value} per million words`;
+  }
+
+  function renderTier(name, randomize) {
+    const list = tiers[name];
+    const el = $('tier-' + name);
+    const pick = name === 'common' ? list.slice(0, SHOW[name]) : (randomize ? shuffle(list) : list).slice(0, SHOW[name]);
+    if (!pick.length) { el.innerHTML = '<span style="color:var(--muted);font-size:.9rem">Nothing in this range. Try a broader topic.</span>'; return; }
+    el.innerHTML = pick.map(a => `<button class="answer" data-copy="${esc(a.name)}">${esc(a.name)}<small>${esc(fmt(a))}</small></button>`).join('');
+  }
+
+  function renderAll() {
+    $('results').classList.remove('hidden');
+    // Primordial picks: start with a random mix from the rarest bucket so repeats don't always show the same ones
+    renderTier('primordial', true);
+    renderTier('deep', true);
+    renderTier('safe', true);
+    renderTier('common', false);
+  }
+
+  function renderCats() {
+    const box = $('sources');
+    if (!catState.length) { box.classList.add('hidden'); return; }
+    box.classList.remove('hidden');
+    box.innerHTML = '<span style="color:var(--muted);font-size:.82rem;align-self:center">Wikipedia categories:</span>' +
+      catState.map((c, i) => `<button class="chip ${c.on ? 'on' : ''}" data-cat="${i}">${esc(c.title.replace(/^Category:/, ''))}</button>`).join('');
+  }
+
+  async function run(topic, reuseCats) {
+    topic = topic.trim().toLowerCase();
+    if (!topic) { setStatus('Type a question first.', true); return; }
+    lastTopic = topic;
+    $('topic').value = topic;
+    $('topicLine').classList.remove('hidden');
+    $('goBtn').disabled = true;
+    setStatus('Collecting possible answers…');
+    try {
+      if (!reuseCats) {
+        const cats = await findCategories(topic).catch(() => []);
+        catState = cats.map((t, i) => ({ title: t, on: i < 2 }));
+        renderCats();
+      }
+      const active = catState.filter(c => c.on).map(c => c.title);
+      const [dm, list, ...cats] = await Promise.allSettled([
+        datamuseCandidates(topic),
+        listPageCandidates(topic),
+        ...active.map(categoryCandidates),
+      ]);
+      const wikiMap = new Map();
+      for (const r of [list, ...cats]) if (r.status === 'fulfilled') for (const [k, v] of r.value) {
+        if (!wikiMap.has(k) || (v || 0) > (wikiMap.get(k) || 0)) wikiMap.set(k, v);
+      }
+      const sources = [
+        // Floors drop answers so obscure the game might not recognise them
+        { label: 'wiki', unit: 'views', items: rankSource(wikiMap, 60) },
+        { label: 'words', unit: 'freq', items: dm.status === 'fulfilled' ? rankSource(dm.value, 0.02) : [] },
+      ];
+      tiers = buildTiers(sources, topic);
+      if (tiers.total < 5) {
+        const allFailed = dm.status === 'rejected' && list.status === 'rejected';
+        setStatus(allFailed
+          ? 'Could not reach Wikipedia. Check your internet connection and try again.'
+          : `Only found ${tiers.total} answers for "${topic}". Try a simpler or plural topic, like "fruits" or "painters".`, true);
+        $('results').classList.toggle('hidden', tiers.total === 0);
+        if (tiers.total) renderAll();
+        return;
+      }
+      setStatus(`Ranked ${tiers.total.toLocaleString()} possible answers by popularity.`);
+      renderAll();
+    } catch (e) {
+      setStatus('Something went wrong fetching answers. Try again.', true);
+    } finally {
+      $('goBtn').disabled = false;
+    }
+  }
+
+  $('goBtn').onclick = () => run(topicFromQuestion($('question').value) || $('question').value, false);
+  $('question').addEventListener('keydown', e => { if (e.key === 'Enter') $('goBtn').click(); });
+  $('retopicBtn').onclick = () => run($('topic').value, false);
+  $('topic').addEventListener('keydown', e => { if (e.key === 'Enter') $('retopicBtn').click(); });
+
+  $('sources').addEventListener('click', e => {
+    const b = e.target.closest('[data-cat]');
+    if (!b) return;
+    const c = catState[+b.dataset.cat];
+    c.on = !c.on;
+    renderCats();
+    run(lastTopic, true);
+  });
+
+  document.addEventListener('click', async e => {
+    const s = e.target.closest('[data-shuffle]');
+    if (s && tiers) { renderTier(s.dataset.shuffle, true); return; }
+    const a = e.target.closest('[data-copy]');
+    if (!a || a.closest('.common')) return;
+    try { await navigator.clipboard.writeText(a.dataset.copy); } catch { /* clipboard unavailable */ }
+    a.classList.add('copied');
+    const small = a.querySelector('small');
+    const old = small.textContent;
+    small.textContent = 'Copied!';
+    setTimeout(() => { a.classList.remove('copied'); small.textContent = old; }, 1200);
+  });
+
+  window.__deepcut = { topicFromQuestion, plural, singular, buildTiers, rankSource };
+})();
+</script>
+</body>
+</html>

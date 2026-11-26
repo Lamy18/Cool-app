@@ -39,6 +39,8 @@ An incremental anime card-collecting game. Character art and names load live fro
 
 - Tap for coins; cards earn coins every second (and half-rate while you're away, up to 8 hours)
 - Four packs with a shake → tear → flip opening animation, particles, light rays, screen shake and sounds; better pulls shake the pack harder
-- Editions (Holo, Gold, Prismatic, Glitch, Negative, Shadow) and traits (Signed, 1st Edition, Full Art, Sparkle, Misprint) multiply a card's value
+- Holographic glass card design: rarity borders (clear glass, silver foil, holo, gold foil, prismatic), foil that follows your pointer, film-grain noise, frosted info bars
+- Editions (Holo, Silver Foil, Gold Foil, Liquid Glass, Prismatic, Glitch, Negative, Shadow) and traits (Signed, 1st Edition, Full Art, Die-cut Sticker, Sparkle, Misprint) multiply a card's value
+- Crinkled holographic foil packs that tilt with your pointer
 - Drag-to-spin 3D card viewer with holo light that follows the angle
 - Upgrades: Power Tap, Fan Club, Lucky Charm, Trait Hunter, Auto-Opener

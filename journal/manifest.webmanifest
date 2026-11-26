@@ -1,0 +1,21 @@
+{
+  "name": "Dayflow Journal",
+  "short_name": "Dayflow",
+  "description": "Habits, countdowns and a daily journal.",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#050505",
+  "theme_color": "#050505",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Write today's journal", "short_name": "Journal", "url": "./#journal", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Tick off habits", "short_name": "Habits", "url": "./#habits", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] }
+  ]
+}

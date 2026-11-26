@@ -4,6 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#050505">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Dayflow">
 <title>Dayflow Journal</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -31,7 +38,7 @@
     color-scheme: dark;
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  html, body { margin: 0; }
+  html, body { margin: 0; overscroll-behavior-y: none; -webkit-text-size-adjust: 100%; }
   body {
     background: var(--bg); color: var(--text); font-family: var(--body);
     min-height: 100vh;
@@ -252,7 +259,21 @@ const KEY = 'dayflow:data';
 const store = {
   load() { try { return JSON.parse(localStorage.getItem(KEY)); } catch { return null; } },
   save(d) { try { localStorage.setItem(KEY, JSON.stringify(d)); return true; } catch { return false; } },
+  flag(k) { try { return localStorage.getItem('dayflow:' + k) === '1'; } catch { return false; } },
+  setFlag(k, v) { try { localStorage.setItem('dayflow:' + k, v ? '1' : '0'); } catch { /* ignore */ } },
 };
+
+// ================= Install / offline =================
+let installEvt = null;
+const isStandalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+const isIOS = () => /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); installEvt = e; if (tab === 'home' && D.name) render(); });
+addEventListener('appinstalled', () => { installEvt = null; toast('Dayflow installed 🎉'); });
+if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+  addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => { /* offline support unavailable */ }));
+}
+// Ask the browser to keep this app's data even when storage runs low
+if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
 let D = store.load() || { name: '', habits: [], countdowns: [], journal: {} };
 D.habits ||= []; D.countdowns ||= []; D.journal ||= {};
 const save = () => { if (!store.save(D)) toast('Could not save on this device'); };
@@ -496,6 +517,7 @@ function homeHTML() {
       ${folderTile('yellow', ICON.clock, upcoming().length, 'Active countdowns')}
     </div>
 
+    ${installCardHTML()}
     <button class="wide-btn" id="reflectBtn">Write today's reflection ${ICON.arrow}</button>
     <p class="footer-links"><a href="../">Earshot</a> · <a href="../trader/">Candle Crawl</a> · <a href="../cards/">Holo Pull</a></p>`;
 }
@@ -508,8 +530,18 @@ function sparkline(vals, col) {
   const pts = vals.map((v, i) => `${(i / (vals.length - 1) * w).toFixed(1)},${(h - 3 - v * (h - 6)).toFixed(1)}`);
   return `<svg class="spark" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" aria-hidden="true"><polyline points="${pts.join(' ')}" fill="none" stroke="${col}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg>`;
 }
+function installCardHTML() {
+  if (isStandalone() || store.flag('installHidden')) return '';
+  if (!installEvt && !isIOS()) return '';
+  return `<div class="card c-blue" id="installCard">
+    <div class="row"><img src="icons/icon-192.png" alt="" width="48" height="48" style="border-radius:14px"><div class="spacer"><h3>Put Dayflow on your home screen</h3><div class="meta">${installEvt ? 'Opens full screen and works offline.' : 'Tap the Share button in Safari, then “Add to Home Screen”.'}</div></div></div>
+    <div class="row" style="margin-top:12px">${installEvt ? '<button class="pill" id="installBtn" style="background:#0b0b0b;color:#fff">Install app</button>' : ''}<button class="pill" id="installHide" style="border:1.5px solid rgba(11,11,11,.35)">Not now</button></div>
+  </div>`;
+}
 function bindHome() {
   $('profileBtn').onclick = openSettings;
+  if ($('installBtn')) $('installBtn').onclick = async () => { const e = installEvt; installEvt = null; e.prompt(); const r = await e.userChoice; if (r.outcome === 'accepted') toast('Installing Dayflow…'); render(); };
+  if ($('installHide')) $('installHide').onclick = () => { store.setFlag('installHidden', true); render(); };
   if ($('heroCd')) $('heroCd').onclick = () => setTab('countdowns');
   if ($('heroAdd')) $('heroAdd').onclick = () => openCountdownSheet();
   $('homeJournal').onclick = () => { journalDay = todayKey(); setTab('journal'); };
@@ -831,6 +863,7 @@ function openSettings() {
     <h2>Settings</h2>
     <label class="field"><span>Your name</span><input id="sName" maxlength="24" value="${esc(D.name)}"></label>
     <button class="wide-btn" id="sSave">Save name ${ICON.arrow}</button>
+    ${installEvt ? '<button class="wide-btn ghost" id="sInstall">Install app on this device</button>' : ''}
     <div class="field"><span>Backup</span>
       <div class="btn-row"><button class="wide-btn ghost" id="sExport">Download backup</button><button class="wide-btn ghost" id="sImport">Restore backup</button></div>
       <input type="file" id="sFile" accept="application/json,.json" class="hidden">
@@ -847,6 +880,7 @@ function openSettings() {
     toast('Backup downloaded');
   };
   $('sImport').onclick = () => $('sFile').click();
+  if ($('sInstall')) $('sInstall').onclick = async () => { const e = installEvt; installEvt = null; closeSheet(); e.prompt(); await e.userChoice; render(); };
   $('sFile').onchange = async (e) => {
     const f = e.target.files[0]; if (!f) return;
     try {
@@ -864,6 +898,8 @@ function openSettings() {
 let lastDay = todayKey();
 setInterval(() => { if (todayKey() !== lastDay) { lastDay = todayKey(); habitDay = journalDay = lastDay; if (!$('sheetRoot').innerHTML && document.activeElement.tagName !== 'TEXTAREA' && document.activeElement.tagName !== 'INPUT') render(); } }, 30000);
 
+if (['#journal', '#habits', '#countdowns'].includes(location.hash)) tab = location.hash.slice(1);
+addEventListener('hashchange', () => { if (['#journal', '#habits', '#countdowns', '#home'].includes(location.hash) && D.name) setTab(location.hash.slice(1)); });
 window.__dj = { get D() { return D; }, streak, bestStreak, render };
 render();
 })();

@@ -19,10 +19,12 @@ It's a single file with no build step. Either:
 
 # DeepCut 🔎 (`/niche/`)
 
-A helper for "give the most niche answer" games. Paste the question (e.g. "Name a fruit") and it:
+A helper for "give the most niche answer" games. Type the question or paste a screenshot of it, and Claude reads it and suggests real answers that few players will give:
 
-1. pulls every answer it can find from Wikipedia categories, "List of…" pages, and the Datamuse word database,
-2. ranks them by popularity (Wikipedia page views over 30 days, word frequency),
-3. shows **Primordial picks** (rarest but still real), **Deep cuts**, **Safe niche**, and the popular answers to avoid.
+- **Primordial picks**: rarest answers that still clearly fit
+- **Deep cuts** and **Safe niche**: progressively safer options
+- **Avoid**: what everyone else will say
 
-Tap an answer to copy it.
+Each suggestion is checked against Wikipedia page views (sorted rarest first, and flagged if there is no page). Tap an answer to copy it.
+
+Needs your own Anthropic API key (console.anthropic.com), entered once on the page. It is stored only in your browser and sent only to Anthropic. Each question costs roughly 1–3 cents.

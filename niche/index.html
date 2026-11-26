@@ -17,7 +17,7 @@
     --primordial: #c08bff;
     --deep: #4fb6ff;
     --safe: #8fd36b;
-    --common: #ff7a6b;
+    --bad: #ff7a6b;
     --radius: 14px;
   }
   * { box-sizing: border-box; }
@@ -36,393 +36,336 @@
   .tagline { color: var(--muted); margin: 4px 0 20px; }
   .card { background: var(--panel); border-radius: var(--radius); padding: 18px; margin-bottom: 14px; border: 1px solid var(--line); }
   label { display: block; color: var(--muted); font-size: .85rem; margin-bottom: 6px; }
-  input[type=text] {
+  input[type=text], input[type=password], textarea {
     width: 100%; font: inherit; color: var(--text); background: var(--bg);
     border: 2px solid var(--line); border-radius: 10px; padding: 12px 14px; outline: none;
   }
-  input[type=text]:focus { border-color: var(--accent); }
-  .row { display: flex; gap: 8px; }
-  .row input { flex: 1; min-width: 0; }
+  textarea { resize: vertical; min-height: 76px; }
+  input:focus, textarea:focus { border-color: var(--accent); }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .row > input { flex: 1; min-width: 0; }
   button {
     font: inherit; font-weight: 600; border: 0; border-radius: 10px; padding: 12px 16px;
     cursor: pointer; color: var(--text); background: var(--panel-2);
   }
   button:hover:not(:disabled) { filter: brightness(1.15); }
   button:disabled { opacity: .5; cursor: not-allowed; }
-  button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .go { background: var(--accent); color: var(--accent-ink); }
-  .topic-line { margin-top: 12px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; color: var(--muted); font-size: .9rem; }
-  .topic-line input { width: auto; flex: 1; min-width: 140px; padding: 8px 10px; }
-  .sources { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
-  .chip {
-    font-size: .82rem; padding: 6px 10px; border-radius: 999px; background: var(--panel-2);
-    border: 1px solid var(--line); color: var(--muted); cursor: pointer; font-weight: 500;
-  }
-  .chip.on { border-color: var(--accent); color: var(--text); }
+  .actions { display: flex; gap: 8px; margin-top: 10px; align-items: center; flex-wrap: wrap; }
+  .actions .go { margin-left: auto; min-width: 150px; }
+  .small { font-size: .85rem; color: var(--muted); }
+  .small a { color: var(--accent); }
+  .shot { margin-top: 10px; position: relative; display: inline-block; }
+  .shot img { max-width: 220px; max-height: 220px; border-radius: 10px; border: 1px solid var(--line); display: block; }
+  .shot button { position: absolute; top: 6px; right: 6px; padding: 4px 9px; font-size: .8rem; background: rgba(0,0,0,.7); }
   .status { color: var(--muted); font-size: .9rem; margin-top: 10px; min-height: 1.2em; }
-  .error { color: var(--common); }
+  .error { color: var(--bad); }
+  .read-as { color: var(--muted); font-size: .9rem; margin: 0 0 12px; }
+  .read-as b { color: var(--text); }
 
   .tiers { display: grid; gap: 14px; }
   .tier h2 { margin: 0 0 2px; font-size: 1.1rem; display: flex; align-items: center; gap: 8px; }
   .tier p.hint { margin: 0 0 12px; color: var(--muted); font-size: .85rem; }
-  .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
   .tier.primordial { border-color: var(--primordial); box-shadow: 0 0 0 1px var(--primordial) inset, 0 0 40px rgba(192,139,255,.12); }
   .tier.primordial .dot { background: var(--primordial); }
   .tier.deep .dot { background: var(--deep); }
   .tier.safe .dot { background: var(--safe); }
-  .tier.common .dot { background: var(--common); }
-  .answers { display: flex; flex-wrap: wrap; gap: 8px; }
+  .tier.avoid .dot { background: var(--bad); }
+  .answers { display: grid; gap: 8px; }
   .answer {
-    background: var(--panel-2); border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px;
-    cursor: pointer; text-align: left; font-weight: 500; display: flex; flex-direction: column; gap: 2px;
+    background: var(--panel-2); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px;
+    cursor: pointer; text-align: left; display: grid; gap: 3px; width: 100%;
   }
-  .answer small { color: var(--muted); font-size: .72rem; font-weight: 400; }
+  .answer .name { font-weight: 700; font-size: 1.05rem; display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
+  .answer .name small { color: var(--muted); font-weight: 400; font-size: .75rem; white-space: nowrap; }
+  .answer .name small.warn { color: var(--bad); }
+  .answer .why { color: var(--muted); font-weight: 400; font-size: .85rem; }
   .answer.copied { border-color: var(--accent); }
-  .tier.common .answer { cursor: default; opacity: .75; text-decoration: line-through; text-decoration-color: var(--common); }
-  .tier-actions { margin-top: 10px; display: flex; gap: 8px; }
-  .tier-actions button { padding: 8px 12px; font-size: .85rem; }
-  .tips { color: var(--muted); font-size: .88rem; line-height: 1.5; }
-  .tips b { color: var(--text); }
+  .avoid-list { display: flex; flex-wrap: wrap; gap: 6px; }
+  .avoid-list span { background: var(--panel-2); border-radius: 8px; padding: 6px 10px; text-decoration: line-through; text-decoration-color: var(--bad); color: var(--muted); }
+  .hidden { display: none !important; }
   .footer { color: var(--muted); font-size: .8rem; text-align: center; margin-top: 20px; }
   .footer a { color: var(--muted); }
-  .hidden { display: none !important; }
+  details summary { cursor: pointer; color: var(--muted); font-size: .9rem; }
+  details[open] summary { margin-bottom: 10px; }
 </style>
 </head>
 <body>
 <main>
   <h1>Deep<span>Cut</span></h1>
-  <p class="tagline">Paste the question. Get real answers that almost nobody else will think of.</p>
+  <p class="tagline">Type or screenshot the question. Claude reads it and finds real answers almost nobody else will give.</p>
+
+  <section class="card" id="keyCard">
+    <details id="keyDetails">
+      <summary id="keySummary">Set up: add your Claude API key</summary>
+      <label for="apiKey">Anthropic API key</label>
+      <div class="row">
+        <input type="password" id="apiKey" placeholder="sk-ant-…" autocomplete="off">
+        <button id="saveKey">Save</button>
+        <button id="forgetKey">Forget</button>
+      </div>
+      <p class="small">Get one at <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">console.anthropic.com</a> (add a few dollars of credit; each question costs about 1–3 cents). The key is stored only in this browser and is sent only to Anthropic.</p>
+    </details>
+  </section>
 
   <section class="card">
     <label for="question">Question</label>
-    <div class="row">
-      <input type="text" id="question" placeholder='e.g. "Name a fruit" or "A famous painter"' autocomplete="off">
-      <button class="go" id="goBtn">Find</button>
+    <textarea id="question" placeholder='e.g. "Name an animal that lives in the ocean and starts with the letter S"'></textarea>
+    <div id="shotWrap" class="shot hidden">
+      <img id="shotImg" alt="Screenshot of the question">
+      <button id="removeShot" aria-label="Remove screenshot">✕</button>
     </div>
-    <div class="topic-line hidden" id="topicLine">
-      Searching for: <input type="text" id="topic" aria-label="Topic"> <button id="retopicBtn" style="padding:8px 12px">Update</button>
+    <div class="actions">
+      <button id="shotBtn">📷 Add screenshot</button>
+      <input type="file" id="shotFile" accept="image/*" class="hidden">
+      <button class="go" id="goBtn">Find answers</button>
     </div>
-    <div class="sources hidden" id="sources"></div>
-    <div class="status" id="status"></div>
+    <p class="small" style="margin:8px 0 0">Tip: you can also paste a screenshot straight into this page (Ctrl/Cmd+V).</p>
+    <div class="status" id="status" role="status"></div>
   </section>
 
   <section class="tiers hidden" id="results">
+    <p class="read-as" id="readAs"></p>
     <div class="card tier primordial">
       <h2><span class="dot"></span>Primordial picks</h2>
-      <p class="hint">Rarest answers that are still real and recognizable. Tap to copy.</p>
+      <p class="hint">Rarest answers that still clearly fit the question. Tap to copy.</p>
       <div class="answers" id="tier-primordial"></div>
-      <div class="tier-actions"><button data-shuffle="primordial">Show different ones</button></div>
     </div>
     <div class="card tier deep">
       <h2><span class="dot"></span>Deep cuts</h2>
       <p class="hint">Very uncommon, a little safer.</p>
       <div class="answers" id="tier-deep"></div>
-      <div class="tier-actions"><button data-shuffle="deep">Show different ones</button></div>
     </div>
     <div class="card tier safe">
       <h2><span class="dot"></span>Safe niche</h2>
-      <p class="hint">Less common than most answers, but everyone will accept them.</p>
+      <p class="hint">Less common than most answers, and certain to be accepted.</p>
       <div class="answers" id="tier-safe"></div>
-      <div class="tier-actions"><button data-shuffle="safe">Show different ones</button></div>
     </div>
-    <div class="card tier common">
+    <div class="card tier avoid">
       <h2><span class="dot"></span>Avoid: everyone says these</h2>
-      <p class="hint">The most popular answers. Saying one of these won't score.</p>
-      <div class="answers" id="tier-common"></div>
+      <div class="avoid-list" id="avoid"></div>
     </div>
   </section>
 
-  <section class="card tips">
-    <b>How it ranks answers:</b> it collects every answer it can find for the topic from Wikipedia (category pages and "List of…" pages) and a word database. It then ranks them by popularity, using Wikipedia page views over the last 30 days and how often each word is used in English. Low popularity means few other players will think of it. Answers with almost zero traffic are dropped, because the game may not accept something nobody has heard of.<br><br>
-    <b>Tip:</b> if the results look off, edit the "Searching for" box to a simpler topic (e.g. "painters" instead of "a famous painter") or toggle the Wikipedia categories found.
-  </section>
-
-  <p class="footer"><a href="../">← Back to Earshot</a> · Data from Wikipedia and Datamuse</p>
+  <p class="footer"><a href="../">← Back to Earshot</a> · Answers by Claude · Popularity from Wikipedia page views</p>
 </main>
 
-<script>
-(() => {
-  'use strict';
-  const $ = (id) => document.getElementById(id);
-  const WIKI = 'https://en.wikipedia.org/w/api.php';
-  const DATAMUSE = 'https://api.datamuse.com/words';
-  const SHOW = { primordial: 12, deep: 12, safe: 10, common: 8 };
+<script type="module">
+import Anthropic from 'https://cdn.jsdelivr.net/npm/@anthropic-ai/sdk@1.8.0/+esm';
 
-  const esc = (s) => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  const shuffle = (a) => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const KEY_STORE = 'deepcut:apiKey';
 
-  // ---------- Text helpers ----------
-  function topicFromQuestion(q) {
-    let t = ' ' + q.toLowerCase().replace(/[?!.:"“”]/g, ' ') + ' ';
-    const lead = [
-      'can you name', 'name as many', 'name one of the', 'name one', 'name some', 'name an', 'name a', 'name the', 'name',
-      'what is your favorite', "what's your favorite", 'what is a', 'what is an', "what's a", 'what are some', 'what',
-      'give me a', 'give me an', 'give me', 'think of a', 'think of an', 'think of', 'list some', 'list a', 'list',
-      'tell me a', 'tell me an', 'type of', 'types of', 'kind of', 'kinds of', 'sort of', 'example of', 'examples of',
-      'a famous', 'an famous', 'famous', 'popular', 'well known', 'well-known', 'any', 'some', 'one', 'a', 'an', 'the',
-      'favorite', 'favourite', 'your', 'you', 'can', 'that', 'is', 'are'
-    ];
-    let changed = true;
-    while (changed) {
-      changed = false;
-      t = t.trim();
-      for (const p of lead) {
-        if (t === p) break;
-        if (t.startsWith(p + ' ')) { t = t.slice(p.length + 1); changed = true; break; }
-      }
-    }
-    t = t.replace(/\s+(that|which|who|you|in the world|ever|of all time).*$/, '');
-    return t.trim();
-  }
+// ---------- API key ----------
+function loadKey() { try { return localStorage.getItem(KEY_STORE) || ''; } catch { return ''; } }
+function saveKey(k) { try { localStorage.setItem(KEY_STORE, k); } catch { /* storage blocked */ } }
+function forgetKey() { try { localStorage.removeItem(KEY_STORE); } catch { /* storage blocked */ } }
+let apiKey = loadKey();
 
-  function plural(w) {
-    const parts = w.split(' '); let last = parts.pop();
-    if (/(s|x|z|ch|sh)$/.test(last)) last += 'es';
-    else if (/[^aeiou]y$/.test(last)) last = last.slice(0, -1) + 'ies';
-    else if (!/s$/.test(last)) last += 's';
-    return [...parts, last].join(' ');
-  }
-  function singular(w) {
-    const parts = w.split(' '); let last = parts.pop();
-    if (/ies$/.test(last)) last = last.slice(0, -3) + 'y';
-    else if (/(ses|xes|zes|ches|shes)$/.test(last)) last = last.slice(0, -2);
-    else if (/[^s]s$/.test(last)) last = last.slice(0, -1);
-    return [...parts, last].join(' ');
-  }
-  const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
-  const key = (s) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]/g, '');
+function renderKeyState() {
+  $('keySummary').textContent = apiKey ? '✓ Claude API key saved (tap to change)' : 'Set up: add your Claude API key';
+  $('keyDetails').open = !apiKey;
+}
+$('saveKey').onclick = () => {
+  const k = $('apiKey').value.trim();
+  if (!k) return;
+  apiKey = k; saveKey(k); $('apiKey').value = ''; renderKeyState();
+};
+$('forgetKey').onclick = () => { apiKey = ''; forgetKey(); renderKeyState(); };
+renderKeyState();
 
-  function cleanTitle(title) {
-    if (/^(list|lists|outline|glossary|index|history|timeline|bibliography) of/i.test(title)) return null;
-    if (/:/.test(title)) return null;
-    if (/^\d+$/.test(title)) return null;
-    const t = title.replace(/\s*\(.*?\)\s*/g, ' ').trim();
-    if (!t || t.length > 40) return null;
-    return t;
-  }
+// ---------- Screenshot ----------
+let shot = null; // { media_type, data }
 
-  // ---------- API calls ----------
-  async function wiki(params) {
-    const u = new URL(WIKI);
-    for (const [k, v] of Object.entries({ format: 'json', formatversion: '2', origin: '*', ...params })) u.searchParams.set(k, v);
+async function setShot(file) {
+  if (!file || !file.type.startsWith('image/')) return;
+  // Downscale large screenshots so uploads stay quick and cheap
+  const url = URL.createObjectURL(file);
+  const img = new Image();
+  await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = url; });
+  const scale = Math.min(1, 1568 / Math.max(img.width, img.height));
+  const canvas = document.createElement('canvas');
+  canvas.width = Math.round(img.width * scale);
+  canvas.height = Math.round(img.height * scale);
+  canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+  URL.revokeObjectURL(url);
+  const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+  shot = { media_type: 'image/jpeg', data: dataUrl.split(',')[1] };
+  $('shotImg').src = dataUrl;
+  $('shotWrap').classList.remove('hidden');
+}
+$('shotBtn').onclick = () => $('shotFile').click();
+$('shotFile').onchange = (e) => { setShot(e.target.files[0]); e.target.value = ''; };
+$('removeShot').onclick = () => { shot = null; $('shotWrap').classList.add('hidden'); };
+document.addEventListener('paste', (e) => {
+  const item = [...(e.clipboardData?.items || [])].find(i => i.type.startsWith('image/'));
+  if (item) { e.preventDefault(); setShot(item.getAsFile()); }
+});
+
+// ---------- Claude ----------
+const SYSTEM = `You help a player of a solo trivia party game. Each round shows a question (e.g. "Name a fruit", "A country that starts with B", "Something you find in a kitchen"). The player wins the top rank, "Primordial", by giving an answer that is accepted as correct AND that the fewest other players also gave. Typical players are casual and answer fast, so they pick the first famous examples that come to mind.
+
+Your job:
+1. Read the question carefully, from the text and/or screenshot. Respect every condition in it (starting letters, time periods, places, categories, word counts, "real" vs "fictional", etc.).
+2. Suggest answers that clearly and verifiably satisfy every condition, but that few casual players would think of.
+3. Every answer must be a real, checkable thing that a judge could confirm with a quick search. Never invent names. Prefer answers with a Wikipedia article. Avoid answers so obscure or technical that a judge might reject them, and avoid ambiguous or borderline answers.
+4. Write each answer the way it should be typed into the game: its common name, spelled exactly, with no extra explanation.
+
+Return:
+- "question": the question as you read it.
+- "primordial": 6 answers that are valid but very rarely given.
+- "deep": 4 answers that are uncommon but a bit more familiar.
+- "safe": 3 answers that are less common than the obvious ones but certain to be accepted.
+- "avoid": the 6 answers most players will give.
+For each suggested answer, give a short "why" (under 15 words) saying what it is and why it fits.`;
+
+const answerItem = {
+  type: 'object',
+  properties: { answer: { type: 'string' }, why: { type: 'string' } },
+  required: ['answer', 'why'],
+  additionalProperties: false,
+};
+const SCHEMA = {
+  type: 'object',
+  properties: {
+    question: { type: 'string' },
+    primordial: { type: 'array', items: answerItem },
+    deep: { type: 'array', items: answerItem },
+    safe: { type: 'array', items: answerItem },
+    avoid: { type: 'array', items: { type: 'string' } },
+  },
+  required: ['question', 'primordial', 'deep', 'safe', 'avoid'],
+  additionalProperties: false,
+};
+
+async function askClaude(questionText) {
+  const client = new Anthropic({ apiKey, dangerouslyAllowBrowser: true });
+  const content = [];
+  if (shot) content.push({ type: 'image', source: { type: 'base64', media_type: shot.media_type, data: shot.data } });
+  content.push({ type: 'text', text: questionText
+    ? `Question: ${questionText}`
+    : 'The question is in the screenshot above.' });
+
+  const response = await client.beta.messages.create({
+    model: 'claude-opus-5-5',
+    max_tokens: 16000,
+    betas: ['server-side-fallback-2026-07-01'],
+    fallbacks: 'default',
+    output_config: { effort: 'medium', format: { type: 'json_schema', schema: SCHEMA } },
+    system: SYSTEM,
+    messages: [{ role: 'user', content }],
+  });
+
+  if (response.stop_reason === 'refusal') throw new Error('Claude declined to answer this question. Try rewording it.');
+  if (response.stop_reason === 'max_tokens') throw new Error('The answer was cut off. Please try again.');
+  const text = response.content.filter(b => b.type === 'text').map(b => b.text).join('');
+  return JSON.parse(text);
+}
+
+// ---------- Wikipedia popularity check ----------
+// Looks up 30-day page views for every suggested answer in one request.
+async function wikiViews(names) {
+  const out = new Map();
+  try {
+    const u = new URL('https://en.wikipedia.org/w/api.php');
+    const params = { action: 'query', format: 'json', formatversion: '2', origin: '*', prop: 'pageviews', pvipdays: '30', redirects: '1', titles: names.join('|') };
+    for (const [k, v] of Object.entries(params)) u.searchParams.set(k, v);
     const r = await fetch(u);
-    if (!r.ok) throw new Error('wiki ' + r.status);
-    return r.json();
-  }
-
-  function sumViews(pv) {
-    if (!pv) return null;
-    const vals = Object.values(pv).filter(v => typeof v === 'number');
-    return vals.length ? vals.reduce((a, b) => a + b, 0) : null;
-  }
-
-  // Pages (with 30-day views) from a generator, following continuation a few times
-  async function wikiPagesWithViews(genParams, maxRequests = 6) {
-    const out = new Map();
-    let cont = {};
-    for (let i = 0; i < maxRequests; i++) {
-      const d = await wiki({ action: 'query', prop: 'pageviews', pvipdays: '30', redirects: '1', ...genParams, ...cont });
-      for (const p of (d.query && d.query.pages) || []) {
-        if (p.missing || p.ns !== 0) continue;
-        const v = sumViews(p.pageviews);
-        const prev = out.get(p.title);
-        if (v !== null && (prev == null || v > prev)) out.set(p.title, v);
-        else if (prev === undefined) out.set(p.title, v);
-      }
-      if (!d.continue) break;
-      cont = d.continue;
+    if (!r.ok) return out;
+    const d = await r.json();
+    const q = d.query || {};
+    // Follow normalisation and redirects back to the name Claude gave
+    const alias = new Map();
+    for (const n of q.normalized || []) alias.set(n.to, n.from);
+    for (const rd of q.redirects || []) alias.set(rd.to, alias.get(rd.from) || rd.from);
+    for (const p of q.pages || []) {
+      const original = alias.get(p.title) || p.title;
+      if (p.missing) { out.set(original, -1); continue; }
+      const vals = Object.values(p.pageviews || {}).filter(v => typeof v === 'number');
+      out.set(original, vals.length ? vals.reduce((a, b) => a + b, 0) : null);
     }
-    return out;
+  } catch { /* popularity is optional */ }
+  return out;
+}
+
+// ---------- UI ----------
+function setStatus(msg, isErr) { $('status').innerHTML = isErr ? `<span class="error">${esc(msg)}</span>` : esc(msg); }
+
+function renderTier(id, items, views) {
+  const el = $('tier-' + id);
+  el.innerHTML = items.map(a => {
+    const v = views.get(a.answer);
+    let tag = '';
+    if (v === -1) tag = '<small class="warn">no Wikipedia page, double-check</small>';
+    else if (typeof v === 'number') tag = `<small>${v.toLocaleString()} views/mo</small>`;
+    return `<button class="answer" data-copy="${esc(a.answer)}"><span class="name">${esc(a.answer)}${tag}</span><span class="why">${esc(a.why)}</span></button>`;
+  }).join('') || '<span class="small">None.</span>';
+}
+
+function render(result, views) {
+  $('readAs').innerHTML = `Question read as: <b>${esc(result.question)}</b>`;
+  // Within each tier, show the least-viewed (rarest) first; unknowns keep Claude's order at the end
+  const byViews = (list) => list.map((a, i) => ({ a, i, v: views.get(a.answer) }))
+    .sort((x, y) => {
+      const xv = typeof x.v === 'number' && x.v >= 0 ? x.v : Infinity;
+      const yv = typeof y.v === 'number' && y.v >= 0 ? y.v : Infinity;
+      return xv - yv || x.i - y.i;
+    }).map(x => x.a);
+  renderTier('primordial', byViews(result.primordial), views);
+  renderTier('deep', byViews(result.deep), views);
+  renderTier('safe', byViews(result.safe), views);
+  $('avoid').innerHTML = result.avoid.map(a => `<span>${esc(a)}</span>`).join('');
+  $('results').classList.remove('hidden');
+}
+
+function friendlyError(e) {
+  if (e instanceof Anthropic.AuthenticationError) return 'Your API key was rejected. Check it in the set-up box above.';
+  if (e instanceof Anthropic.PermissionDeniedError) return 'Your API key does not have access to this model.';
+  if (e instanceof Anthropic.RateLimitError) return 'Too many requests, or your account is out of credit. Wait a moment or add credit at console.anthropic.com.';
+  if (e instanceof Anthropic.APIConnectionError) return 'Could not reach Claude. Check your internet connection.';
+  if (e instanceof Anthropic.BadRequestError) return 'Claude could not process that request: ' + (e.message || '');
+  if (e instanceof Anthropic.APIError) return 'Claude had a problem (' + (e.status || 'error') + '). Try again in a moment.';
+  if (e instanceof SyntaxError) return 'Got an unreadable answer from Claude. Try again.';
+  return e.message || 'Something went wrong. Try again.';
+}
+
+async function run() {
+  const q = $('question').value.trim();
+  if (!apiKey) { setStatus('Add your Claude API key first (set-up box above).', true); $('keyDetails').open = true; $('apiKey').focus(); return; }
+  if (!q && !shot) { setStatus('Type the question or add a screenshot.', true); return; }
+  $('goBtn').disabled = true;
+  setStatus('Claude is reading the question and hunting for rare answers… (about 10–30 seconds)');
+  try {
+    const result = await askClaude(q);
+    setStatus('Checking how popular each answer is…');
+    const names = [...result.primordial, ...result.deep, ...result.safe].map(a => a.answer).slice(0, 50);
+    const views = await wikiViews(names);
+    render(result, views);
+    setStatus('Done. Tap an answer to copy it.');
+  } catch (e) {
+    console.error(e);
+    setStatus(friendlyError(e), true);
+  } finally {
+    $('goBtn').disabled = false;
   }
+}
 
-  async function findCategories(topic) {
-    const pl = plural(topic);
-    const d = await wiki({ action: 'query', list: 'search', srnamespace: '14', srsearch: pl, srlimit: '8' });
-    const hits = ((d.query && d.query.search) || []).map(s => s.title);
-    // Prefer the exact "Category:<Plural>" when it exists
-    const exact = 'Category:' + cap(pl);
-    const ordered = hits.includes(exact) ? [exact, ...hits.filter(h => h !== exact)] : hits;
-    return ordered.filter(c => !/(stubs|by country|by year|templates|images|people from|lists of|wikipedia|articles)/i.test(c)).slice(0, 5);
-  }
+$('goBtn').onclick = run;
+$('question').addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); run(); } });
 
-  async function categoryCandidates(cat) {
-    const pages = await wikiPagesWithViews({ generator: 'categorymembers', gcmtitle: cat, gcmnamespace: '0', gcmlimit: '50' }, 4);
-    // One level of sub-categories (e.g. Category:Fruits → Category:Tropical fruit)
-    const sub = await wiki({ action: 'query', list: 'categorymembers', cmtitle: cat, cmtype: 'subcat', cmlimit: '12' });
-    const subs = ((sub.query && sub.query.categorymembers) || []).map(c => c.title)
-      .filter(c => !/(stubs|by country|images|templates|lists|people)/i.test(c)).slice(0, 6);
-    const subResults = await Promise.allSettled(subs.map(s =>
-      wikiPagesWithViews({ generator: 'categorymembers', gcmtitle: s, gcmnamespace: '0', gcmlimit: '50' }, 2)));
-    for (const r of subResults) if (r.status === 'fulfilled') for (const [k, v] of r.value) if (!pages.has(k)) pages.set(k, v);
-    return pages;
-  }
-
-  async function listPageCandidates(topic) {
-    return wikiPagesWithViews({ generator: 'links', titles: 'List of ' + plural(topic), gplnamespace: '0', gpllimit: '50' }, 8);
-  }
-
-  async function datamuseCandidates(topic) {
-    const terms = [...new Set([singular(topic), topic])];
-    const out = new Map();
-    for (const t of terms) {
-      const r = await fetch(`${DATAMUSE}?rel_gen=${encodeURIComponent(t)}&md=f&max=500`);
-      if (!r.ok) continue;
-      for (const w of await r.json()) {
-        const f = (w.tags || []).find(x => x.startsWith('f:'));
-        out.set(w.word, f ? parseFloat(f.slice(2)) : 0);
-      }
-    }
-    return out;
-  }
-
-  // ---------- Ranking ----------
-  // Each source gets ranked on its own scale (page views vs word frequency), then merged by percentile.
-  function rankSource(map, floor) {
-    const items = [...map.entries()].filter(([, v]) => v !== null && v >= floor);
-    items.sort((a, b) => a[1] - b[1]);
-    const n = items.length;
-    return items.map(([name, v], i) => ({ name, value: v, pct: n > 1 ? i / (n - 1) : 0.5 }));
-  }
-
-  function buildTiers(sources, topic) {
-    const merged = new Map();
-    const topicKeys = new Set([key(topic), key(singular(topic)), key(plural(topic))]);
-    for (const { items, label, unit } of sources) {
-      for (const it of items) {
-        const name = label === 'wiki' ? cleanTitle(it.name) : it.name;
-        if (!name) continue;
-        const k = key(name);
-        if (!k || topicKeys.has(k)) continue;
-        const prev = merged.get(k);
-        // Keep the most popular reading of an answer (if it's popular anywhere, others may say it)
-        if (!prev || it.pct > prev.pct) merged.set(k, { name, pct: it.pct, value: it.value, unit, sources: new Set([...(prev ? prev.sources : []), label]) });
-        else prev.sources.add(label);
-      }
-    }
-    const all = [...merged.values()].sort((a, b) => a.pct - b.pct);
-    return {
-      total: all.length,
-      primordial: all.filter(a => a.pct < 0.18),
-      deep: all.filter(a => a.pct >= 0.18 && a.pct < 0.4),
-      safe: all.filter(a => a.pct >= 0.4 && a.pct < 0.7),
-      common: all.filter(a => a.pct >= 0.85).sort((a, b) => b.pct - a.pct),
-    };
-  }
-
-  // ---------- UI ----------
-  let tiers = null;
-  let catState = [];  // {title, on}
-  let lastTopic = '';
-
-  function setStatus(msg, isErr) { $('status').innerHTML = isErr ? `<span class="error">${esc(msg)}</span>` : esc(msg); }
-
-  function fmt(a) {
-    if (a.unit === 'views') return `${a.value.toLocaleString()} views / 30 days`;
-    return a.value < 0.01 ? 'very rare word' : `${a.value} per million words`;
-  }
-
-  function renderTier(name, randomize) {
-    const list = tiers[name];
-    const el = $('tier-' + name);
-    const pick = name === 'common' ? list.slice(0, SHOW[name]) : (randomize ? shuffle(list) : list).slice(0, SHOW[name]);
-    if (!pick.length) { el.innerHTML = '<span style="color:var(--muted);font-size:.9rem">Nothing in this range. Try a broader topic.</span>'; return; }
-    el.innerHTML = pick.map(a => `<button class="answer" data-copy="${esc(a.name)}">${esc(a.name)}<small>${esc(fmt(a))}</small></button>`).join('');
-  }
-
-  function renderAll() {
-    $('results').classList.remove('hidden');
-    // Primordial picks: start with a random mix from the rarest bucket so repeats don't always show the same ones
-    renderTier('primordial', true);
-    renderTier('deep', true);
-    renderTier('safe', true);
-    renderTier('common', false);
-  }
-
-  function renderCats() {
-    const box = $('sources');
-    if (!catState.length) { box.classList.add('hidden'); return; }
-    box.classList.remove('hidden');
-    box.innerHTML = '<span style="color:var(--muted);font-size:.82rem;align-self:center">Wikipedia categories:</span>' +
-      catState.map((c, i) => `<button class="chip ${c.on ? 'on' : ''}" data-cat="${i}">${esc(c.title.replace(/^Category:/, ''))}</button>`).join('');
-  }
-
-  async function run(topic, reuseCats) {
-    topic = topic.trim().toLowerCase();
-    if (!topic) { setStatus('Type a question first.', true); return; }
-    lastTopic = topic;
-    $('topic').value = topic;
-    $('topicLine').classList.remove('hidden');
-    $('goBtn').disabled = true;
-    setStatus('Collecting possible answers…');
-    try {
-      if (!reuseCats) {
-        const cats = await findCategories(topic).catch(() => []);
-        catState = cats.map((t, i) => ({ title: t, on: i < 2 }));
-        renderCats();
-      }
-      const active = catState.filter(c => c.on).map(c => c.title);
-      const [dm, list, ...cats] = await Promise.allSettled([
-        datamuseCandidates(topic),
-        listPageCandidates(topic),
-        ...active.map(categoryCandidates),
-      ]);
-      const wikiMap = new Map();
-      for (const r of [list, ...cats]) if (r.status === 'fulfilled') for (const [k, v] of r.value) {
-        if (!wikiMap.has(k) || (v || 0) > (wikiMap.get(k) || 0)) wikiMap.set(k, v);
-      }
-      const sources = [
-        // Floors drop answers so obscure the game might not recognise them
-        { label: 'wiki', unit: 'views', items: rankSource(wikiMap, 60) },
-        { label: 'words', unit: 'freq', items: dm.status === 'fulfilled' ? rankSource(dm.value, 0.02) : [] },
-      ];
-      tiers = buildTiers(sources, topic);
-      if (tiers.total < 5) {
-        const allFailed = dm.status === 'rejected' && list.status === 'rejected';
-        setStatus(allFailed
-          ? 'Could not reach Wikipedia. Check your internet connection and try again.'
-          : `Only found ${tiers.total} answers for "${topic}". Try a simpler or plural topic, like "fruits" or "painters".`, true);
-        $('results').classList.toggle('hidden', tiers.total === 0);
-        if (tiers.total) renderAll();
-        return;
-      }
-      setStatus(`Ranked ${tiers.total.toLocaleString()} possible answers by popularity.`);
-      renderAll();
-    } catch (e) {
-      setStatus('Something went wrong fetching answers. Try again.', true);
-    } finally {
-      $('goBtn').disabled = false;
-    }
-  }
-
-  $('goBtn').onclick = () => run(topicFromQuestion($('question').value) || $('question').value, false);
-  $('question').addEventListener('keydown', e => { if (e.key === 'Enter') $('goBtn').click(); });
-  $('retopicBtn').onclick = () => run($('topic').value, false);
-  $('topic').addEventListener('keydown', e => { if (e.key === 'Enter') $('retopicBtn').click(); });
-
-  $('sources').addEventListener('click', e => {
-    const b = e.target.closest('[data-cat]');
-    if (!b) return;
-    const c = catState[+b.dataset.cat];
-    c.on = !c.on;
-    renderCats();
-    run(lastTopic, true);
-  });
-
-  document.addEventListener('click', async e => {
-    const s = e.target.closest('[data-shuffle]');
-    if (s && tiers) { renderTier(s.dataset.shuffle, true); return; }
-    const a = e.target.closest('[data-copy]');
-    if (!a || a.closest('.common')) return;
-    try { await navigator.clipboard.writeText(a.dataset.copy); } catch { /* clipboard unavailable */ }
-    a.classList.add('copied');
-    const small = a.querySelector('small');
-    const old = small.textContent;
-    small.textContent = 'Copied!';
-    setTimeout(() => { a.classList.remove('copied'); small.textContent = old; }, 1200);
-  });
-
-  window.__deepcut = { topicFromQuestion, plural, singular, buildTiers, rankSource };
-})();
+document.addEventListener('click', async e => {
+  const a = e.target.closest('[data-copy]');
+  if (!a) return;
+  try { await navigator.clipboard.writeText(a.dataset.copy); } catch { /* clipboard unavailable */ }
+  a.classList.add('copied');
+  const why = a.querySelector('.why');
+  const old = why.textContent;
+  why.textContent = 'Copied!';
+  setTimeout(() => { a.classList.remove('copied'); why.textContent = old; }, 1200);
+});
 </script>
 </body>
 </html>

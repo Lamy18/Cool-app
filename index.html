@@ -1,0 +1,756 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Earshot — Name That Song</title>
+<style>
+  :root {
+    --bg: #0f1020;
+    --panel: #1a1b33;
+    --panel-2: #24264a;
+    --text: #f2f2ff;
+    --muted: #9a9cc4;
+    --accent: #ff5d8f;
+    --accent-2: #7c5cff;
+    --good: #3ddc97;
+    --bad: #ff6b6b;
+    --skip: #f5b942;
+    --radius: 14px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: radial-gradient(1200px 600px at 50% -10%, #2a1d55 0%, var(--bg) 60%);
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 24px 16px 48px;
+  }
+  main { width: 100%; max-width: 560px; }
+  h1 {
+    font-size: 2.2rem; margin: 0 0 4px; letter-spacing: -0.02em;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .tagline { color: var(--muted); margin: 0 0 24px; }
+  .card {
+    background: var(--panel); border-radius: var(--radius); padding: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.35); margin-bottom: 16px;
+  }
+  .hidden { display: none !important; }
+  button {
+    font: inherit; border: 0; border-radius: 10px; cursor: pointer;
+    padding: 12px 18px; font-weight: 600; color: var(--text); background: var(--panel-2);
+    transition: transform .06s ease, filter .15s ease, opacity .15s;
+  }
+  button:hover:not(:disabled) { filter: brightness(1.15); }
+  button:active:not(:disabled) { transform: scale(.97); }
+  button:disabled { opacity: .45; cursor: not-allowed; }
+  .primary { background: linear-gradient(90deg, var(--accent), var(--accent-2)); }
+  .skip-btn { background: transparent; border: 2px solid var(--skip); color: var(--skip); }
+
+  /* Playlist picker */
+  .playlists { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+  .playlist {
+    text-align: left; padding: 14px; background: var(--panel-2); border: 2px solid transparent;
+  }
+  .playlist.selected { border-color: var(--accent); }
+  .playlist .emoji { font-size: 1.5rem; display: block; margin-bottom: 4px; }
+  .playlist small { color: var(--muted); font-weight: 400; display: block; }
+  .artist-row { display: flex; gap: 8px; margin-top: 12px; }
+  .artist-row input { flex: 1; }
+  .best { color: var(--muted); font-size: .9rem; margin-top: 14px; }
+
+  /* HUD */
+  .hud { display: flex; justify-content: space-between; color: var(--muted); font-size: .95rem; margin-bottom: 14px; }
+  .hud b { color: var(--text); }
+
+  /* Snippet bar */
+  .bar {
+    position: relative; height: 18px; border-radius: 9px; background: #0c0d1c; overflow: hidden;
+    display: flex;
+  }
+  .seg { height: 100%; border-right: 2px solid var(--panel); background: transparent; position: relative; z-index: 1; }
+  .seg:last-child { border-right: 0; }
+  .seg.unlocked { background: rgba(124, 92, 255, .28); }
+  .progress {
+    position: absolute; left: 0; top: 0; bottom: 0; width: 0;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2)); z-index: 2;
+  }
+  .bar-labels { display: flex; color: var(--muted); font-size: .8rem; margin-top: 6px; }
+  .bar-labels span { text-align: right; }
+
+  .controls { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 18px; }
+  .play {
+    width: 64px; height: 64px; border-radius: 50%; padding: 0; font-size: 1.5rem;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    display: grid; place-items: center; flex-shrink: 0;
+  }
+  .stage-label { color: var(--muted); text-align: center; flex: 1; }
+  .stage-label b { color: var(--text); font-size: 1.4rem; display: block; }
+
+  /* Guesses */
+  .guesses { list-style: none; padding: 0; margin: 0 0 14px; display: grid; gap: 6px; }
+  .guesses li {
+    background: var(--panel-2); border-radius: 8px; padding: 9px 12px; font-size: .95rem;
+    display: flex; gap: 10px; align-items: center; min-height: 40px;
+  }
+  .guesses li.empty { background: transparent; border: 1px dashed #383a66; }
+  .guesses li.wrong .icon { color: var(--bad); }
+  .guesses li.skipped { color: var(--skip); }
+  .guesses li.right { outline: 2px solid var(--good); }
+  .guesses li.right .icon { color: var(--good); }
+
+  /* Answer area */
+  .answer { position: relative; }
+  input[type=text] {
+    width: 100%; font: inherit; color: var(--text); background: #0c0d1c; border: 2px solid #33356a;
+    border-radius: 10px; padding: 12px 14px; outline: none;
+  }
+  input[type=text]:focus { border-color: var(--accent-2); }
+  .answer-row { display: flex; gap: 8px; }
+  .answer-row input { flex: 1; min-width: 0; }
+  .suggestions {
+    position: absolute; left: 0; right: 0; bottom: calc(100% + 6px);
+    background: var(--panel-2); border-radius: 10px; list-style: none; margin: 0; padding: 4px;
+    max-height: 260px; overflow-y: auto; box-shadow: 0 -10px 30px rgba(0,0,0,.4); z-index: 10;
+  }
+  .suggestions li { padding: 9px 10px; border-radius: 7px; cursor: pointer; }
+  .suggestions li small { color: var(--muted); }
+  .suggestions li.active, .suggestions li:hover { background: var(--accent-2); }
+  .suggestions li.active small, .suggestions li:hover small { color: #e6e0ff; }
+  .action-row { display: flex; justify-content: space-between; margin-top: 12px; }
+
+  /* Reveal */
+  .reveal { display: flex; gap: 16px; align-items: center; }
+  .reveal img { width: 96px; height: 96px; border-radius: 10px; object-fit: cover; background: var(--panel-2); }
+  .reveal h2 { margin: 0 0 2px; font-size: 1.25rem; }
+  .reveal p { margin: 0; color: var(--muted); }
+  .result-msg { font-weight: 700; margin: 0 0 12px; font-size: 1.1rem; }
+  .result-msg.good { color: var(--good); }
+  .result-msg.bad { color: var(--bad); }
+
+  .status { color: var(--muted); text-align: center; padding: 30px 0; }
+  .error { color: var(--bad); }
+  .summary-score { font-size: 3rem; font-weight: 800; margin: 6px 0; }
+  .summary-list { list-style: none; padding: 0; margin: 16px 0; display: grid; gap: 6px; }
+  .summary-list li { display: flex; justify-content: space-between; gap: 10px; background: var(--panel-2); border-radius: 8px; padding: 8px 12px; font-size: .92rem; }
+  .summary-list li span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .footer { color: var(--muted); font-size: .8rem; text-align: center; margin-top: 24px; }
+  .footer a { color: var(--muted); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Earshot</h1>
+  <p class="tagline">Name the song from a 1-second clip. Can't get it? Skip to hear more.</p>
+
+  <!-- Start screen -->
+  <section id="start" class="card">
+    <h3 style="margin-top:0">Pick a playlist</h3>
+    <div class="playlists" id="playlists"></div>
+    <div class="artist-row">
+      <input type="text" id="artistInput" placeholder="…or type any artist (e.g. Taylor Swift)">
+    </div>
+    <div class="best" id="bestScore"></div>
+    <div style="margin-top:16px">
+      <button class="primary" id="startBtn" style="width:100%">Start game · 10 songs</button>
+    </div>
+    <p class="error hidden" id="startError"></p>
+  </section>
+
+  <!-- Game screen -->
+  <section id="game" class="hidden">
+    <div class="card">
+      <div class="hud">
+        <span>Song <b id="roundNum">1</b> / <span id="roundTotal">10</span></span>
+        <span>Streak <b id="streak">0</b></span>
+        <span>Score <b id="score">0</b></span>
+      </div>
+
+      <div id="loading" class="status">Loading song…</div>
+
+      <div id="playerArea" class="hidden">
+        <div class="bar" id="bar">
+          <div class="progress" id="progress"></div>
+        </div>
+        <div class="bar-labels" id="barLabels"></div>
+
+        <div class="controls">
+          <button class="play" id="playBtn" aria-label="Play clip">▶</button>
+          <div class="stage-label">Clip length<b id="stageLabel">1s</b></div>
+          <button class="skip-btn" id="skipBtn">Skip (+1s)</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" id="guessCard">
+      <ul class="guesses" id="guesses"></ul>
+      <div class="answer" id="answerArea">
+        <ul class="suggestions hidden" id="suggestions"></ul>
+        <div class="answer-row">
+          <input type="text" id="guessInput" placeholder="Type the song title…" autocomplete="off" disabled>
+          <button class="primary" id="submitBtn" disabled>Guess</button>
+        </div>
+      </div>
+      <div class="action-row">
+        <button id="giveUpBtn" disabled>Give up</button>
+        <button id="quitBtn">Quit</button>
+      </div>
+    </div>
+
+    <div class="card hidden" id="revealCard">
+      <p class="result-msg" id="resultMsg"></p>
+      <div class="reveal">
+        <img id="artwork" alt="">
+        <div>
+          <h2 id="revealTitle"></h2>
+          <p id="revealArtist"></p>
+          <p id="revealPoints" style="margin-top:6px"></p>
+        </div>
+      </div>
+      <div class="controls" style="justify-content:flex-start">
+        <button id="replayFullBtn">▶ Play full preview</button>
+        <button class="primary" id="nextBtn" style="margin-left:auto">Next song →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Summary -->
+  <section id="summary" class="card hidden">
+    <h3 style="margin:0">Game over</h3>
+    <div class="summary-score" id="finalScore">0</div>
+    <div id="finalNote" style="color:var(--muted)"></div>
+    <ul class="summary-list" id="summaryList"></ul>
+    <button class="primary" id="againBtn" style="width:100%">Play again</button>
+  </section>
+
+  <p class="footer">Song previews provided by Apple Music / iTunes. Scoring: 1s = 100 · 2s = 75 · 5s = 50 · 10s = 25</p>
+</main>
+
+<audio id="audio" preload="auto"></audio>
+
+<script>
+(() => {
+  'use strict';
+
+  // ---------- Config ----------
+  const STAGES = [1, 2, 5, 10];          // seconds of audio unlocked per stage
+  const POINTS = [100, 75, 50, 25];      // points for guessing at each stage
+  const ROUNDS = 10;
+
+  const PLAYLISTS = {
+    pop: { name: 'Pop Hits', emoji: '🎤', desc: '2010s–today', songs: [
+      'The Weeknd Blinding Lights', 'Dua Lipa Levitating', 'Harry Styles As It Was', 'Ed Sheeran Shape of You',
+      'Billie Eilish bad guy', 'Olivia Rodrigo drivers license', 'Taylor Swift Shake It Off', 'Bruno Mars Uptown Funk',
+      'Lady Gaga Bad Romance', 'Katy Perry Firework', 'Adele Rolling in the Deep', 'Miley Cyrus Flowers',
+      'Lizzo About Damn Time', 'Justin Bieber Sorry', 'Ariana Grande 7 rings', 'Post Malone Circles',
+      'Doja Cat Say So', 'Lewis Capaldi Someone You Loved', 'Sabrina Carpenter Espresso', 'Chappell Roan Good Luck, Babe!',
+      'Sia Chandelier', 'Maroon 5 Sugar', 'Imagine Dragons Believer', 'Rihanna Umbrella', 'Pharrell Williams Happy'
+    ]},
+    throwback: { name: '2000s Throwback', emoji: '📼', desc: 'Y2K bangers', songs: [
+      'Beyonce Crazy in Love', 'OutKast Hey Ya!', 'The Killers Mr. Brightside', 'Britney Spears Toxic',
+      'Kelly Clarkson Since U Been Gone', 'Avril Lavigne Complicated', 'Usher Yeah!', 'Gnarls Barkley Crazy',
+      'Nelly Furtado Promiscuous', 'Black Eyed Peas I Gotta Feeling', 'Rihanna SOS', 'Gwen Stefani Hollaback Girl',
+      'Coldplay Viva La Vida', 'Linkin Park In the End', 'Shakira Hips Don\'t Lie', 'Amy Winehouse Rehab',
+      'MGMT Kids', 'Christina Aguilera Genie in a Bottle', 'Eminem Lose Yourself', 'Lady Gaga Just Dance',
+      'Fall Out Boy Sugar, We\'re Goin Down', 'Justin Timberlake SexyBack', 'Daniel Powter Bad Day', 'Vanessa Carlton A Thousand Miles'
+    ]},
+    rock: { name: 'Rock Classics', emoji: '🎸', desc: '60s–90s', songs: [
+      'Queen Bohemian Rhapsody', 'Nirvana Smells Like Teen Spirit', 'Guns N\' Roses Sweet Child O\' Mine', 'AC/DC Back In Black',
+      'Bon Jovi Livin\' on a Prayer', 'Journey Don\'t Stop Believin\'', 'Eagles Hotel California', 'Led Zeppelin Stairway to Heaven',
+      'The Rolling Stones Paint It Black', 'Deep Purple Smoke on the Water', 'Fleetwood Mac Go Your Own Way', 'Toto Africa',
+      'Survivor Eye of the Tiger', 'Queen Another One Bites the Dust', 'Red Hot Chili Peppers Californication', 'Oasis Wonderwall',
+      'Lynyrd Skynyrd Sweet Home Alabama', 'The Police Every Breath You Take', 'Def Leppard Pour Some Sugar on Me', 'Kiss I Was Made for Lovin\' You',
+      'The Clash Should I Stay or Should I Go', 'Foo Fighters Everlong', 'Green Day Basket Case', 'Pearl Jam Alive'
+    ]},
+    eighties: { name: '80s Party', emoji: '🪩', desc: 'Synths & big hair', songs: [
+      'Michael Jackson Billie Jean', 'a-ha Take On Me', 'Madonna Like a Prayer', 'Cyndi Lauper Girls Just Want to Have Fun',
+      'Whitney Houston I Wanna Dance with Somebody', 'Rick Astley Never Gonna Give You Up', 'Prince When Doves Cry', 'Tears for Fears Everybody Wants to Rule the World',
+      'Wham! Wake Me Up Before You Go-Go', 'Kenny Loggins Footloose', 'Soft Cell Tainted Love', 'Dexys Midnight Runners Come On Eileen',
+      'Eurythmics Sweet Dreams', 'Duran Duran Hungry Like the Wolf', 'Bonnie Tyler Total Eclipse of the Heart', 'Europe The Final Countdown',
+      'Simple Minds Don\'t You (Forget About Me)', 'Michael Jackson Beat It', 'Pat Benatar Heartbreaker', 'Starship We Built This City',
+      'Billy Idol White Wedding', 'Toni Basil Mickey', 'The Bangles Walk Like an Egyptian', 'Hall & Oates You Make My Dreams'
+    ]},
+    hiphop: { name: 'Hip-Hop & R&B', emoji: '🎧', desc: 'Heavy rotation', songs: [
+      'Drake God\'s Plan', 'Kendrick Lamar HUMBLE.', 'Travis Scott SICKO MODE', 'Lil Nas X Old Town Road',
+      'Kanye West Stronger', 'Jay-Z Empire State of Mind', 'Cardi B Bodak Yellow', 'Pharrell Williams Get Lucky',
+      'SZA Kill Bill', 'Frank Ocean Thinkin Bout You', 'Missy Elliott Get Ur Freak On', '50 Cent In da Club',
+      'Nicki Minaj Super Bass', 'Coolio Gangsta\'s Paradise', 'Mark Ronson Uptown Funk', 'Juice WRLD Lucid Dreams',
+      'Megan Thee Stallion Savage', 'Post Malone Rockstar', 'Childish Gambino Redbone', 'Kendrick Lamar Not Like Us',
+      'Destiny\'s Child Say My Name', 'TLC No Scrubs', 'Alicia Keys Fallin\'', 'Ms. Lauryn Hill Doo Wop (That Thing)'
+    ]},
+  };
+
+  // ---------- Helpers ----------
+  const $ = (id) => document.getElementById(id);
+  const shuffle = (a) => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  const esc = (s) => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+  const store = {
+    get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* ignore */ } },
+  };
+
+  // JSONP request to the iTunes Search API (works from any origin, including file://)
+  let jsonpId = 0;
+  function jsonp(url, timeoutMs = 10000) {
+    return new Promise((resolve, reject) => {
+      const cb = `__earshot_cb_${Date.now()}_${jsonpId++}`;
+      const script = document.createElement('script');
+      const timer = setTimeout(() => { cleanup(); reject(new Error('timeout')); }, timeoutMs);
+      function cleanup() { clearTimeout(timer); delete window[cb]; script.remove(); }
+      window[cb] = (data) => { cleanup(); resolve(data); };
+      script.onerror = () => { cleanup(); reject(new Error('network')); };
+      script.src = `${url}${url.includes('?') ? '&' : '?'}callback=${cb}`;
+      document.head.appendChild(script);
+    });
+  }
+
+  function itunesSearch(term, limit = 10) {
+    const q = encodeURIComponent(term);
+    return jsonp(`https://itunes.apple.com/search?term=${q}&media=music&entity=song&limit=${limit}`)
+      .then(d => (d.results || []).filter(r => r.kind === 'song' && r.previewUrl));
+  }
+
+  // Normalise a title for comparison: drop "(feat. x)", "[Remastered]", " - Live", punctuation, etc.
+  function normalize(s) {
+    return String(s).toLowerCase()
+      .normalize('NFD').replace(/[̀-ͯ]/g, '')
+      .replace(/\(.*?\)|\[.*?\]/g, ' ')
+      .replace(/\s-\s.*$/, ' ')
+      .replace(/\b(feat|ft|featuring)\b.*$/, ' ')
+      .replace(/&/g, ' and ')
+      .replace(/[^a-z0-9 ]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  function levenshtein(a, b) {
+    if (a === b) return 0;
+    const m = a.length, n = b.length;
+    if (!m) return n; if (!n) return m;
+    let prev = Array.from({ length: n + 1 }, (_, i) => i);
+    for (let i = 1; i <= m; i++) {
+      const cur = [i];
+      for (let j = 1; j <= n; j++) {
+        cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+      }
+      prev = cur;
+    }
+    return prev[n];
+  }
+
+  function isCorrect(guess, track) {
+    if (guess.trackId && guess.trackId === track.trackId) return true;
+    const g = normalize(guess.title), t = normalize(track.trackName);
+    if (!g || !t) return false;
+    if (g === t) return true;
+    // Forgive small typos (about 1 mistake per 6 characters) on longer titles
+    const allowed = Math.floor(t.length / 6);
+    return t.length >= 4 && levenshtein(g, t) <= allowed;
+  }
+
+  // ---------- State ----------
+  const state = {
+    playlistKey: 'pop',
+    queue: [],
+    round: 0,
+    score: 0,
+    streak: 0,
+    stage: 0,
+    track: null,
+    guesses: [],     // {type: 'wrong'|'skip'|'right', text}
+    history: [],     // per-round summary
+    roundOver: false,
+    usedIds: new Set(),
+  };
+
+  // ---------- Start screen ----------
+  function renderPlaylists() {
+    const wrap = $('playlists');
+    wrap.innerHTML = '';
+    for (const [key, pl] of Object.entries(PLAYLISTS)) {
+      const b = document.createElement('button');
+      b.className = 'playlist' + (key === state.playlistKey && !$('artistInput').value.trim() ? ' selected' : '');
+      b.innerHTML = `<span class="emoji">${pl.emoji}</span>${esc(pl.name)}<small>${esc(pl.desc)}</small>`;
+      b.onclick = () => { state.playlistKey = key; $('artistInput').value = ''; renderPlaylists(); };
+      wrap.appendChild(b);
+    }
+    renderBest();
+  }
+
+  function currentModeKey() {
+    const artist = $('artistInput').value.trim();
+    return artist ? `artist:${artist.toLowerCase()}` : state.playlistKey;
+  }
+
+  function renderBest() {
+    const best = store.get('earshot:best') || {};
+    const b = best[currentModeKey()];
+    $('bestScore').textContent = b ? `Your best here: ${b} / ${ROUNDS * POINTS[0]}` : '';
+  }
+
+  $('artistInput').addEventListener('input', () => renderPlaylists());
+
+  async function startGame() {
+    $('startError').classList.add('hidden');
+    const artist = $('artistInput').value.trim();
+    const btn = $('startBtn');
+    btn.disabled = true;
+    try {
+      if (artist) {
+        btn.textContent = 'Finding songs…';
+        const results = await itunesSearch(artist, 100);
+        const want = normalize(artist);
+        const seen = new Set();
+        const tracks = results.filter(r => {
+          const a = normalize(r.artistName);
+          if (!(a.includes(want) || want.includes(a))) return false;
+          const key = normalize(r.trackName);
+          if (seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        });
+        if (tracks.length < 3) throw new Error(`Couldn't find enough songs for "${artist}". Check the spelling?`);
+        state.queue = shuffle(tracks).map(t => ({ track: t }));
+      } else {
+        state.queue = shuffle(PLAYLISTS[state.playlistKey].songs).map(q => ({ query: q }));
+      }
+    } catch (e) {
+      const msg = e.message === 'network' || e.message === 'timeout'
+        ? 'Could not reach the music service. Check your internet connection and try again.'
+        : e.message;
+      $('startError').textContent = msg;
+      $('startError').classList.remove('hidden');
+      btn.disabled = false; btn.textContent = `Start game · ${ROUNDS} songs`;
+      return;
+    }
+    btn.disabled = false; btn.textContent = `Start game · ${ROUNDS} songs`;
+
+    state.mode = currentModeKey();
+    state.totalRounds = Math.min(ROUNDS, state.queue.length);
+    state.round = 0; state.score = 0; state.streak = 0; state.history = []; state.usedIds.clear();
+    $('roundTotal').textContent = state.totalRounds;
+    show('game');
+    nextRound();
+  }
+
+  // ---------- Round flow ----------
+  async function resolveTrack(item) {
+    if (item.track) return item.track;
+    const results = await itunesSearch(item.query, 5);
+    if (!results.length) return null;
+    // Prefer a result whose title appears in the query (avoids karaoke/cover hits)
+    const q = normalize(item.query);
+    return results.find(r => q.includes(normalize(r.trackName))) || results[0];
+  }
+
+  async function nextRound() {
+    stopAudio();
+    if (state.round >= state.totalRounds) return endGame();
+    state.round++;
+    state.stage = 0;
+    state.guesses = [];
+    state.roundOver = false;
+    $('roundNum').textContent = state.round;
+    $('revealCard').classList.add('hidden');
+    $('guessCard').classList.remove('hidden');
+    $('loading').classList.remove('hidden');
+    $('loading').textContent = 'Loading song…';
+    $('playerArea').classList.add('hidden');
+    $('guessInput').value = '';
+    hideSuggestions();
+    setInputsEnabled(false);
+    renderGuesses();
+
+    let track = null;
+    while (!track && state.queue.length) {
+      const item = state.queue.shift();
+      try {
+        const t = await resolveTrack(item);
+        if (t && !state.usedIds.has(t.trackId)) track = t;
+      } catch (e) {
+        if (!state.queue.length) break;
+      }
+    }
+    if (!track) {
+      $('loading').innerHTML = '<span class="error">Could not load a song. Check your connection.</span>';
+      return;
+    }
+    state.usedIds.add(track.trackId);
+    state.track = track;
+
+    audio.src = track.previewUrl;
+    audio.load();
+    await new Promise(res => {
+      const done = () => { audio.removeEventListener('canplay', done); audio.removeEventListener('error', done); res(); };
+      audio.addEventListener('canplay', done);
+      audio.addEventListener('error', done);
+      setTimeout(done, 6000);
+    });
+
+    $('loading').classList.add('hidden');
+    $('playerArea').classList.remove('hidden');
+    renderBar();
+    setInputsEnabled(true);
+    $('guessInput').focus();
+  }
+
+  function setInputsEnabled(on) {
+    for (const id of ['guessInput', 'submitBtn', 'giveUpBtn', 'skipBtn', 'playBtn']) $(id).disabled = !on;
+  }
+
+  function renderBar() {
+    const total = STAGES[STAGES.length - 1];
+    const bar = $('bar');
+    bar.querySelectorAll('.seg').forEach(s => s.remove());
+    const labels = $('barLabels');
+    labels.innerHTML = '';
+    let prev = 0;
+    STAGES.forEach((s, i) => {
+      const seg = document.createElement('div');
+      seg.className = 'seg' + (i <= state.stage ? ' unlocked' : '');
+      seg.style.width = `${((s - prev) / total) * 100}%`;
+      bar.appendChild(seg);
+      const lab = document.createElement('span');
+      lab.style.width = seg.style.width;
+      lab.textContent = `${s}s`;
+      labels.appendChild(lab);
+      prev = s;
+    });
+    $('progress').style.width = '0%';
+    $('stageLabel').textContent = `${STAGES[state.stage]}s`;
+    const last = state.stage >= STAGES.length - 1;
+    $('skipBtn').textContent = last ? 'Skip (reveal)' : `Skip (+${STAGES[state.stage + 1] - STAGES[state.stage]}s)`;
+  }
+
+  function renderGuesses() {
+    const ul = $('guesses');
+    ul.innerHTML = '';
+    for (let i = 0; i < STAGES.length; i++) {
+      const g = state.guesses[i];
+      const li = document.createElement('li');
+      if (!g) { li.className = 'empty'; li.innerHTML = '&nbsp;'; }
+      else if (g.type === 'skip') { li.className = 'skipped'; li.innerHTML = `<span class="icon">⏭</span> Skipped (${STAGES[i]}s)`; }
+      else if (g.type === 'wrong') { li.className = 'wrong'; li.innerHTML = `<span class="icon">✗</span> ${esc(g.text)}`; }
+      else { li.className = 'right'; li.innerHTML = `<span class="icon">✓</span> ${esc(g.text)}`; }
+      ul.appendChild(li);
+    }
+  }
+
+  function advanceStage(entry) {
+    state.guesses.push(entry);
+    renderGuesses();
+    if (state.stage >= STAGES.length - 1) return finishRound(false);
+    state.stage++;
+    renderBar();
+    // Auto-play the newly unlocked, longer clip so the player hears more right away
+    playClip();
+  }
+
+  function submitGuess(guess) {
+    if (state.roundOver || !state.track) return;
+    if (!guess.title.trim()) return;
+    hideSuggestions();
+    $('guessInput').value = '';
+    const label = guess.artist ? `${guess.title} — ${guess.artist}` : guess.title;
+    if (isCorrect(guess, state.track)) {
+      state.guesses.push({ type: 'right', text: label });
+      renderGuesses();
+      finishRound(true);
+    } else {
+      advanceStage({ type: 'wrong', text: label });
+    }
+  }
+
+  function finishRound(won) {
+    state.roundOver = true;
+    stopAudio();
+    setInputsEnabled(false);
+    const pts = won ? POINTS[state.stage] : 0;
+    state.score += pts;
+    state.streak = won ? state.streak + 1 : 0;
+    $('score').textContent = state.score;
+    $('streak').textContent = state.streak;
+    state.history.push({ track: state.track, won, stage: state.stage, pts });
+
+    const t = state.track;
+    $('resultMsg').textContent = won
+      ? (state.stage === 0 ? 'Incredible! Got it in 1 second!' : `Nice! Got it in ${STAGES[state.stage]} seconds.`)
+      : 'Out of clips! The song was:';
+    $('resultMsg').className = 'result-msg ' + (won ? 'good' : 'bad');
+    $('artwork').src = (t.artworkUrl100 || '').replace('100x100', '300x300');
+    $('artwork').alt = `${t.collectionName || t.trackName} cover art`;
+    $('revealTitle').textContent = t.trackName;
+    $('revealArtist').textContent = t.artistName;
+    $('revealPoints').textContent = `+${pts} points`;
+    $('nextBtn').textContent = state.round >= state.totalRounds ? 'See results →' : 'Next song →';
+    $('guessCard').classList.add('hidden');
+    $('revealCard').classList.remove('hidden');
+    $('nextBtn').focus();
+  }
+
+  function endGame() {
+    stopAudio();
+    const max = state.totalRounds * POINTS[0];
+    $('finalScore').textContent = `${state.score} / ${max}`;
+    const correct = state.history.filter(h => h.won).length;
+    const best = store.get('earshot:best') || {};
+    let note = `You named ${correct} of ${state.totalRounds} songs.`;
+    if (!best[state.mode] || state.score > best[state.mode]) {
+      if (best[state.mode]) note += ' New personal best! 🎉';
+      best[state.mode] = state.score;
+      store.set('earshot:best', best);
+    }
+    $('finalNote').textContent = note;
+    $('summaryList').innerHTML = state.history.map(h =>
+      `<li><span>${h.won ? '✅' : '❌'} ${esc(h.track.trackName)} — ${esc(h.track.artistName)}</span><span>${h.won ? STAGES[h.stage] + 's' : '—'}</span></li>`
+    ).join('');
+    show('summary');
+  }
+
+  function show(id) {
+    for (const s of ['start', 'game', 'summary']) $(s).classList.toggle('hidden', s !== id);
+    if (id === 'start') renderPlaylists();
+  }
+
+  // ---------- Audio ----------
+  const audio = $('audio');
+  let rafId = null;
+  let clipLimit = 0;
+
+  function playClip(limit = STAGES[state.stage]) {
+    if (!state.track) return;
+    stopAudio();
+    clipLimit = limit;
+    audio.currentTime = 0;
+    const p = audio.play();
+    if (p && p.catch) p.catch(() => { /* autoplay blocked; user can press play */ });
+    $('playBtn').textContent = '■';
+    const total = STAGES[STAGES.length - 1];
+    const tick = () => {
+      const t = audio.currentTime;
+      if (!state.roundOver) $('progress').style.width = `${Math.min(t, total) / total * 100}%`;
+      if (t >= clipLimit || audio.ended) { stopAudio(); return; }
+      rafId = requestAnimationFrame(tick);
+    };
+    rafId = requestAnimationFrame(tick);
+  }
+
+  function stopAudio() {
+    if (rafId) cancelAnimationFrame(rafId);
+    rafId = null;
+    audio.pause();
+    $('playBtn').textContent = '▶';
+    $('replayFullBtn').textContent = '▶ Play full preview';
+  }
+
+  $('playBtn').onclick = () => { if (!audio.paused) stopAudio(); else playClip(); };
+  $('replayFullBtn').onclick = () => {
+    if (!audio.paused) { stopAudio(); return; }
+    playClip(30);
+    $('replayFullBtn').textContent = '■ Stop';
+  };
+
+  // ---------- Answer area + autocomplete ----------
+  const input = $('guessInput');
+  const sugList = $('suggestions');
+  let suggestions = [];
+  let activeIdx = -1;
+  let searchTimer = null;
+  let searchSeq = 0;
+
+  function localMatches(q) {
+    // Suggest from the current playlist without hitting the network
+    if (state.mode && state.mode.startsWith('artist:')) {
+      return state.history.map(h => h.track).concat(state.queue.map(i => i.track).filter(Boolean), state.track ? [state.track] : [])
+        .filter(t => normalize(t.trackName).includes(q))
+        .map(t => ({ title: t.trackName, artist: t.artistName, trackId: t.trackId }));
+    }
+    return [];
+  }
+
+  function renderSuggestions() {
+    if (!suggestions.length) { hideSuggestions(); return; }
+    sugList.innerHTML = suggestions.map((s, i) =>
+      `<li data-i="${i}" class="${i === activeIdx ? 'active' : ''}">${esc(s.title)} <small>— ${esc(s.artist)}</small></li>`
+    ).join('');
+    sugList.classList.remove('hidden');
+  }
+
+  function hideSuggestions() {
+    sugList.classList.add('hidden');
+    suggestions = []; activeIdx = -1;
+  }
+
+  input.addEventListener('input', () => {
+    const raw = input.value.trim();
+    clearTimeout(searchTimer);
+    if (raw.length < 2) { hideSuggestions(); return; }
+    const q = normalize(raw);
+    const seq = ++searchSeq;
+    const local = localMatches(q);
+    if (local.length) { suggestions = dedupe(local).slice(0, 8); activeIdx = -1; renderSuggestions(); }
+    searchTimer = setTimeout(async () => {
+      try {
+        const results = await itunesSearch(raw, 15);
+        if (seq !== searchSeq || state.roundOver) return;
+        const remote = results.map(r => ({ title: r.trackName, artist: r.artistName, trackId: r.trackId }));
+        suggestions = dedupe(local.concat(remote)).slice(0, 8);
+        activeIdx = -1;
+        renderSuggestions();
+      } catch { /* suggestions are optional */ }
+    }, 250);
+  });
+
+  function dedupe(list) {
+    const seen = new Set();
+    return list.filter(s => {
+      const k = normalize(s.title) + '|' + normalize(s.artist);
+      if (seen.has(k)) return false;
+      seen.add(k); return true;
+    });
+  }
+
+  input.addEventListener('keydown', (e) => {
+    const open = !sugList.classList.contains('hidden') && suggestions.length;
+    if (e.key === 'ArrowDown' && open) { e.preventDefault(); activeIdx = (activeIdx + 1) % suggestions.length; renderSuggestions(); }
+    else if (e.key === 'ArrowUp' && open) { e.preventDefault(); activeIdx = (activeIdx - 1 + suggestions.length) % suggestions.length; renderSuggestions(); }
+    else if (e.key === 'Escape') { hideSuggestions(); }
+    else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (open && activeIdx >= 0) submitGuess(suggestions[activeIdx]);
+      else submitGuess({ title: input.value });
+    }
+  });
+
+  sugList.addEventListener('mousedown', (e) => {
+    const li = e.target.closest('li');
+    if (!li) return;
+    e.preventDefault();
+    submitGuess(suggestions[+li.dataset.i]);
+  });
+  input.addEventListener('blur', () => setTimeout(hideSuggestions, 150));
+
+  $('submitBtn').onclick = () => submitGuess({ title: input.value });
+  $('skipBtn').onclick = () => { if (!state.roundOver) advanceStage({ type: 'skip' }); };
+  $('giveUpBtn').onclick = () => { if (!state.roundOver) finishRound(false); };
+  $('nextBtn').onclick = () => nextRound();
+  $('quitBtn').onclick = () => { stopAudio(); state.track = null; show('start'); };
+  $('againBtn').onclick = () => show('start');
+  $('startBtn').onclick = startGame;
+  $('artistInput').addEventListener('keydown', e => { if (e.key === 'Enter') startGame(); });
+
+  // Expose internals for automated tests only
+  window.__earshot = { normalize, isCorrect, state };
+
+  renderPlaylists();
+})();
+</script>
+</body>
+</html>

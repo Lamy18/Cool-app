@@ -469,6 +469,48 @@
   .credit { text-align: center; color: var(--muted); font-size: .78rem; margin-top: 30px; }
   .credit a { color: var(--muted); }
 
+  /* v2: meters, showcase, free pack, sets, achievements, search, levels */
+  .meters { display: grid; gap: 10px; margin-top: 14px; }
+  .meter { display: grid; gap: 5px; }
+  .meter .lbl { display: flex; justify-content: space-between; font-size: .8rem; color: var(--muted); font-family: var(--mono); }
+  .meter .lbl b { color: var(--text); font-family: var(--body); }
+  .meter .track { height: 8px; border-radius: 999px; background: rgba(255,255,255,.08); overflow: hidden; }
+  .meter .track div { height: 100%; border-radius: 999px; }
+  .free-row { display: flex; align-items: center; gap: 12px; margin-top: 14px; padding: 12px; border-radius: 18px; background: rgba(255,255,255,.06); border: 1px dashed rgba(255,255,255,.25); }
+  .free-row .gift { font-size: 1.8rem; }
+  .free-row .t { flex: 1; min-width: 0; }
+  .free-row .t b { display: block; }
+  .free-row .t span { font-size: .8rem; color: var(--muted); }
+  .free-row .btn { padding: 10px 14px; }
+  .showcase { display: flex; gap: 12px; overflow-x: auto; padding: 6px 2px 12px; scroll-snap-type: x mandatory; }
+  .showcase .slot { width: 128px; flex-shrink: 0; scroll-snap-align: start; }
+  .pack-buttons { display: grid; grid-template-columns: 1fr auto; gap: 6px; width: 100%; }
+  .multi-btn { border-radius: 14px; padding: 10px 12px; font-weight: 800; background: rgba(255,255,255,.12); border: 1px solid var(--glass-line); }
+  .search { flex: 1 1 180px; min-width: 0; font: inherit; color: var(--text); background: var(--glass); border: 1px solid var(--glass-line); border-radius: 999px; padding: 8px 14px; font-size: .88rem; }
+  .search::placeholder { color: var(--muted); }
+  .fav-badge { position: absolute; bottom: -6px; right: -6px; z-index: 5; width: 26px; height: 26px; border-radius: 50%; background: #ff5fb4; display: grid; place-items: center; font-size: .78rem; border: 2px solid #fff; }
+  .pip.lv { background: linear-gradient(90deg, #ff7ad9, #ffd76a); color: #14122e; border-color: #fff; }
+  .sets { display: grid; gap: 8px; }
+  .set-row { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; align-items: center; border-radius: 16px; padding: 10px 14px; }
+  .set-row b { font-size: .92rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .set-row .n { font-family: var(--mono); font-size: .78rem; color: var(--muted); }
+  .set-row .track { grid-column: 1 / -1; height: 6px; border-radius: 999px; background: rgba(255,255,255,.08); overflow: hidden; }
+  .set-row .track div { height: 100%; background: var(--holo); border-radius: 999px; }
+  .set-row.done { border-color: rgba(255,215,106,.6); }
+  .achs { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px; }
+  .ach { display: flex; gap: 10px; align-items: center; border-radius: 16px; padding: 10px 12px; }
+  .ach .ic { font-size: 1.5rem; width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: rgba(255,255,255,.08); flex-shrink: 0; }
+  .ach b { display: block; font-size: .92rem; }
+  .ach span { font-size: .76rem; color: var(--muted); }
+  .ach.locked { opacity: .5; }
+  .ach.locked .ic { filter: grayscale(1); }
+  .ach .rw { margin-left: auto; font-family: var(--mono); font-size: .75rem; color: var(--gold); white-space: nowrap; }
+  .multi-summary { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+  .multi-summary span { border-radius: 999px; padding: 4px 10px; font-family: var(--mono); font-size: .78rem; font-weight: 700; background: rgba(255,255,255,.1); border: 1px solid var(--glass-line); }
+  .stage-count { position: absolute; top: -14px; right: -14px; z-index: 5; width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; font-family: var(--display); font-weight: 700; font-size: 1.2rem; color: var(--ink); background: var(--holo); border: 2px solid #fff; box-shadow: 0 6px 16px rgba(0,0,0,.4); }
+  .ascend-btn { background: var(--noise), var(--holo); background-size: 180px, 200% 100%; background-blend-mode: soft-light, normal; color: var(--ink); border: 1px solid rgba(255,255,255,.7); }
+  .heart-btn.on { background: #ff5fb4; color: #fff; border-color: #fff; }
+
   @media (prefers-reduced-motion: reduce) {
     body::before, .r-2, .r-3, .r-4, .e-holo, .e-foil, .e-gold, .e-prismatic, .e-glass, .e-shadow, .e-glitch .art img, .e-prismatic .foil, .rays, .pack, .cardback, .sparkles i, .logo span, .buy-btn, .btn.primary { animation: none !important; }
   }
@@ -556,6 +598,29 @@ const UPGRADES = [
 ];
 const autoInterval = (l) => 24 / l;
 
+const LEG_PITY = 100;      // cards until a guaranteed Legendary+
+const MYTH_PITY = 400;     // cards until a guaranteed Mythic
+const FREE_EVERY = 4 * 3600 * 1000;
+const MAX_LVL = 5;
+const MIN_SET = 3;          // a series needs at least this many characters to count as a set
+
+const ACHIEVEMENTS = [
+  { id: 'first', icon: '🎴', name: 'First Pull', desc: 'Open your first pack', reward: 50, test: () => save.packs >= 1 },
+  { id: 'pack25', icon: '📦', name: 'Pack Rat', desc: 'Open 25 packs', reward: 2000, test: () => save.packs >= 25 },
+  { id: 'pack250', icon: '🏗️', name: 'Hoarder', desc: 'Open 250 packs', reward: 100000, test: () => save.packs >= 250 },
+  { id: 'rare', icon: '💎', name: 'Rare Find', desc: 'Pull a Rare', reward: 100, test: () => save.best >= 1 },
+  { id: 'epic', icon: '🔮', name: 'Epic Moment', desc: 'Pull an Epic', reward: 500, test: () => save.best >= 2 },
+  { id: 'legend', icon: '👑', name: 'Legend', desc: 'Pull a Legendary', reward: 5000, test: () => save.best >= 3 },
+  { id: 'mythic', icon: '🌠', name: 'Mythic!', desc: 'Pull a Mythic', reward: 50000, test: () => save.best >= 4 },
+  { id: 'shiny', icon: '✨', name: 'Shiny', desc: 'Own a special-edition card', reward: 300, test: () => Object.values(save.coll).some(st => st.traits.some(t => EDITIONS.some(e => e.id === t))) },
+  { id: 'rainbow', icon: '🌈', name: 'Over the Rainbow', desc: 'Own a Prismatic card', reward: 25000, test: () => Object.values(save.coll).some(st => st.traits.includes('prismatic')) },
+  { id: 'coll50', icon: '📚', name: 'Collector', desc: 'Find 50 different characters', reward: 10000, test: () => uniqueCount() >= 50 },
+  { id: 'set', icon: '🧩', name: 'Full Set', desc: 'Complete a series set', reward: 20000, test: () => completedSets().length >= 1 },
+  { id: 'lv3', icon: '⬆️', name: 'Ascended', desc: 'Raise a character to Lv3', reward: 15000, test: () => Object.values(save.lvl).some(l => l >= 3) },
+  { id: 'taps', icon: '👆', name: 'Tap Happy', desc: 'Tap 500 times', reward: 1000, test: () => save.taps >= 500 },
+  { id: 'million', icon: '💰', name: 'Millionaire', desc: 'Earn 1M coins in total', reward: 100000, test: () => save.earned >= 1e6 },
+];
+
 const SAVE_KEY = 'holopull:save';
 const CHAR_KEY = 'holopull:chars';
 const CHAR_MAX_AGE = 7 * 24 * 3600 * 1000;
@@ -589,9 +654,14 @@ let sortBy = 'rarity';
 let showLimit = 120;
 let busy = false;        // a pack is being opened
 let autoTimer = 0;
+let search = '';
+let SETS = [];           // [{name, ids}]
+let incomeCache = null;  // recomputed only when the collection changes
+const dirty = () => { incomeCache = null; };
 
 function freshSave() {
-  return { coins: 100, earned: 0, packs: 0, taps: 0, best: -1, up: { tap: 0, fan: 0, luck: 0, trait: 0, auto: 0 }, coll: {}, order: 0, lastTs: Date.now(), muted: false };
+  return { coins: 100, earned: 0, packs: 0, taps: 0, best: -1, up: { tap: 0, fan: 0, luck: 0, trait: 0, auto: 0 }, coll: {}, order: 0, lastTs: Date.now(), muted: false,
+    pity: { leg: 0, myth: 0 }, favs: [], lvl: {}, freeAt: 0, ach: {} };
 }
 
 // ======================= Character data =======================
@@ -644,6 +714,9 @@ function indexChars(list) {
   BY_ID = new Map(CHARS.map(c => [c.id, c]));
   BY_TIER = [[], [], [], [], []];
   for (const c of CHARS) BY_TIER[c.tier].push(c);
+  const bySeries = new Map();
+  for (const c of CHARS) if (c.series) { if (!bySeries.has(c.series)) bySeries.set(c.series, []); bySeries.get(c.series).push(c.id); }
+  SETS = [...bySeries].filter(([, ids]) => ids.length >= MIN_SET).map(([name, ids]) => ({ name, ids })).sort((a, b) => b.ids.length - a.ids.length);
 }
 
 async function loadChars(force) {
@@ -666,14 +739,20 @@ async function loadChars(force) {
 const charOf = (id) => BY_ID.get(id);
 const traitMult = (traits) => traits.reduce((m, t) => m * (TRAIT[t]?.mult || 1), 1);
 const element = (id) => ELEMENTS[hash(id) % ELEMENTS.length];
-const powerOf = (c, traits) => Math.round((Math.sqrt(c.fav) * 4 + 50) * traitMult(traits));
-const cardIncome = (c, traits) => TIERS[c.tier].income * traitMult(traits);
+const lvlOf = (id) => (save && save.lvl && save.lvl[id]) || 0;
+const lvlMult = (id) => 1 + .5 * lvlOf(id);
+const powerOf = (c, traits) => Math.round((Math.sqrt(c.fav) * 4 + 50) * traitMult(traits) * lvlMult(c.id));
+const cardIncome = (c, traits) => TIERS[c.tier].income * traitMult(traits) * lvlMult(c.id);
+const ownedIds = () => new Set(Object.values(save.coll).map(st => st.id));
+function completedSets() { const own = ownedIds(); return SETS.filter(st => st.ids.every(id => own.has(id))); }
 
 function uniqueCount() { return new Set(Object.values(save.coll).map(s => s.id)).size; }
 function income() {
+  if (incomeCache != null) return incomeCache;
   let base = 0;
   for (const s of Object.values(save.coll)) { const c = charOf(s.id); if (c) base += cardIncome(c, s.traits) * s.count; }
-  return base * (1 + .15 * save.up.fan) * (1 + .01 * uniqueCount());
+  incomeCache = base * (1 + .15 * save.up.fan) * (1 + .01 * uniqueCount()) * (1 + .05 * completedSets().length);
+  return incomeCache;
 }
 const tapValue = () => (1 + 2 * save.up.tap) * (1 + income() * .03);
 const upgCost = (u) => Math.round(u.base * Math.pow(u.mult, save.up[u.id]));
@@ -706,7 +785,13 @@ function rollPack(pack) {
   for (let i = 0; i < 5; i++) {
     let tier = rollTier(pack);
     if (i === 4) tier = Math.max(tier, pack.min);
+    // Pity: guaranteed Legendary+ / Mythic after a dry streak
+    save.pity.leg++; save.pity.myth++;
+    if (save.pity.myth >= MYTH_PITY) tier = 4;
+    else if (save.pity.leg >= LEG_PITY) tier = Math.max(tier, 3);
     while (!BY_TIER[tier].length && tier > 0) tier--;
+    if (tier >= 3) save.pity.leg = 0;
+    if (tier === 4) save.pity.myth = 0;
     const c = pick(BY_TIER[tier]);
     cards.push({ id: c.id, traits: rollTraits() });
   }
@@ -725,10 +810,55 @@ function addCard(inst) {
   save.coll[k].order = ++save.order;
   save.coll[k].fresh = true;
   save.best = Math.max(save.best, charOf(inst.id).tier);
+  dirty();
   return isNewChar;
 }
 
 function persist() { save.lastTs = Date.now(); store.set(SAVE_KEY, save); }
+
+function checkAch() {
+  for (const a of ACHIEVEMENTS) {
+    if (save.ach[a.id] || !a.test()) continue;
+    save.ach[a.id] = Date.now();
+    gain(a.reward);
+    toast(`🏆 ${a.name} unlocked · +🪙 ${fmt(a.reward)}`);
+    sfx.rare(2);
+  }
+}
+
+const isFav = (k) => save.favs.includes(k);
+function toggleFav(k) {
+  if (isFav(k)) save.favs = save.favs.filter(x => x !== k);
+  else save.favs.push(k);
+  persist();
+}
+
+// Ascend: fuse spare copies of a character to raise its level (all its cards earn more)
+function ascendInfo(id) {
+  const lvl = lvlOf(id);
+  const stacks = Object.entries(save.coll).filter(([, st]) => st.id === id).sort((a, b) => traitMult(a[1].traits) - traitMult(b[1].traits));
+  const bestKey = stacks.length ? stacks[stacks.length - 1][0] : null;
+  const keepOf = (k) => (k === bestKey || isFav(k)) ? 1 : 0;
+  const spare = stacks.reduce((a, [k, st]) => a + Math.max(0, st.count - keepOf(k)), 0);
+  const need = lvl + 2;
+  const cost = Math.round(TIERS[charOf(id).tier].income * 400 * (lvl + 1));
+  return { lvl, need, spare, cost, stacks, keepOf, maxed: lvl >= MAX_LVL };
+}
+function ascend(id) {
+  const a = ascendInfo(id);
+  if (a.maxed || a.spare < a.need || save.coins < a.cost) return false;
+  let left = a.need;
+  for (const [k, st] of a.stacks) {
+    const take = Math.min(left, Math.max(0, st.count - a.keepOf(k)));
+    st.count -= take; left -= take;
+    if (st.count <= 0) { delete save.coll[k]; save.favs = save.favs.filter(x => x !== k); }
+    if (!left) break;
+  }
+  save.coins -= a.cost;
+  save.lvl[id] = a.lvl + 1;
+  dirty(); persist(); checkAch();
+  return true;
+}
 
 // ======================= Card rendering =======================
 function cardHTML(inst, opts = {}) {
@@ -753,7 +883,7 @@ function cardHTML(inst, opts = {}) {
         ${inst.traits.includes('first') ? '<span class="first-ed">1st</span>' : ''}
         <div class="tchips">${inst.traits.map(x => `<span class="tchip">${TRAIT[x].icon} ${TRAIT[x].name}</span>`).join('')}</div>
       </div>
-      <div class="top-row"><span class="pip">⚡${fmt(powerOf(c, inst.traits))}</span><span class="pip">${'★'.repeat(t.stars)}</span></div>
+      <div class="top-row"><span class="pip">⚡${fmt(powerOf(c, inst.traits))}</span>${lvlOf(c.id) ? `<span class="pip lv">Lv${lvlOf(c.id)} ${'★'.repeat(t.stars)}</span>` : `<span class="pip">${'★'.repeat(t.stars)}</span>`}</div>
       <div class="info">
         <div class="irow"><span class="box no">#${String(c.rank || 0).padStart(3, '0')}</span><span class="box nm">${esc(c.name)}</span><span class="box el" title="${el.name}">${el.icon}</span></div>
         <div class="box meta"><span><span class="rlabel">${t.name}</span> · ${esc(c.series || el.name)}</span><span class="inc">+${fmt(cardIncome(c, inst.traits))}/s</span></div>
@@ -832,6 +962,18 @@ function shopHTML() {
       <button class="tap-card" id="tapBtn" aria-label="Tap for coins">${backHTML()}</button>
       <div class="tap-info"><b>Tap the card for coins</b><p>Each tap: <span class="num" id="tapVal" style="color:var(--gold)"></span>. Your cards also earn coins every second, even while you're away.</p></div>
     </div>
+    <div class="panel" style="margin-top:14px">
+      <div class="free-row" style="margin-top:0">
+        <span class="gift">🎁</span>
+        <span class="t"><b>Free Premium Pack</b><span id="freeInfo">Every 4 hours</span></span>
+        <button class="btn primary" id="freeBtn">Open free</button>
+      </div>
+      <div class="meters">
+        <div class="meter"><div class="lbl"><b>Legendary+ guaranteed</b><span id="pityLeg"></span></div><div class="track"><div id="pityLegBar" style="background:linear-gradient(90deg,#c8952e,#ffe9a6)"></div></div></div>
+        <div class="meter"><div class="lbl"><b>Mythic guaranteed</b><span id="pityMyth"></span></div><div class="track"><div id="pityMythBar" style="background:linear-gradient(90deg,#ff5fc8,#ffd36b,#7dffcf,#6fd8ff,#b07bff)"></div></div></div>
+      </div>
+    </div>
+    ${showcaseHTML()}
     <h2>Packs</h2>
     <div class="packs">${PACKS.map(p => {
       const odds = packOdds(p);
@@ -839,7 +981,7 @@ function shopHTML() {
         ${packHTML(p)}
         <b>${esc(p.name)}</b>
         <div class="odds">${odds.map((o, i) => o > 0 ? `<i style="color:${TIERS[i].color}">${TIERS[i].name[0]}</i> ${(o * 100).toFixed(o < .01 ? 2 : 1)}%` : '').filter(Boolean).join(' · ')}${p.min ? `<br>1 ${TIERS[p.min].name}+ guaranteed` : ''}</div>
-        <button class="buy-btn" data-pack="${p.id}">Open · <span class="num">🪙 ${fmt(p.price)}</span></button>
+        <div class="pack-buttons"><button class="buy-btn" data-pack="${p.id}">Open · <span class="num">🪙 ${fmt(p.price)}</span></button><button class="multi-btn" data-multi="${p.id}" title="Open 5 for 🪙 ${fmt(p.price * 5)}">×5</button></div>
       </div>`;
     }).join('')}</div>
     <h2>Upgrades</h2>
@@ -855,40 +997,64 @@ function shopHTML() {
   </section>`;
 }
 
+function showcaseHTML() {
+  const favs = save.favs.filter(k => save.coll[k] && charOf(save.coll[k].id));
+  if (!favs.length) return '';
+  return `<h2>Showcase</h2><div class="showcase">${favs.map(k => `<div class="slot" data-key="${esc(k)}" role="button" tabindex="0">${cardHTML(save.coll[k])}</div>`).join('')}</div>`;
+}
+
 function stacksSorted() {
   let list = Object.entries(save.coll).map(([k, s]) => ({ k, ...s, c: charOf(s.id) })).filter(s => s.c);
   if (filter === 'special') list = list.filter(s => s.traits.length);
+  else if (filter === 'fav') list = list.filter(s => isFav(s.k));
   else if (filter !== 'all') list = list.filter(s => s.c.tier === +filter);
   const inc = (s) => cardIncome(s.c, s.traits) * s.count;
   if (sortBy === 'rarity') list.sort((a, b) => b.c.tier - a.c.tier || traitMult(b.traits) - traitMult(a.traits) || b.c.fav - a.c.fav);
   if (sortBy === 'income') list.sort((a, b) => inc(b) - inc(a));
   if (sortBy === 'newest') list.sort((a, b) => b.order - a.order);
   if (sortBy === 'name') list.sort((a, b) => a.c.name.localeCompare(b.c.name));
+  if (sortBy === 'level') list.sort((a, b) => lvlOf(b.id) - lvlOf(a.id) || b.c.tier - a.c.tier);
+  if (search) { const q = search.toLowerCase(); list = list.filter(s => s.c.name.toLowerCase().includes(q) || (s.c.series || '').toLowerCase().includes(q)); }
   return list;
 }
 
 function collectionHTML() {
-  const list = stacksSorted();
   const total = Object.values(save.coll).reduce((a, s) => a + s.count, 0);
-  const dupes = Object.values(save.coll).filter(s => s.count > 1 && charOf(s.id)?.tier <= 1).reduce((a, s) => a + s.count - 1, 0);
-  const filters = [['all', 'All'], ['4', 'Mythic'], ['3', 'Legendary'], ['2', 'Epic'], ['1', 'Rare'], ['0', 'Common'], ['special', 'Special']];
+  const dupes = Object.values(save.coll).filter(st => st.count > 1 && charOf(st.id)?.tier <= 1).reduce((a, st) => a + st.count - 1, 0);
+  const filters = [['all', 'All'], ['fav', '♥ Favorites'], ['4', 'Mythic'], ['3', 'Legendary'], ['2', 'Epic'], ['1', 'Rare'], ['0', 'Common'], ['special', 'Special']];
   return `<section class="view">
     <div class="toolbar">
-      ${filters.map(([v, l]) => `<button class="chip ${filter === v ? 'on' : ''}" data-filter="${v}">${l}</button>`).join('')}
-      <select id="sortSel" aria-label="Sort">${[['rarity', 'Rarity'], ['income', 'Income'], ['newest', 'Newest'], ['name', 'Name']].map(([v, l]) => `<option value="${v}" ${sortBy === v ? 'selected' : ''}>Sort: ${l}</option>`).join('')}</select>
+      <input class="search" id="searchBox" type="search" placeholder="Search name or series…" value="${esc(search)}" aria-label="Search collection">
+      <select id="sortSel" aria-label="Sort">${[['rarity', 'Rarity'], ['income', 'Income'], ['level', 'Level'], ['newest', 'Newest'], ['name', 'Name']].map(([v, l]) => `<option value="${v}" ${sortBy === v ? 'selected' : ''}>Sort: ${l}</option>`).join('')}</select>
     </div>
+    <div class="toolbar">${filters.map(([v, l]) => `<button class="chip ${filter === v ? 'on' : ''}" data-filter="${v}">${l}</button>`).join('')}</div>
     <div class="toolbar" style="justify-content:space-between">
       <span style="color:var(--muted);font-size:.9rem">${total} cards · ${uniqueCount()} characters</span>
       ${dupes ? `<button class="chip" id="sellDupes">Sell ${dupes} Common/Rare duplicates</button>` : ''}
     </div>
-    ${list.length ? `<div class="grid">${list.slice(0, showLimit).map(s => `
-      <div class="slot" data-key="${esc(s.k)}" role="button" tabindex="0" aria-label="View ${esc(s.c.name)}">
-        ${s.count > 1 ? `<span class="count">×${s.count}</span>` : ''}${s.fresh ? '<span class="new-badge">NEW</span>' : ''}
-        ${cardHTML(s)}
-      </div>`).join('')}</div>
-      ${list.length > showLimit ? `<div style="text-align:center;margin-top:16px"><button class="btn" id="moreBtn">Show more (${list.length - showLimit})</button></div>` : ''}`
-      : `<div class="empty">${total ? 'No cards match this filter.' : 'No cards yet. Open a pack in the Shop!'}</div>`}
+    <div id="collGrid">${gridHTML()}</div>
   </section>`;
+}
+
+function gridHTML() {
+  const list = stacksSorted();
+  const total = Object.keys(save.coll).length;
+  if (!list.length) return `<div class="empty">${total ? 'No cards match.' : 'No cards yet. Open a pack in the Shop!'}</div>`;
+  return `<div class="grid">${list.slice(0, showLimit).map(st => `
+      <div class="slot" data-key="${esc(st.k)}" role="button" tabindex="0" aria-label="View ${esc(st.c.name)}">
+        ${st.count > 1 ? `<span class="count">×${st.count}</span>` : ''}${st.fresh ? '<span class="new-badge">NEW</span>' : ''}${isFav(st.k) ? '<span class="fav-badge">♥</span>' : ''}
+        ${cardHTML(st)}
+      </div>`).join('')}</div>
+    ${list.length > showLimit ? `<div style="text-align:center;margin-top:16px"><button class="btn" id="moreBtn">Show more (${list.length - showLimit})</button></div>` : ''}`;
+}
+
+function bindSlots(root) {
+  root.querySelectorAll('.slot').forEach(sl => {
+    const open = () => { const st = save.coll[sl.dataset.key]; if (st) { st.fresh = false; openViewer(sl.dataset.key); } };
+    sl.onclick = open;
+    sl.onkeydown = (e) => { if (e.key === 'Enter') open(); };
+  });
+  if ($('moreBtn')) $('moreBtn').onclick = () => { showLimit += 120; $('collGrid').innerHTML = gridHTML(); bindSlots($('collGrid')); };
 }
 
 function indexHTML() {
@@ -912,6 +1078,19 @@ function indexHTML() {
       <div class="stat"><b class="num">${fmt(specials)}</b><span>Special editions</span></div>
       <div class="stat"><b class="num">${fmt(save.earned)}</b><span>Coins earned</span></div>
     </div>
+    <h2>Achievements <span style="color:var(--muted);font-size:.9rem;font-weight:500">${Object.keys(save.ach).length}/${ACHIEVEMENTS.length}</span></h2>
+    <div class="achs">${ACHIEVEMENTS.map(a => `
+      <div class="ach glass ${save.ach[a.id] ? '' : 'locked'}"><span class="ic">${a.icon}</span><div><b>${a.name}</b><span>${a.desc}</span></div><span class="rw">${save.ach[a.id] ? '✓' : '🪙 ' + fmt(a.reward)}</span></div>`).join('')}</div>
+    <h2>Series sets <span style="color:var(--muted);font-size:.9rem;font-weight:500">${completedSets().length} complete · +${completedSets().length * 5}% income</span></h2>
+    <p style="color:var(--muted);margin:-4px 0 12px;font-size:.88rem">Own every character from a series to complete its set. Each set adds +5% to all income.</p>
+    <div class="sets">${(() => {
+      const own = ownedIds();
+      return SETS.map(st => ({ ...st, n: st.ids.filter(id => own.has(id)).length }))
+        .sort((a, b) => (b.n / b.ids.length) - (a.n / a.ids.length) || b.ids.length - a.ids.length)
+        .slice(0, 40).map(st => `
+          <div class="set-row glass ${st.n === st.ids.length ? 'done' : ''}"><b>${st.n === st.ids.length ? '✅ ' : ''}${esc(st.name)}</b><span class="n">${st.n}/${st.ids.length}</span><div class="track"><div style="width:${st.n / st.ids.length * 100}%"></div></div></div>`).join('')
+        || '<div class="empty">No series data yet.</div>';
+    })()}</div>
     <h2>Editions & traits</h2>
     <div class="trait-list">${[...EDITIONS, ...EXTRAS].map(t => `
       <div class="trait-row"><span class="ic">${t.icon}</span><div><b>${t.name}</b><span>${t.desc} ${(t.chance * (1 + .25 * save.up.trait) * 100).toFixed(1)}% per card</span></div><span class="x">×${t.mult}</span></div>`).join('')}</div>
@@ -924,21 +1103,21 @@ function bindView() {
     tapBtn.onclick = (e) => {
       const v = tapValue();
       gain(v); save.taps++;
+      if (save.taps % 25 === 0) checkAch();
       floaty(e.clientX || tapBtn.getBoundingClientRect().left + 50, e.clientY || tapBtn.getBoundingClientRect().top, '+' + fmt(v));
       sfx.coin();
     };
     document.querySelectorAll('[data-pack]').forEach(b => b.onclick = () => openPack(PACKS.find(p => p.id === b.dataset.pack)));
+    document.querySelectorAll('[data-multi]').forEach(b => b.onclick = () => openPack(PACKS.find(p => p.id === b.dataset.multi), { count: 5 }));
+    $('freeBtn').onclick = () => { if (Date.now() >= (save.freeAt || 0)) openPack(PACKS[1], { free: true }); };
+    bindSlots($('main'));
     document.querySelectorAll('[data-upg]').forEach(b => b.onclick = () => buyUpgrade(UPGRADES.find(u => u.id === b.dataset.upg)));
   }
   if (tab === 'collection') {
     document.querySelectorAll('[data-filter]').forEach(b => b.onclick = () => { filter = b.dataset.filter; showLimit = 120; render(); });
     $('sortSel').onchange = (e) => { sortBy = e.target.value; render(); };
-    document.querySelectorAll('.slot').forEach(s => {
-      const open = () => { const st = save.coll[s.dataset.key]; if (st) { st.fresh = false; openViewer(s.dataset.key); } };
-      s.onclick = open;
-      s.onkeydown = (e) => { if (e.key === 'Enter') open(); };
-    });
-    if ($('moreBtn')) $('moreBtn').onclick = () => { showLimit += 120; render(); };
+    $('searchBox').oninput = (e) => { search = e.target.value; showLimit = 120; $('collGrid').innerHTML = gridHTML(); bindSlots($('collGrid')); };
+    bindSlots($('collGrid'));
     if ($('sellDupes')) $('sellDupes').onclick = sellDupes;
   }
 }
@@ -949,6 +1128,21 @@ function updateHUD() {
   $('rate').textContent = fmt(income());
   if ($('tapVal')) $('tapVal').textContent = '+' + fmt(tapValue()) + ' 🪙';
   document.querySelectorAll('[data-pack]').forEach(b => { b.disabled = busy || save.coins < PACKS.find(p => p.id === b.dataset.pack).price; });
+  document.querySelectorAll('[data-multi]').forEach(b => { b.disabled = busy || save.coins < PACKS.find(p => p.id === b.dataset.multi).price * 5; });
+  if ($('freeBtn')) {
+    const wait = (save.freeAt || 0) - Date.now();
+    $('freeBtn').disabled = busy || wait > 0;
+    $('freeBtn').textContent = wait > 0 ? 'Waiting' : 'Open free';
+    const h = Math.floor(wait / 3600000), m = Math.floor(wait % 3600000 / 60000), sec = Math.floor(wait % 60000 / 1000);
+    $('freeInfo').textContent = wait > 0 ? `Ready in ${h ? h + 'h ' : ''}${m}m ${h ? '' : sec + 's'}` : 'Ready now! 5 cards, better odds';
+  }
+  if ($('pityLeg')) {
+    const l = Math.max(0, LEG_PITY - save.pity.leg), m = Math.max(0, MYTH_PITY - save.pity.myth);
+    $('pityLeg').textContent = `within ${l} cards`;
+    $('pityMyth').textContent = `within ${m} cards`;
+    $('pityLegBar').style.width = (save.pity.leg / LEG_PITY * 100) + '%';
+    $('pityMythBar').style.width = (save.pity.myth / MYTH_PITY * 100) + '%';
+  }
   document.querySelectorAll('[data-upg]').forEach(b => { const u = UPGRADES.find(x => x.id === b.dataset.upg); b.disabled = save.up[u.id] >= u.max || save.coins < upgCost(u); });
 }
 
@@ -959,6 +1153,7 @@ function buyUpgrade(u) {
   if (save.coins < cost || save.up[u.id] >= u.max) return;
   save.coins -= cost;
   save.up[u.id]++;
+  dirty();
   sfx.upgrade();
   toast(`${u.icon} ${u.name} → level ${save.up[u.id]}`);
   persist();
@@ -969,8 +1164,9 @@ function sellDupes() {
   let got = 0, n = 0;
   for (const s of Object.values(save.coll)) {
     const c = charOf(s.id);
-    if (c && c.tier <= 1 && s.count > 1) { got += sellValue(c, s.traits) * (s.count - 1); n += s.count - 1; s.count = 1; }
+    if (c && c.tier <= 1 && s.count > 1 && !isFav(keyOf(s))) { got += sellValue(c, s.traits) * (s.count - 1); n += s.count - 1; s.count = 1; }
   }
+  dirty();
   gain(got);
   toast(`Sold ${n} duplicates for 🪙 ${fmt(got)}`);
   persist();
@@ -1004,14 +1200,27 @@ function preload(urls, ms) {
   ]);
 }
 
-async function openPack(pack) {
-  if (busy || save.coins < pack.price) return;
+const cardScore = (c) => charOf(c.id).tier * 100 + traitMult(c.traits);
+
+async function openPack(pack, opts = {}) {
+  const count = opts.count || 1;
+  const price = opts.free ? 0 : pack.price * count;
+  if (busy || save.coins < price) return;
   busy = true;
-  save.coins -= pack.price;
-  save.packs++;
-  const cards = rollPack(pack);
-  const news = cards.map(addCard);     // add right away so a refresh never loses cards
+  save.coins -= price;
+  if (opts.free) save.freeAt = Date.now() + FREE_EVERY;
+  save.packs += count;
+  let all = [];
+  for (let i = 0; i < count; i++) all = all.concat(rollPack(pack));
+  const newFlags = all.map(addCard);     // add right away so a refresh never loses cards
+  // For multi-opens, flip the 5 best and summarise the rest
+  const order = all.map((c, i) => i).sort((a, b) => cardScore(all[a]) - cardScore(all[b]));
+  const shown = order.slice(-5);
+  const cards = shown.map(i => all[i]);
+  const news = shown.map(i => newFlags[i]);
+  const summary = count > 1 ? all : null;
   persist();
+  checkAch();
   updateHUD();
   const best = Math.max(...cards.map(c => charOf(c.id).tier));
   const imgs = preload(cards.map(c => charOf(c.id).img), 4000);
@@ -1019,7 +1228,7 @@ async function openPack(pack) {
   const root = $('stageRoot');
   root.innerHTML = `<div class="stage" id="stage">
     <div class="rays" id="rays"></div>
-    <div class="stage-pack" id="stagePack" role="button" aria-label="Open pack"><div class="pack-glow" style="--glow:${best >= 2 ? TIERS[best].color : 'transparent'}"></div>${packHTML(pack)}</div>
+    <div class="stage-pack" id="stagePack" role="button" aria-label="Open pack"><div class="pack-glow" style="--glow:${best >= 2 ? TIERS[best].color : 'transparent'}"></div>${packHTML(pack)}${count > 1 ? `<span class="stage-count">×${count}</span>` : ''}</div>
     <div class="stage-hint" id="stageHint">Tap the pack to open it</div>
   </div>`;
   sfx.whoosh();
@@ -1055,7 +1264,7 @@ async function openPack(pack) {
     fx.burst(r.left + r.width / 2, r.top + r.height * .1, [pack.c1, pack.c2, '#fff'], 50, { speed: 7 });
     await new Promise(res => setTimeout(res, 650));
     sp.remove();
-    showReveal(pack, cards, news);
+    showReveal(pack, cards, news, { count, summary, free: opts.free });
   };
   sp.onclick = doOpen;
   sp.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') doOpen(); };
@@ -1063,12 +1272,15 @@ async function openPack(pack) {
   sp.focus();
 }
 
-function showReveal(pack, cards, news) {
+function showReveal(pack, cards, news, info = {}) {
+  const count = info.count || 1;
+  const againPrice = pack.price * count;
   const stage = $('stage');
   const wrap = document.createElement('div');
   wrap.className = 'reveal';
   wrap.innerHTML = `
-    <div class="pull-title" id="pullTitle">Tap each card to flip it</div>
+    <div class="pull-title" id="pullTitle">${count > 1 ? `${count} packs opened · your 5 best cards` : 'Tap each card to flip it'}</div>
+    ${info.summary ? `<div class="multi-summary">${TIERS.map((t, i) => { const n = info.summary.filter(c => charOf(c.id).tier === i).length; return n ? `<span style="color:${t.color}">${n} ${t.name}</span>` : ''; }).join('')}<span>${info.summary.filter(c => c.traits.length).length} special</span></div>` : ''}
     <div class="reveal-cards">${cards.map((c, i) => {
       const tier = charOf(c.id).tier;
       return `<div class="flip hint-${tier}" style="--d:${i}" data-i="${i}">
@@ -1078,7 +1290,7 @@ function showReveal(pack, cards, news) {
     }).join('')}</div>
     <div class="reveal-actions">
       <button class="btn" id="revealAll">Reveal all</button>
-      <button class="btn primary hidden" id="againBtn">Open another · 🪙 ${fmt(pack.price)}</button>
+      <button class="btn primary hidden" id="againBtn">Open ${count > 1 ? '×' + count + ' again' : 'another'} · 🪙 ${fmt(againPrice)}</button>
       <button class="btn hidden" id="doneBtn">Collect</button>
     </div>`;
   stage.appendChild(wrap);
@@ -1106,7 +1318,7 @@ function showReveal(pack, cards, news) {
   const finish = () => {
     $('revealAll').classList.add('hidden');
     $('doneBtn').classList.remove('hidden');
-    if (save.coins >= pack.price) $('againBtn').classList.remove('hidden');
+    if (save.coins >= againPrice) $('againBtn').classList.remove('hidden');
     $('pullTitle').textContent = 'Tap a card to view it in 3D';
   };
   wrap.querySelectorAll('.flip').forEach(el => el.onclick = () => flipOne(el));
@@ -1114,7 +1326,7 @@ function showReveal(pack, cards, news) {
     for (const el of wrap.querySelectorAll('.flip:not([data-done])')) { flipOne(el); await new Promise(r => setTimeout(r, 380)); }
   };
   $('doneBtn').onclick = closeStage;
-  $('againBtn').onclick = () => { closeStage(); openPack(pack); };
+  $('againBtn').onclick = () => { closeStage(); openPack(pack, { count }); };
 }
 
 function celebrate(el, tier, inst) {
@@ -1148,6 +1360,7 @@ function autoOpen() {
   save.packs++;
   const cards = rollPack(p);
   cards.forEach(addCard);
+  checkAch();
   const best = cards[cards.length - 1];
   const c = charOf(best.id);
   toast(`🤖 Auto-opened: best was ${c.name} (${TIERS[c.tier].name})`);
@@ -1192,8 +1405,15 @@ function openViewer(key, instOverride) {
         <div class="trait-list">${inst.traits.length ? inst.traits.map(x => `
           <div class="trait-row"><span class="ic">${TRAIT[x].icon}</span><div><b>${TRAIT[x].name}</b><span>${TRAIT[x].desc}</span></div><span class="x">×${TRAIT[x].mult}</span></div>`).join('')
           : '<div class="trait-row"><span class="ic">📄</span><div><b>Standard print</b><span>No special traits on this copy.</span></div></div>'}</div>
+        ${(() => {
+          if (!ownedStack) return '';
+          const a = ascendInfo(c.id);
+          return `<div class="trait-row" style="margin-top:8px"><span class="ic">⬆️</span><div><b>Level ${a.lvl}${a.maxed ? ' (max)' : ''}</b><span>${a.maxed ? 'This character is fully ascended.' : `Fuse ${a.need} spare copies + 🪙 ${fmt(a.cost)} → Lv${a.lvl + 1} (+50% income on every copy). You have ${a.spare} spare.`}</span></div></div>`;
+        })()}
         <div class="v-actions">
           <span class="chip" style="cursor:default">Owned ×<span id="vCount">${count}</span></span>
+          ${ownedStack ? `<button class="btn heart-btn ${isFav(keyOf(inst)) ? 'on' : ''}" id="vFav">${isFav(keyOf(inst)) ? '♥ Favorite' : '♡ Favorite'}</button>` : ''}
+          ${ownedStack && !ascendInfo(c.id).maxed ? `<button class="btn ascend-btn" id="vAscend" ${ascendInfo(c.id).spare < ascendInfo(c.id).need || save.coins < ascendInfo(c.id).cost ? 'disabled' : ''}>⬆️ Ascend</button>` : ''}
           <button class="btn" id="vSpin">Auto-spin</button>
           <button class="btn" id="vFlip">Flip</button>
           ${count ? `<button class="btn" id="vSell">Sell 1 · 🪙 ${fmt(sellValue(c, inst.traits))}</button>` : ''}
@@ -1255,13 +1475,35 @@ function openViewer(key, instOverride) {
   $('vSpin').onclick = () => { V.spin = !V.spin; $('vSpin').textContent = V.spin ? 'Stop spin' : 'Auto-spin'; };
   $('vFlip').onclick = () => { V.vy = 18; };
   $('vClose').onclick = closeViewer;
+  if ($('vFav')) $('vFav').onclick = () => {
+    toggleFav(keyOf(inst));
+    const on = isFav(keyOf(inst));
+    $('vFav').classList.toggle('on', on);
+    $('vFav').textContent = on ? '♥ Favorite' : '♡ Favorite';
+    if ($('vSell')) $('vSell').disabled = on;
+    sfx.coin();
+  };
+  if ($('vAscend')) $('vAscend').onclick = () => {
+    if (!ascend(c.id)) return;
+    sfx.rare(4);
+    const r = $('scene').getBoundingClientRect();
+    fx.burst(r.left + r.width / 2, r.top + r.height / 2, ['#ff7ad9', '#ffd76a', '#7dffcf', '#6fd8ff', '#fff'], 90, { speed: 8, stars: true });
+    toast(`⬆️ ${c.name} ascended to Lv${lvlOf(c.id)}!`);
+    const keep = save.coll[keyOf(inst)] ? keyOf(inst) : Object.keys(save.coll).find(k => save.coll[k].id === c.id);
+    cancelAnimationFrame(viewerState.raf);
+    document.removeEventListener('keydown', viewerKeys);
+    openViewer(keep);
+    updateHUD();
+  };
+  if ($('vSell')) $('vSell').disabled = isFav(keyOf(inst));
   if ($('vSell')) $('vSell').onclick = () => {
     const k = keyOf(inst);
     const st = save.coll[k];
-    if (!st) return;
+    if (!st || isFav(k)) return;
     gain(sellValue(c, inst.traits));
     st.count--;
     if (st.count <= 0) delete save.coll[k];
+    dirty();
     persist();
     sfx.coin();
     toast(`Sold ${c.name} for 🪙 ${fmt(sellValue(c, inst.traits))}`);
@@ -1373,7 +1615,7 @@ $('menuBtn').onclick = () => {
     modal(`<h3>Reset everything?</h3><p>This deletes all your cards, coins and upgrades. It can't be undone.</p>
       <div style="display:flex;gap:8px;justify-content:center"><button class="btn" id="rNo">Keep my cards</button><button class="btn" id="rYes" style="background:#c9435d">Reset</button></div>`);
     $('rNo').onclick = closeModal;
-    $('rYes').onclick = () => { save = freshSave(); persist(); closeModal(); tab = 'shop'; render(); toast('Progress reset'); };
+    $('rYes').onclick = () => { save = freshSave(); dirty(); persist(); closeModal(); tab = 'shop'; render(); toast('Progress reset'); };
   };
 };
 $('muteBtn').onclick = () => { save.muted = !save.muted; $('muteBtn').textContent = save.muted ? '🔇' : '🔊'; persist(); };
@@ -1390,7 +1632,7 @@ setInterval(() => {
   gain(income() * dt);
   if (save.up.auto) { autoTimer += dt; if (autoTimer >= autoInterval(save.up.auto)) { autoTimer = 0; autoOpen(); } }
   saveTimer += dt;
-  if (saveTimer > 5) { saveTimer = 0; persist(); }
+  if (saveTimer > 5) { saveTimer = 0; checkAch(); persist(); }
   updateHUD();
 }, 100);
 document.addEventListener('visibilitychange', () => { if (save && document.hidden) persist(); });
@@ -1414,6 +1656,10 @@ async function boot() {
   }
   save = Object.assign(freshSave(), store.get(SAVE_KEY) || {});
   save.up = Object.assign(freshSave().up, save.up || {});
+  const fresh = freshSave();
+  for (const k of ['pity', 'favs', 'lvl', 'ach']) if (!save[k]) save[k] = fresh[k];
+  if (save.freeAt == null) save.freeAt = 0;
+  dirty();
   // Drop cards whose character is no longer in the list
   for (const [k, s] of Object.entries(save.coll)) if (!charOf(s.id)) delete save.coll[k];
   $('muteBtn').textContent = save.muted ? '🔇' : '🔊';
@@ -1428,11 +1674,12 @@ async function boot() {
     modal(`<div style="font-size:2.4rem">🌙</div><h3>Welcome back!</h3><p>Your cards earned <b class="num" style="color:var(--gold)">🪙 ${fmt(offline)}</b> while you were away.</p><button class="btn primary" id="mOk">Collect</button>`);
     $('mOk').onclick = () => { closeModal(); sfx.coin(); };
   }
+  checkAch();
   persist();
   last = performance.now();
 }
 
-window.__hp = { cardHTML, backHTML, packHTML, get save() { return save; }, get chars() { return CHARS; }, rollPack, openPack, PACKS, openViewer, income };
+window.__hp = { ascend, ascendInfo, checkAch, completedSets, get sets() { return SETS; }, cardHTML, backHTML, packHTML, get save() { return save; }, get chars() { return CHARS; }, rollPack, openPack, PACKS, openViewer, income };
 boot();
 })();
 </script>

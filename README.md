@@ -51,3 +51,7 @@ An incremental anime card-collecting game. Character art and names load live fro
 - Crinkled holographic foil packs that tilt with your pointer
 - Drag-to-spin 3D card viewer with holo light that follows the angle
 - Upgrades: Power Tap, Fan Club, Lucky Charm, Trait Hunter, Auto-Opener
+- Ascend: fuse spare copies to level a character up to Lv5 (+50% income per level)
+- Pity meters: a guaranteed Legendary+ within 100 cards and Mythic within 400
+- Series sets: own every character from a show for +5% income per completed set
+- A free Premium pack every 4 hours, ×5 multi-opens, favorites with a Showcase, 14 achievements and collection search

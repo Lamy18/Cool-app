@@ -65,27 +65,27 @@
   h1, h2, h3 { margin: 0; letter-spacing: -0.02em; text-wrap: balance; }
   .big { font-size: 3.2rem; font-weight: 800; letter-spacing: -0.04em; line-height: 1; }
 
-  /* Pills & round buttons */
   .pill { display: inline-flex; align-items: center; gap: 8px; border-radius: 999px; padding: 9px 16px; font-weight: 600; font-size: .9rem; }
-  .pill.dark { background: var(--ink); color: #fff; }
-  .pill.light { background: rgba(255,255,255,.65); }
-  .round { width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; flex-shrink: 0; }
+  .round { width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; flex-shrink: 0; }
   .round.dark { background: var(--ink); color: #fff; }
-  .round.white { background: #fff; color: var(--ink); }
+  .round.white { background: rgba(255,255,255,.85); color: var(--ink); }
   .round svg { width: 22px; height: 22px; }
 
   /* Header */
-  .header { display: flex; align-items: center; gap: 12px; }
+  .header { display: flex; align-items: center; gap: 10px; }
   .header .who { flex: 1; min-width: 0; }
-  .header h2 { font-size: 1.25rem; }
-  .header .sub { font-size: .85rem; opacity: .75; margin-top: 2px; }
-  .avatar { width: 48px; height: 48px; border-radius: 50%; background: var(--mustard-l); display: grid; place-items: center; font-size: 1.6rem; border: 3px solid #fff; }
+  .header h2 { font-size: 1.2rem; }
+  .header .sub { font-size: .82rem; opacity: .8; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .avatar { width: 46px; height: 46px; border-radius: 50%; background: var(--mustard-l); display: grid; place-items: center; font-size: 1.5rem; border: 3px solid #fff; flex-shrink: 0; }
   .live { display: inline-flex; align-items: center; gap: 6px; }
-  .live i { width: 8px; height: 8px; border-radius: 50%; background: #3ee08f; box-shadow: 0 0 0 0 rgba(62,224,143,.6); animation: pulse 1.6s infinite; }
+  .live i { width: 8px; height: 8px; border-radius: 50%; background: #3ee08f; flex-shrink: 0; box-shadow: 0 0 0 0 rgba(62,224,143,.6); animation: pulse 1.6s infinite; }
   @keyframes pulse { 70% { box-shadow: 0 0 0 8px rgba(62,224,143,0); } 100% { box-shadow: 0 0 0 0 rgba(62,224,143,0); } }
   .daybar { margin-top: 16px; height: 10px; border-radius: 999px; background: rgba(255,255,255,.45); overflow: hidden; }
   .daybar div { height: 100%; width: 0; background: var(--ink); border-radius: 999px; transition: width .2s linear; }
+  .card.ink .daybar { background: rgba(255,255,255,.15); }
+  .card.ink .daybar div { background: linear-gradient(90deg, var(--pink), var(--mustard)); }
   .daylabels { display: flex; justify-content: space-between; font-size: .78rem; margin-top: 6px; opacity: .8; font-weight: 500; }
+  .boss-tag { display: inline-block; background: var(--mustard); color: var(--ink); border-radius: 999px; padding: 1px 8px; font-size: .7rem; font-weight: 800; letter-spacing: .04em; vertical-align: 2px; }
 
   /* Net worth card */
   .tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 18px; }
@@ -105,20 +105,24 @@
   .progress.done div { background: linear-gradient(90deg, var(--teal), #5fc29e); }
 
   /* Chart */
-  .chart-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px; }
-  .chart-head h3 { font-size: 1.15rem; }
-  .chart-head .price { font-size: 1.6rem; font-weight: 800; letter-spacing: -0.03em; }
+  .chart-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 8px; }
+  .chart-head h3 { font-size: 1.1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .chart-head .price { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.03em; text-align: right; }
+  .chart-head .left { min-width: 0; }
   .chg { font-weight: 700; font-size: .85rem; }
   .chg.up { color: var(--up); } .chg.down { color: var(--down); }
-  canvas#chart { width: 100%; height: 190px; display: block; }
-  .chart-x { display: flex; justify-content: space-between; font-size: .75rem; color: var(--muted); margin-top: 4px; }
+  canvas#chart { width: 100%; height: 200px; display: block; }
+  .chart-foot { display: flex; justify-content: space-between; align-items: center; font-size: .75rem; color: var(--muted); margin-top: 6px; gap: 8px; }
+  .seg { display: inline-flex; background: #efe8c2; border-radius: 999px; padding: 3px; }
+  .seg button { border-radius: 999px; padding: 5px 12px; font-size: .78rem; font-weight: 700; color: var(--ink-2); }
+  .seg button.on { background: var(--ink); color: #fff; }
 
   /* Trade panel */
   .trade-top { display: flex; align-items: center; gap: 12px; }
-  .trade-top .ic { width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center; font-size: 1.5rem; }
+  .trade-top .ic { width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center; font-size: 1.5rem; flex-shrink: 0; }
   .trade-top .info { flex: 1; min-width: 0; }
   .trade-top .info b { font-size: 1.05rem; }
-  .trade-top .info div { font-size: .82rem; opacity: .7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .trade-top .info div { font-size: .82rem; opacity: .75; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .qty { display: flex; gap: 6px; margin: 16px 0 12px; }
   .qty button { flex: 1; border-radius: 999px; padding: 9px 0; background: rgba(255,255,255,.1); color: #fff; font-weight: 600; font-size: .9rem; }
   .qty button.on { background: #fff; color: var(--ink); }
@@ -127,27 +131,26 @@
   .trade-btns button small { display: block; font-weight: 500; font-size: .75rem; opacity: .75; }
   .buy { background: var(--mustard); }
   .sell { background: var(--pink); }
-  .freeze-btn { margin-top: 10px; width: 100%; border-radius: 999px; padding: 10px; background: rgba(255,255,255,.12); color: #fff; font-weight: 600; }
+  .ghost-btn { margin-top: 10px; width: 100%; border-radius: 999px; padding: 10px; background: rgba(255,255,255,.12); color: #fff; font-weight: 600; }
+  .halt-note { margin-top: 10px; border-radius: 14px; padding: 8px 12px; background: rgba(240,127,152,.25); font-size: .85rem; font-weight: 600; text-align: center; }
 
-  /* Stock list rows (leaderboard style) */
+  /* Stock list rows */
   .stocks { display: grid; gap: 10px; }
-  .row {
-    display: flex; align-items: center; gap: 10px; border-radius: 999px; padding: 8px 8px 8px 8px;
-    text-align: left; width: 100%; border: 3px solid transparent; transition: transform .1s;
-  }
+  .row { display: flex; align-items: center; gap: 10px; border-radius: 999px; padding: 8px; text-align: left; width: 100%; border: 3px solid transparent; transition: transform .1s; }
   .row:active { transform: scale(.98); }
   .row.sel { border-color: var(--ink); }
+  .row.flash-up { animation: flashUp .7s ease-out; }
+  .row.flash-down { animation: flashDown .7s ease-out; }
+  @keyframes flashUp { 0% { box-shadow: 0 0 0 0 rgba(35,150,106,.0); } 30% { box-shadow: 0 0 0 6px rgba(35,150,106,.45); } 100% { box-shadow: 0 0 0 0 rgba(35,150,106,0); } }
+  @keyframes flashDown { 0% { box-shadow: 0 0 0 0 rgba(224,81,108,0); } 30% { box-shadow: 0 0 0 6px rgba(224,81,108,.5); } 100% { box-shadow: 0 0 0 0 rgba(224,81,108,0); } }
   .row .ic { width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,.6); display: grid; place-items: center; font-size: 1.3rem; flex-shrink: 0; }
   .row .t { flex: 1; min-width: 0; }
   .row .t b { display: block; font-size: 1rem; font-weight: 800; }
   .row .t span { font-size: .78rem; color: var(--ink-2); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .row svg.spark { width: 64px; height: 28px; flex-shrink: 0; }
-  .row .pct {
-    width: 58px; height: 58px; border-radius: 50%; background: #fff; display: grid; place-items: center; flex-shrink: 0;
-    font-weight: 800; font-size: .82rem; text-align: center; line-height: 1.05;
-  }
+  .row svg.spark { width: 60px; height: 28px; flex-shrink: 0; }
+  .row .pct { width: 58px; height: 58px; border-radius: 50%; background: #fff; display: grid; place-items: center; flex-shrink: 0; font-weight: 800; font-size: .82rem; text-align: center; line-height: 1.05; }
   .row .pct small { display: block; font-weight: 500; font-size: .68rem; color: var(--muted); }
-  .badge { display: inline-block; font-size: .68rem; font-weight: 700; background: var(--ink); color: #fff; border-radius: 999px; padding: 1px 7px; margin-left: 4px; vertical-align: 2px; }
+  .badge { display: inline-block; font-size: .66rem; font-weight: 700; background: var(--ink); color: #fff; border-radius: 999px; padding: 1px 7px; margin-left: 4px; vertical-align: 2px; }
 
   /* News */
   .news h3 { font-size: 1.15rem; margin: 6px 0 4px; }
@@ -156,13 +159,13 @@
   .feed { display: grid; gap: 8px; margin-top: 12px; }
   .feed div { background: rgba(255,255,255,.4); border-radius: 14px; padding: 8px 12px; font-size: .85rem; }
   .feed div em { font-style: normal; opacity: .7; font-size: .75rem; margin-right: 6px; }
+  .upcoming { display: grid; gap: 6px; margin-top: 12px; }
+  .upcoming .ev { border: 1px solid #f0ead0; display: flex; align-items: center; gap: 10px; background: #fff; border-radius: 16px; padding: 8px 12px; font-size: .85rem; font-weight: 600; }
+  .upcoming .ev .tm { background: var(--ink); color: #fff; border-radius: 999px; padding: 2px 8px; font-size: .75rem; }
+  .upcoming .ev .wh { margin-left: auto; font-size: .75rem; font-weight: 700; }
 
   /* Bottom nav */
-  .nav {
-    position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(14px + env(safe-area-inset-bottom));
-    background: var(--ink); border-radius: 999px; padding: 8px; display: flex; gap: 6px; z-index: 20;
-    box-shadow: 0 10px 30px rgba(31,27,36,.3);
-  }
+  .nav { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(14px + env(safe-area-inset-bottom)); background: var(--ink); border-radius: 999px; padding: 8px; display: flex; gap: 6px; z-index: 20; box-shadow: 0 10px 30px rgba(31,27,36,.3); }
   .nav button { width: 54px; height: 54px; border-radius: 50%; display: grid; place-items: center; color: #b9b2c2; }
   .nav button svg { width: 24px; height: 24px; }
   .nav button.on { background: var(--lav); color: #fff; }
@@ -196,21 +199,35 @@
   .rank .bar small { font-size: .78rem; font-weight: 500; margin-left: auto; text-align: right; line-height: 1.2; }
   .rank .circ { width: 58px; height: 58px; border-radius: 50%; background: #fff; display: grid; place-items: center; text-align: center; font-weight: 800; line-height: 1; flex-shrink: 0; }
   .rank .circ small { display: block; font-size: .62rem; font-weight: 500; color: var(--muted); }
-  .tabs { display: inline-flex; background: rgba(255,255,255,.18); border-radius: 999px; padding: 4px; }
 
   /* Home */
   .hero h1 { font-size: 2.3rem; line-height: 1.02; margin: 6px 0 10px; max-width: 13ch; }
   .hero p { margin: 0 0 22px; opacity: .9; max-width: 30ch; line-height: 1.4; }
   .hero .deco { position: absolute; right: -10px; top: 18px; font-size: 6.5rem; transform: rotate(12deg); opacity: .95; }
   .hero-cta { display: flex; align-items: center; gap: 12px; font-weight: 700; }
-  .stat-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  .stat { border-radius: var(--r-lg); padding: 16px; background: #fff; border: 3px solid var(--orange-l); }
+  .stat-tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .stat { border-radius: var(--r-lg); padding: 14px 12px; background: #fff; border: 3px solid var(--orange-l); }
   .stat:nth-child(2) { border-color: var(--lav-l); background: #f3f1ff; }
-  .stat .eyebrow { display: flex; align-items: center; gap: 6px; }
-  .stat b { font-size: 2.6rem; font-weight: 800; letter-spacing: -0.04em; display: block; margin-top: 6px; }
+  .stat:nth-child(3) { border-color: var(--mustard-l); background: #fff9e6; }
+  .stat .eyebrow { font-size: .68rem; }
+  .stat b { font-size: 2rem; font-weight: 800; letter-spacing: -0.04em; display: block; margin-top: 4px; }
+  .stat span { color: var(--muted); font-size: .78rem; }
   .how { display: grid; gap: 10px; margin-top: 12px; }
   .how div { display: flex; gap: 10px; align-items: flex-start; font-size: .92rem; line-height: 1.35; }
-  .how div i { font-style: normal; width: 30px; height: 30px; border-radius: 50%; background: var(--cream); display: grid; place-items: center; flex-shrink: 0; font-weight: 800; font-size: .85rem; }
+  .how div i { font-style: normal; width: 30px; height: 30px; border-radius: 50%; background: #fff; display: grid; place-items: center; flex-shrink: 0; font-weight: 800; font-size: .85rem; }
+
+  /* Trading desk (meta upgrades) */
+  .desk-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .wax { background: #fff; color: var(--ink); border-radius: 999px; padding: 6px 12px; font-weight: 800; }
+  .desk-item { display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,.14); border-radius: 20px; padding: 10px 12px; width: 100%; text-align: left; color: #fff; }
+  .desk-item .ic { width: 42px; height: 42px; border-radius: 14px; background: rgba(255,255,255,.18); display: grid; place-items: center; font-size: 1.3rem; flex-shrink: 0; }
+  .desk-item .t { flex: 1; min-width: 0; }
+  .desk-item .t b { display: block; font-size: .95rem; }
+  .desk-item .t span { font-size: .78rem; opacity: .8; }
+  .desk-item .cost { background: #fff; color: var(--ink); border-radius: 999px; padding: 6px 10px; font-weight: 800; font-size: .82rem; white-space: nowrap; }
+  .pips { display: inline-flex; gap: 3px; margin-left: 6px; vertical-align: 1px; }
+  .pips i { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,.3); }
+  .pips i.on { background: var(--mustard); }
 
   /* Modal */
   .modal { position: fixed; inset: 0; background: rgba(31,27,36,.45); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); z-index: 50; display: grid; place-items: center; padding: 16px; overflow-y: auto; }
@@ -220,17 +237,20 @@
   .choice:hover { transform: translateY(-2px); }
   .choice .go { margin-left: auto; width: 40px; height: 40px; border-radius: 50%; background: var(--ink); color: #fff; display: grid; place-items: center; flex-shrink: 0; }
   .big-btn { width: 100%; border-radius: 999px; padding: 16px; background: var(--ink); color: #fff; font-weight: 700; font-size: 1.05rem; }
+  .big-btn.light { background: #fff; color: var(--ink); }
   .summary { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
   .summary div { background: rgba(255,255,255,.55); border-radius: 16px; padding: 10px 12px; }
   .summary b { display: block; font-size: 1.25rem; }
   .summary span { font-size: .78rem; color: var(--ink-2); }
 
-  /* Toasts */
+  /* Toasts, floats, confetti */
   .toasts { position: fixed; top: calc(12px + env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); z-index: 60; display: grid; gap: 8px; width: min(440px, calc(100% - 32px)); pointer-events: none; }
-  .toast { background: var(--ink); color: #fff; border-radius: 18px; padding: 10px 14px; font-size: .9rem; font-weight: 500; box-shadow: 0 8px 24px rgba(0,0,0,.25); animation: pop .2s ease-out; display: flex; gap: 10px; align-items: center; }
+  .toast { background: var(--ink); color: #fff; border-radius: 18px; padding: 10px 14px; font-size: .9rem; font-weight: 500; box-shadow: 0 8px 24px rgba(0,0,0,.25); animation: pop .2s ease-out; }
   .toast.good { background: var(--teal); }
   .toast.bad { background: #c9435d; }
-
+  .float { position: fixed; z-index: 65; pointer-events: none; font-weight: 800; font-size: 1.3rem; animation: floatUp 1.1s ease-out forwards; text-shadow: 0 2px 0 #fff; }
+  @keyframes floatUp { to { transform: translateY(-70px); opacity: 0; } }
+  canvas#fx { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 70; }
   .frozen-banner { background: #bfe6ff; color: var(--ink); border-radius: 999px; padding: 8px 14px; font-weight: 700; text-align: center; }
 
   @media (prefers-reduced-motion: reduce) {
@@ -241,13 +261,14 @@
 <body>
 <div class="app" id="app"></div>
 <nav class="nav hidden" id="nav" aria-label="Game sections">
-  <button data-tab="market" class="on" aria-label="Market"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l5-6 4 4 8-9"/><path d="M15 6h5v5"/></svg></button>
+  <button data-tab="market" class="on" aria-label="Market"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16M17 4v16"/><rect x="4.5" y="8" width="5" height="7" rx="1.2"/><rect x="14.5" y="6" width="5" height="9" rx="1.2"/></svg></button>
   <button data-tab="portfolio" aria-label="Portfolio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="3"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M3 12h18"/></svg></button>
   <button data-tab="perks" aria-label="Perks"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg></button>
   <button data-tab="ranks" aria-label="Leaderboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg></button>
 </nav>
 <div class="toasts" id="toasts" aria-live="polite"></div>
 <div id="modalRoot"></div>
+<canvas id="fx"></canvas>
 
 <script>
 (() => {
@@ -293,15 +314,15 @@ const STOCK_POOL = [
     bad: ['Taco Planet runs out of hot sauce', 'TACO drone delivery drops tacos on wrong houses'] },
 ];
 
-const GENERIC_GOOD = ['Analysts upgrade {tk} to Strong Buy', '{name} smashes earnings expectations', '{name} announces surprise buyback', 'Whale investor scoops up {tk}'];
-const GENERIC_BAD = ['Analysts downgrade {tk} to Sell', '{name} misses earnings', '{name} CEO dozes off on earnings call', 'Big fund dumps its {tk} shares'];
+const GENERIC_GOOD = ['Analysts upgrade {tk} to Strong Buy', '{name} announces surprise buyback', 'Whale investor scoops up {tk}'];
+const GENERIC_BAD = ['Analysts downgrade {tk} to Sell', '{name} CEO dozes off on a call', 'Big fund dumps its {tk} shares'];
 
 const COLORS = [
-  { bg: 'var(--pink-l)', line: '#f07f98', solid: 'var(--pink)' },
-  { bg: 'var(--mustard-l)', line: '#e9a52a', solid: 'var(--mustard)' },
-  { bg: 'var(--teal-l)', line: '#3f8f7a', solid: 'var(--teal)' },
-  { bg: 'var(--lav-l)', line: '#8f86e8', solid: 'var(--lav)' },
-  { bg: 'var(--orange-l)', line: '#f08a32', solid: 'var(--orange)' },
+  { bg: 'var(--pink-l)', line: '#f07f98' },
+  { bg: 'var(--mustard-l)', line: '#e9a52a' },
+  { bg: 'var(--teal-l)', line: '#3f8f7a' },
+  { bg: 'var(--lav-l)', line: '#8f86e8' },
+  { bg: 'var(--orange-l)', line: '#f08a32' },
 ];
 
 const MOODS = [
@@ -310,9 +331,18 @@ const MOODS = [
   { id: 'bear', name: 'Bear Hug', icon: '🐻', desc: 'Everything tends to drift down.', drift: -.005, vol: 1, ev: 1 },
   { id: 'storm', name: 'Volatility Storm', icon: '🌪️', desc: 'Prices swing 70% harder.', drift: 0, vol: 1.7, ev: 1 },
   { id: 'sleepy', name: 'Sleepy Market', icon: '😴', desc: 'Small moves, less news.', drift: 0, vol: .6, ev: .6 },
-  { id: 'frenzy', name: 'News Frenzy', icon: '📰', desc: 'Headlines drop twice as often.', drift: 0, vol: 1, ev: 2 },
+  { id: 'frenzy', name: 'News Frenzy', icon: '📰', desc: 'Headlines drop twice as often, and there\'s an extra earnings report.', drift: 0, vol: 1, ev: 2 },
   { id: 'meme', name: 'Meme Mania', icon: '🤪', desc: 'One stock goes absolutely wild.', drift: 0, vol: 1, ev: 1.2 },
 ];
+
+// Every 5th day is a boss day
+const BOSSES = [
+  { id: 'whale', name: 'The Whale', icon: '🐋', desc: 'A giant trader shoves prices up and down all day. Ride the waves.', drift: 0, vol: 1.3, ev: .9 },
+  { id: 'crash', name: 'Flash Crash', icon: '⚡', desc: 'Everything will drop about 16% at the posted time, then slowly recover. Get out first, buy the dip after.', drift: 0, vol: 1.1, ev: 1 },
+  { id: 'breaker', name: 'Circuit Breaker', icon: '🚦', desc: 'Big moves freeze a stock for 7 seconds. You can\'t trade it while it\'s halted.', drift: 0, vol: 1.4, ev: 1.3 },
+  { id: 'bearlord', name: 'Bear Lord', icon: '👑', desc: 'Heavy selling all day, and only 35% of news is good. Short sellers rejoice.', drift: -.007, vol: 1.1, ev: 1 },
+];
+const BOSS_EVERY = 5;
 
 const PERKS = [
   { id: 'nofee', name: 'Zero Commission', icon: '🎟️', rarity: 'common', once: true, desc: 'No more trading fees.' },
@@ -321,16 +351,29 @@ const PERKS = [
   { id: 'dividend', name: 'Dividend Club', icon: '🧾', rarity: 'common', desc: 'Shares you own pay 0.3% of their value every hour.' },
   { id: 'slow', name: 'Slow Clock', icon: '🐢', rarity: 'common', desc: 'Each day lasts 25% longer.' },
   { id: 'easy', name: 'Friendly Landlord', icon: '🔑', rarity: 'common', desc: 'All future goals are 6% lower.' },
+  { id: 'cashback', name: 'Cash Back', icon: '💳', rarity: 'common', desc: 'Get 1% of every sale back as a bonus.' },
   { id: 'stoploss', name: 'Stop-Loss Bot', icon: '🤖', rarity: 'rare', once: true, desc: 'Auto-closes any position once it moves 10% against you.' },
   { id: 'lucky', name: 'Lucky Candle', icon: '🕯️', rarity: 'rare', once: true, desc: 'Good news happens 65% of the time instead of 50%.' },
   { id: 'insider', name: 'Insider Whisper', icon: '🤫', rarity: 'rare', once: true, desc: 'Rumors are always right and arrive earlier.' },
+  { id: 'earnings', name: 'Earnings Insider', icon: '📅', rarity: 'rare', once: true, desc: 'Earnings whispers are always right and come 1 hour earlier.' },
   { id: 'hottip', name: 'Hot Tip', icon: '🔥', rarity: 'rare', once: true, desc: 'Each day, one stock is marked as trending up.' },
   { id: 'freeze', name: 'Freeze Frame', icon: '🧊', rarity: 'rare', once: true, desc: 'Once a day, freeze the market for 8 seconds.' },
+  { id: 'whalewatch', name: 'Whale Watcher', icon: '🔭', rarity: 'rare', once: true, desc: 'Market-wide drops (crashes, whale dumps) hit half as hard.' },
   { id: 'short', name: 'Short Seller', icon: '📉', rarity: 'legendary', once: true, desc: 'Sell stocks you don\'t own and profit when they fall.' },
   { id: 'margin', name: 'Margin Desk', icon: '🏗️', rarity: 'legendary', once: true, desc: 'Borrow up to 50% of net worth to buy more. Debt costs 0.3% per hour.' },
   { id: 'life', name: 'Second Wind', icon: '❤️', rarity: 'legendary', desc: 'Survive one missed goal.' },
 ];
 const RARITY_WEIGHT = { common: 60, rare: 30, legendary: 12 };
+
+// Permanent upgrades bought with Wax between runs
+const DESK = [
+  { id: 'seed', name: 'Seed Money', icon: '🌱', max: 5, base: 6, desc: (l) => `Start every run with +$${150 * (l + 1)} (now +$${150 * l}).` },
+  { id: 'reroll', name: 'Reroll Tokens', icon: '🎲', max: 3, base: 8, desc: (l) => `Reroll perk choices ${l + 1}× per run (now ${l}×).` },
+  { id: 'head', name: 'Head Start', icon: '🎁', max: 1, base: 12, desc: () => 'Begin each run with a random common perk.' },
+  { id: 'analyst', name: 'Analyst Desk', icon: '🧑‍💼', max: 1, base: 15, desc: () => 'Earnings whispers are right 80% of the time (up from 65%).' },
+  { id: 'slot', name: 'Bigger Menu', icon: '🍱', max: 1, base: 20, desc: () => 'Choose from 4 perks instead of 3.' },
+];
+const deskCost = (d, l) => d.base * (l + 1);
 
 const START_CASH = 1000;
 const BASE_DAY_SECONDS = 100;     // a 24h in-game day takes this many real seconds
@@ -361,57 +404,107 @@ const store = {
   get(k, d) { try { const v = JSON.parse(localStorage.getItem(k)); return v ?? d; } catch { return d; } },
   set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* storage unavailable */ } },
 };
+function loadMeta() {
+  const m = store.get('cc:meta', {});
+  return { wax: m.wax || 0, totalWax: m.totalWax || 0, bosses: m.bosses || 0, desk: Object.assign({ seed: 0, reroll: 0, head: 0, analyst: 0, slot: 0 }, m.desk || {}) };
+}
+let meta = loadMeta();
+const saveMeta = () => store.set('cc:meta', meta);
+
+// ================= Sound & haptics =================
+let muted = store.get('cc:muted', false);
+const sfx = (() => {
+  let ac = null;
+  const ctx = () => { if (muted) return null; try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); if (ac.state === 'suspended') ac.resume(); return ac; } catch { return null; } };
+  function tone(f, d, type = 'sine', v = .05, when = 0, slide) {
+    const a = ctx(); if (!a) return;
+    const o = a.createOscillator(), g = a.createGain(), t = a.currentTime + when;
+    o.type = type; o.frequency.setValueAtTime(f, t);
+    if (slide) o.frequency.exponentialRampToValueAtTime(slide, t + d);
+    g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(.0001, t + d);
+    o.connect(g).connect(a.destination); o.start(t); o.stop(t + d + .02);
+  }
+  return {
+    buy() { tone(520, .09, 'triangle', .05); tone(780, .12, 'triangle', .045, .06); },
+    sell(profit) { if (profit >= 0) { tone(990, .08, 'square', .03); tone(1320, .14, 'square', .03, .06); } else { tone(330, .18, 'triangle', .05, 0, 220); } },
+    news(kind) { if (kind === 'good') tone(880, .12, 'sine', .04, 0, 1180); else if (kind === 'bad') tone(500, .18, 'sine', .04, 0, 300); else tone(700, .08, 'sine', .03); },
+    clear() { [523, 659, 784, 1047].forEach((f, i) => tone(f, .25, 'triangle', .06, i * .1)); },
+    fail() { [392, 330, 262].forEach((f, i) => tone(f, .3, 'triangle', .06, i * .15)); },
+    boss() { [196, 196, 262].forEach((f, i) => tone(f, .25, 'sawtooth', .035, i * .18)); },
+    tick() { tone(1200, .03, 'square', .015); },
+  };
+})();
+const buzz = (ms) => { try { navigator.vibrate && navigator.vibrate(ms); } catch { /* not supported */ } };
+
+// ================= Confetti =================
+const fx = (() => {
+  const cv = $('fx'), c = cv.getContext('2d');
+  let parts = [], running = false;
+  const size = () => { const d = window.devicePixelRatio || 1; cv.width = innerWidth * d; cv.height = innerHeight * d; c.setTransform(d, 0, 0, d, 0, 0); };
+  size(); addEventListener('resize', size);
+  const colors = ['#f07f98', '#f2b544', '#3f8f7a', '#8f86e8', '#f59a4a', '#ffffff'];
+  function frame() {
+    c.clearRect(0, 0, innerWidth, innerHeight);
+    parts = parts.filter(p => p.y < innerHeight + 20 && p.life > 0);
+    for (const p of parts) {
+      p.x += p.vx; p.y += p.vy; p.vy += .18; p.vx *= .99; p.r += p.vr; p.life -= .004;
+      c.save(); c.translate(p.x, p.y); c.rotate(p.r); c.fillStyle = p.col; c.globalAlpha = Math.min(1, p.life * 2);
+      c.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2); c.restore();
+    }
+    if (parts.length) requestAnimationFrame(frame); else { running = false; c.clearRect(0, 0, innerWidth, innerHeight); }
+  }
+  return {
+    burst(n = 120) {
+      if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      for (let i = 0; i < n; i++) parts.push({ x: innerWidth / 2 + rand(-60, 60), y: innerHeight * .35, vx: rand(-8, 8), vy: rand(-12, -4), r: rand(0, 6), vr: rand(-.3, .3), s: rand(6, 12), col: pick(colors), life: 1 });
+      if (!running) { running = true; requestAnimationFrame(frame); }
+    },
+  };
+})();
 
 // ================= State =================
 let S = null;          // current run
 let tab = 'market';
 let qtyMode = '1';
-let loop = null;
-let lastTime = 0;
+let chartMode = store.get('cc:chart', 'candles');
 
 function newRun() {
   const picks = shuffle(STOCK_POOL).slice(0, 5);
   S = {
     day: 0,
-    cash: START_CASH,
-    fees: 0,
-    trades: 0,
-    bestTrade: 0,
-    peak: START_CASH,
-    target: START_CASH,
-    perks: {},
-    lives: 0,
-    clockMin: 8 * 60,            // run starts at 08:00 on day 1
-    dayStartMin: 8 * 60,
-    timeLeft: 0,
-    dayLength: BASE_DAY_SECONDS,
-    tick: 0,
-    phase: 'daystart',
-    paused: false,
-    frozen: 0,
-    freezeUsed: false,
-    mood: MOODS[0],
-    memeTk: null,
-    hotTk: null,
-    nextEvent: 6,
-    pending: [],                 // rumors waiting to resolve
-    feed: [],
-    lastHour: 8,
-    selected: 0,
+    cash: START_CASH + 150 * meta.desk.seed,
+    fees: 0, trades: 0, bestTrade: 0,
+    peak: 0, target: START_CASH,
+    perks: {}, lives: 0, rerolls: meta.desk.reroll, bossesBeaten: 0,
+    clockMin: 8 * 60, dayStartMin: 8 * 60,
+    timeLeft: 0, dayLength: BASE_DAY_SECONDS,
+    tick: 0, phase: 'daystart', paused: false,
+    frozen: 0, freezeUsed: false,
+    mood: MOODS[0], boss: null, memeTk: null, hotTk: null,
+    nextEvent: 6, whaleIn: 8, pending: [], schedule: [], feed: [],
+    recover: false, lastHour: 8, selected: 0,
     stocks: picks.map((p, i) => ({
       ...p, color: COLORS[i], price: +(p.price * rand(.85, 1.15)).toFixed(2),
-      hist: [], qty: 0, avg: 0, shock: [], dayOpen: 0, marks: [],
+      hist: [], qty: 0, avg: 0, shock: [], dayOpen: 0, marks: [], halt: 0,
     })),
   };
+  S.peak = S.cash;
   // Pre-fill some history so the chart isn't empty on day 1
-  for (let i = 0; i < 160; i++) stepPrices(BASE_DAY_SECONDS, TICK_MS / 1000, true);
-  S.tick = 0;
-  for (const s of S.stocks) s.marks = [];
+  for (const s of S.stocks) s.dayOpen = s.price;
+  for (let i = 0; i < 240; i++) stepPrices(BASE_DAY_SECONDS, TICK_MS / 1000, true);
+  if (meta.desk.head) {
+    const p = pick(PERKS.filter(x => x.rarity === 'common' && x.id !== 'cash'));
+    S.perks[p.id] = 1;
+    S.headStart = p;
+  }
   startDay();
 }
 
 const netWorth = () => S.cash + S.stocks.reduce((a, s) => a + s.qty * s.price, 0);
 const has = (id) => (S.perks[id] || 0) > 0;
+const isBossDay = (d) => d % BOSS_EVERY === 0;
+const pGood = () => S.boss && S.boss.id === 'bearlord' ? .35 : has('lucky') ? .65 : .5;
+const minutesPerTick = () => (TICK_MS / 1000) * 1440 / S.dayLength;
 
 function goalFor(day) {
   let g = START_CASH;
@@ -427,13 +520,33 @@ function startDay() {
   S.dayStartMin = S.clockMin;
   S.freezeUsed = false;
   S.frozen = 0;
-  S.mood = S.day === 1 ? MOODS[0] : pick(MOODS);
+  S.recover = false;
+  S.boss = isBossDay(S.day) ? pick(BOSSES) : null;
+  S.mood = S.boss || (S.day === 1 ? MOODS[0] : pick(MOODS));
   S.memeTk = S.mood.id === 'meme' ? pick(S.stocks).tk : null;
   S.hotTk = has('hottip') ? pick(S.stocks).tk : null;
-  for (const s of S.stocks) s.dayOpen = s.price;
+  S.whaleIn = rand(6, 10);
+  for (const s of S.stocks) { s.dayOpen = s.price; s.halt = 0; }
+  buildSchedule();
   S.phase = 'daystart';
+  S._dayStartNW = null;
   render();
   showDayStart();
+}
+
+// Earnings reports (and the boss crash) are posted in advance so you can plan for them
+function buildSchedule() {
+  const start = S.dayStartMin;
+  const n = 2 + (S.mood.id === 'frenzy' ? 1 : 0);
+  const picks = shuffle(S.stocks).slice(0, n);
+  const slots = shuffle([4, 7, 10, 13, 16, 19]).slice(0, n).sort((a, b) => a - b);
+  S.schedule = picks.map((s, i) => {
+    const atMin = start + slots[i] * 60 + Math.round(rand(0, 50));
+    const lead = has('earnings') ? 150 : 90;
+    return { type: 'earn', s, atMin, hintAt: atMin - lead, good: Math.random() < pGood(), hinted: false, done: false };
+  });
+  if (S.boss && S.boss.id === 'crash') S.schedule.push({ type: 'crash', atMin: start + Math.round(rand(9, 13) * 60), done: false });
+  S.schedule.sort((a, b) => a.atMin - b.atMin);
 }
 
 // ================= Simulation =================
@@ -441,9 +554,10 @@ function stepPrices(dayLength, dt, silent) {
   const minutes = dt * 1440 / dayLength;
   const h = minutes / 60;
   for (const s of S.stocks) {
-    let mu = s.drift + S.mood.drift;
+    if (s.halt > 0) { s.hist.push(s.price); if (s.hist.length > 900) s.hist.shift(); continue; }
+    let mu = s.drift + S.mood.drift + (S.recover ? .012 : 0);
     if (s.tk === S.hotTk) mu += .012;
-    let sigma = s.vol * S.mood.vol * (s.tk === S.memeTk ? 3 : 1);
+    const sigma = s.vol * S.mood.vol * (s.tk === S.memeTk ? 3 : 1);
     const shock = s.shock.length ? s.shock.shift() : 0;
     // Gentle pull back toward the day's open stops runaway trends
     const revert = s.dayOpen ? -.02 * Math.log(s.price / s.dayOpen) * h : 0;
@@ -472,24 +586,20 @@ function hourly() {
 function scheduleNextEvent() { S.nextEvent = rand(6, 11) / S.mood.ev; }
 
 function spawnEvent() {
-  const r = Math.random();
-  if (r < .12) {
-    // Market-wide event
-    const up = Math.random() < (has('lucky') ? .62 : .5);
+  if (Math.random() < .12) {
+    const up = Math.random() < pGood();
     const m = rand(.04, .09);
     const title = up ? pick(['Central bank cuts rates! Whole market rallies', 'Jobs report blows past expectations', 'Market-wide FOMO kicks in'])
-                     : pick(['Flash crash! Everything drops', 'Inflation scare spooks traders', 'Big bank wobbles, markets slide']);
-    for (const s of S.stocks) applyShock(s, up ? m : -m);
+                     : pick(['Sudden selloff! Everything drops', 'Inflation scare spooks traders', 'Big bank wobbles, markets slide']);
+    marketShock(up ? m : -m);
     pushNews(title, up ? 'good' : 'bad', ['#Market', up ? '#Rally' : '#Selloff']);
     return;
   }
-  // Single-company event (meme stock gets picked more)
   const pool = S.memeTk ? [...S.stocks, ...S.stocks.filter(s => s.tk === S.memeTk)] : S.stocks;
   const s = pick(pool);
-  const good = Math.random() < (has('lucky') ? .65 : .5);
+  const good = Math.random() < pGood();
   const mag = rand(.06, .18) * s.ev;
   if (Math.random() < .5) {
-    // Rumor first; the real news follows a few seconds later
     const insider = has('insider');
     const accurate = insider || Math.random() < .7;
     const hintUp = accurate ? good : !good;
@@ -503,27 +613,75 @@ function spawnEvent() {
 
 function fireCompanyNews(s, good, mag) {
   const tpl = Math.random() < .55 ? pick(good ? s.good : s.bad) : pick(good ? GENERIC_GOOD : GENERIC_BAD);
-  const title = tpl.replace('{tk}', s.tk).replace('{name}', s.name);
   applyShock(s, good ? mag : -mag);
-  pushNews(title, good ? 'good' : 'bad', ['#' + s.tk, good ? '#Breaking' : '#Ouch']);
+  pushNews(tpl.replace('{tk}', s.tk).replace('{name}', s.name), good ? 'good' : 'bad', ['#' + s.tk, good ? '#Breaking' : '#Ouch'], s);
+}
+
+function marketShock(m) {
+  if (m < 0 && has('whalewatch')) m /= 2;
+  for (const s of S.stocks) applyShock(s, m);
 }
 
 function applyShock(s, m) {
   const steps = 6;
   const per = Math.log(1 + m) / steps;
   for (let i = 0; i < steps; i++) s.shock[i] = (s.shock[i] || 0) + per;
+  flashRow(s, m >= 0);
+  // Circuit breaker boss: big moves halt the stock (after the move lands)
+  if (S.boss && S.boss.id === 'breaker' && Math.abs(m) >= .06 && s.halt <= 0) {
+    setTimeout(() => { if (S && S.phase === 'trading') { s.halt = 7; toast(`🚦 ${s.tk} halted for 7 seconds`, 'bad'); renderLive(); } }, 1300);
+  }
+}
+
+function processSchedule() {
+  for (const e of S.schedule) {
+    if (e.done) continue;
+    if (e.type === 'earn') {
+      if (!e.hinted && S.clockMin >= e.hintAt) {
+        e.hinted = true;
+        const acc = has('earnings') ? 1 : meta.desk.analyst ? .8 : .65;
+        e.hintUp = Math.random() < acc ? e.good : !e.good;
+        pushNews(`${has('earnings') ? 'Verified whisper' : 'Whisper'}: ${e.s.tk} earnings at ${clock(e.atMin)} look ${e.hintUp ? 'strong 📈' : 'weak 📉'}`, 'rumor',
+          ['#' + e.s.tk, '#Earnings', e.hintUp ? '#Bullish' : '#Bearish']);
+      }
+      if (S.clockMin >= e.atMin) {
+        e.done = true;
+        const mag = rand(.12, .26) * e.s.ev;
+        applyShock(e.s, e.good ? mag : -mag);
+        pushNews(e.good ? `${e.s.name} crushes earnings! 🚀` : `${e.s.name} misses earnings badly`, e.good ? 'good' : 'bad', ['#' + e.s.tk, '#Earnings'], e.s);
+      }
+    }
+    if (e.type === 'crash' && S.clockMin >= e.atMin) {
+      e.done = true;
+      marketShock(-.16);
+      S.recover = true;
+      pushNews('⚡ FLASH CRASH! Everything plunges', 'bad', ['#Market', '#Crash']);
+      shake();
+    }
+  }
+}
+
+function whaleMove() {
+  const s = pick(S.stocks);
+  const up = Math.random() < .5;
+  let m = rand(.08, .14) * (up ? 1 : -1);
+  if (!up && has('whalewatch')) m /= 2;
+  applyShock(s, m);
+  pushNews(up ? `🐋 The Whale scoops up ${s.tk}` : `🐋 The Whale dumps ${s.tk}`, up ? 'good' : 'bad', ['#' + s.tk, '#Whale'], s);
 }
 
 function pushNews(title, kind, tags) {
   S.feed.unshift({ title, kind, tags, time: clock(S.clockMin) });
   S.feed = S.feed.slice(0, 6);
   toast(title, kind === 'good' ? 'good' : kind === 'bad' ? 'bad' : '');
+  sfx.news(kind);
   if (tab === 'market') renderNews();
 }
 
 function autoClose() {
   if (!has('stoploss')) return;
   for (const s of S.stocks) {
+    if (s.halt > 0) continue;
     if (s.qty > 0 && s.price < s.avg * .9) { const q = s.qty; trade(s, -q, true); toast(`🤖 Stop-loss sold ${q} ${s.tk}`, 'bad'); }
     else if (s.qty < 0 && s.price > s.avg * 1.1) { const q = -s.qty; trade(s, q, true); toast(`🤖 Stop-loss covered ${q} ${s.tk}`, 'bad'); }
   }
@@ -532,13 +690,16 @@ function autoClose() {
 function update(dt) {
   if (!S || S.phase !== 'trading' || S.paused) return;
   if (S.frozen > 0) { S.frozen = Math.max(0, S.frozen - dt); renderLive(); return; }
+  for (const s of S.stocks) if (s.halt > 0) { s.halt = Math.max(0, s.halt - dt); if (!s.halt) toast(`🚦 ${s.tk} trading resumed`); }
   stepPrices(S.dayLength, dt, false);
   hourly();
+  processSchedule();
   for (const p of S.pending) p.at -= dt;
   for (const p of S.pending.filter(p => p.at <= 0)) fireCompanyNews(p.s, p.good, p.mag);
   S.pending = S.pending.filter(p => p.at > 0);
   S.nextEvent -= dt;
   if (S.nextEvent <= 0) { spawnEvent(); scheduleNextEvent(); }
+  if (S.boss && S.boss.id === 'whale') { S.whaleIn -= dt; if (S.whaleIn <= 0) { whaleMove(); S.whaleIn = rand(7, 11); } }
   autoClose();
   const nw = netWorth();
   S.peak = Math.max(S.peak, nw);
@@ -549,10 +710,7 @@ function update(dt) {
 }
 
 // ================= Trading =================
-function buyingPower() {
-  const nw = netWorth();
-  return S.cash + (has('margin') ? .5 * Math.max(0, nw) : 0);
-}
+function buyingPower() { return S.cash + (has('margin') ? .5 * Math.max(0, netWorth()) : 0); }
 function shortRoom() {
   if (!has('short')) return 0;
   const exposure = S.stocks.reduce((a, s) => a + Math.max(0, -s.qty) * s.price, 0);
@@ -561,51 +719,95 @@ function shortRoom() {
 const fee = (cost) => has('nofee') ? 0 : Math.max(1, cost * FEE_RATE);
 
 function maxBuy(s) {
-  // Covering a short needs no buying power beyond the cash it costs
   const bp = buyingPower();
   let n = Math.floor(bp / (s.price * (has('nofee') ? 1 : 1 + FEE_RATE)));
   if (!has('nofee')) while (n > 0 && n * s.price + fee(n * s.price) > bp) n--;
   return Math.max(0, n);
 }
-function maxSell(s) {
-  return Math.max(0, s.qty) + Math.floor(shortRoom() / s.price);
-}
+function maxSell(s) { return Math.max(0, s.qty) + Math.floor(shortRoom() / s.price); }
 function qtyFor(s, side) {
   const max = side === 'buy' ? maxBuy(s) : maxSell(s);
   if (qtyMode === 'max') return max;
+  if (qtyMode === 'half') return max > 1 ? Math.floor(max / 2) : max;
   return Math.min(max, +qtyMode);
 }
 
-// delta > 0 buys, delta < 0 sells
+// delta > 0 buys, delta < 0 sells. Returns realised profit on the closed part.
 function trade(s, delta, auto) {
-  if (!delta) return;
+  if (!delta) return 0;
   const cost = delta * s.price;
   const f = fee(Math.abs(cost));
   const before = s.qty;
-  // Realised profit when shrinking a position
+  let pnl = 0;
   if (before !== 0 && Math.sign(delta) !== Math.sign(before)) {
     const closed = Math.min(Math.abs(delta), Math.abs(before));
-    const pnl = (s.price - s.avg) * closed * Math.sign(before);
+    pnl = (s.price - s.avg) * closed * Math.sign(before);
     S.bestTrade = Math.max(S.bestTrade, pnl);
   }
   S.cash -= cost + f;
+  if (delta < 0 && has('cashback')) S.cash += Math.abs(cost) * .01 * S.perks.cashback;
   S.fees += f;
   s.qty += delta;
   if (s.qty === 0) s.avg = 0;
-  else if (Math.sign(s.qty) !== Math.sign(before)) s.avg = s.price;      // flipped or opened
+  else if (Math.sign(s.qty) !== Math.sign(before)) s.avg = s.price;
   else if (Math.abs(s.qty) > Math.abs(before)) s.avg = (s.avg * Math.abs(before) + s.price * Math.abs(delta)) / Math.abs(s.qty);
   S.trades++;
   s.marks.push({ t: S.tick, side: delta > 0 ? 'B' : 'S' });
-  if (s.marks.length > 30) s.marks.shift();
+  if (s.marks.length > 40) s.marks.shift();
   if (!auto) renderLive();
+  return pnl;
 }
 
 function doTrade(side) {
   if (!S || S.phase !== 'trading' || S.paused) return;
   const s = S.stocks[S.selected];
+  if (s.halt > 0) { toast(`🚦 ${s.tk} is halted`, 'bad'); return; }
   const n = qtyFor(s, side);
   if (n <= 0) { toast(side === 'buy' ? 'Not enough cash' : (has('short') ? 'No room to short more' : `You don't own any ${s.tk}`), 'bad'); return; }
-  trade(s, side === 'buy' ? n : -n);
+  const closing = (side === 'sell' && s.qty > 0) || (side === 'buy' && s.qty < 0);
+  const pnl = trade(s, side === 'buy' ? n : -n);
+  buzz(12);
+  if (closing) { sfx.sell(pnl); floatText($(side === 'buy' ? 'buyBtn' : 'sellBtn'), pnl); }
+  else sfx.buy();
+}
+
+function closeAll() {
+  if (!S || S.phase !== 'trading') return;
+  let total = 0, n = 0;
+  for (const s of S.stocks) if (s.qty && s.halt <= 0) { total += trade(s, -s.qty, true); n++; }
+  if (!n) return;
+  sfx.sell(total); buzz(20);
+  toast(`Closed ${n} position${n > 1 ? 's' : ''}: ${total >= 0 ? '+' : ''}${money(total)}`, total >= 0 ? 'good' : 'bad');
+  render();
+}
+
+function floatText(anchor, pnl) {
+  if (!anchor) return;
+  const r = anchor.getBoundingClientRect();
+  const el = document.createElement('div');
+  el.className = 'float';
+  el.style.left = (r.left + r.width / 2 - 40) + 'px';
+  el.style.top = (r.top - 10) + 'px';
+  el.style.color = pnl >= 0 ? 'var(--up)' : 'var(--down)';
+  el.textContent = (pnl >= 0 ? '+' : '') + money(pnl);
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1100);
+}
+
+function flashRow(s, up) {
+  const i = S.stocks.indexOf(s);
+  const row = document.querySelector(`#stocks .row[data-i="${i}"]`);
+  if (!row) return;
+  row.classList.remove('flash-up', 'flash-down');
+  void row.offsetWidth;
+  row.classList.add(up ? 'flash-up' : 'flash-down');
+}
+
+function shake() {
+  const app = $('app');
+  if (!app.animate || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  app.animate([{ transform: 'translate(0,0)' }, { transform: 'translate(-8px,3px)' }, { transform: 'translate(7px,-4px)' }, { transform: 'translate(-4px,2px)' }, { transform: 'translate(0,0)' }], { duration: 450 });
+  buzz([30, 40, 30]);
 }
 
 // ================= Day flow =================
@@ -613,10 +815,13 @@ function endDay() {
   S.phase = 'dayend';
   const nw = netWorth();
   if (nw >= S.target) {
+    if (S.boss) { S.bossesBeaten++; meta.bosses++; saveMeta(); }
+    sfx.clear(); fx.burst(S.boss ? 200 : 120); buzz([20, 40, 20]);
     showPerkChoice();
   } else if (S.lives > 0) {
     S.lives--;
     S.perks.life = Math.max(0, (S.perks.life || 0) - 1);
+    sfx.fail();
     showModal(`
       <div class="card pink">
         <div class="eyebrow">Day ${S.day} missed</div>
@@ -626,38 +831,49 @@ function endDay() {
       <button class="big-btn" id="mNext">Keep going →</button>`);
     $('mNext').onclick = () => { closeModal(); startDay(); };
   } else {
+    sfx.fail();
     gameOver(`You needed ${money(S.target)} but ended day ${S.day} with ${money(nw)}.`);
   }
 }
 
 function rollPerks() {
+  const count = 3 + meta.desk.slot;
   const avail = PERKS.filter(p => !(p.once && has(p.id)));
   const out = [];
-  while (out.length < 3 && avail.length) {
+  while (out.length < count && avail.length) {
     const total = avail.reduce((a, p) => a + RARITY_WEIGHT[p.rarity], 0);
     let r = Math.random() * total;
     const i = avail.findIndex(p => (r -= RARITY_WEIGHT[p.rarity]) < 0);
     out.push(avail.splice(i, 1)[0]);
   }
+  // Beating a boss guarantees a legendary
+  if (S.boss && !out.some(p => p.rarity === 'legendary')) {
+    const leg = avail.filter(p => p.rarity === 'legendary');
+    if (leg.length) out[out.length - 1] = pick(leg);
+  }
   return out;
 }
 
-function showPerkChoice() {
+function showPerkChoice(choices) {
   const nw = netWorth();
-  const choices = rollPerks();
+  choices = choices || rollPerks();
   showModal(`
-    <div class="card cream">
-      <div class="eyebrow">Day ${S.day} cleared</div>
+    <div class="card ${S.boss ? 'mustard' : 'cream'}">
+      <div class="eyebrow">${S.boss ? `${S.boss.icon} Boss defeated · day ${S.day}` : `Day ${S.day} cleared`}</div>
       <div class="big num" style="margin:10px 0 6px">${money(nw)}</div>
-      <div style="color:var(--ink-2)">Goal was ${money(S.target)} · next goal <b class="num">${money(Math.round(goalFor(S.day + 1)))}</b></div>
+      <div style="color:var(--ink-2)">Goal was ${money(S.target)} · next goal <b class="num">${money(Math.round(goalFor(S.day + 1)))}</b>${isBossDay(S.day + 1) ? ' · <b>boss day next!</b>' : ''}</div>
     </div>
-    <div class="eyebrow" style="color:#fff;opacity:.9;padding-left:6px">Pick a perk</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:0 6px;color:#fff">
+      <span class="eyebrow" style="opacity:.95">Pick a perk</span>
+      ${S.rerolls > 0 ? `<button class="pill" id="mReroll" style="background:#fff;color:var(--ink);padding:6px 12px">🎲 Reroll (${S.rerolls})</button>` : ''}
+    </div>
     ${choices.map((p, i) => `
       <button class="perk choice rarity-${p.rarity}" data-perk="${i}">
         <span class="ic">${p.icon}</span>
         <span><span class="rar">${p.rarity}</span><b>${esc(p.name)}</b><span>${esc(p.desc)}</span></span>
         <span class="go">→</span>
       </button>`).join('')}`);
+  if ($('mReroll')) $('mReroll').onclick = () => { S.rerolls--; sfx.tick(); showPerkChoice(); };
   document.querySelectorAll('[data-perk]').forEach(b => b.onclick = () => {
     const p = choices[+b.dataset.perk];
     S.perks[p.id] = (S.perks[p.id] || 0) + 1;
@@ -672,21 +888,27 @@ function showPerkChoice() {
 function showDayStart() {
   const m = S.mood;
   const extra = [];
+  if (S.day === 1 && S.headStart) extra.push(`🎁 Head Start gave you <b>${esc(S.headStart.name)}</b>.`);
   if (S.memeTk) extra.push(`🤪 <b>${S.memeTk}</b> is today's meme stock: huge swings.`);
   if (S.hotTk) extra.push(`🔥 Hot tip: <b>${S.hotTk}</b> is trending up today.`);
+  const cal = S.schedule.map(e => e.type === 'earn'
+    ? `<div class="ev"><span class="tm num">${clock(e.atMin)}</span>📅 ${e.s.tk} earnings<span class="wh" style="color:var(--muted)">${esc(e.s.name)}</span></div>`
+    : `<div class="ev"><span class="tm num">${clock(e.atMin)}</span>⚡ Flash crash<span class="wh" style="color:var(--down)">sell before this</span></div>`).join('');
+  if (S.boss) sfx.boss();
   showModal(`
-    <div class="card lav">
-      <div class="eyebrow">Day ${S.day} · starts ${clock(S.clockMin)}</div>
+    <div class="card ${S.boss ? 'ink' : 'lav'}">
+      <div class="eyebrow">Day ${S.day} · starts ${clock(S.clockMin)}${S.boss ? ' · BOSS DAY' : ''}</div>
       <h2 style="font-size:2rem;margin:10px 0 4px">Reach <span class="num">${money(S.target)}</span></h2>
       <p style="margin:0;opacity:.9">by the end of this 24-hour day. You have <span class="num">${money(netWorth())}</span>.</p>
     </div>
-    <div class="perk rarity-common" style="background:#fff">
-      <span class="ic" style="background:var(--cream)">${m.icon}</span>
-      <span><span class="rar">Market mood</span><b>${m.name}</b><span>${m.desc}</span></span>
+    <div class="perk" style="background:${S.boss ? 'var(--mustard-l)' : '#fff'}">
+      <span class="ic" style="background:${S.boss ? '#fff' : 'var(--cream)'}">${m.icon}</span>
+      <span><span class="rar">${S.boss ? 'Boss' : 'Market mood'}</span><b>${m.name}</b><span>${m.desc}</span></span>
     </div>
+    <div class="card" style="padding:14px 16px;border-radius:var(--r-lg)"><div class="rar">Today's calendar</div><div class="upcoming" style="margin-top:8px">${cal}</div></div>
     ${extra.map(x => `<div class="perk" style="background:#fff"><span>${x}</span></div>`).join('')}
     <button class="big-btn" id="mGo">Ring the bell 🔔</button>`);
-  $('mGo').onclick = () => { closeModal(); S.phase = 'trading'; scheduleNextEvent(); S.nextEvent = Math.min(S.nextEvent, 4); renderLive(); };
+  $('mGo').onclick = () => { closeModal(); S.phase = 'trading'; scheduleNextEvent(); S.nextEvent = Math.min(S.nextEvent, 4); sfx.tick(); renderLive(); };
 }
 
 function gameOver(reason) {
@@ -695,10 +917,13 @@ function gameOver(reason) {
   const runs = store.get('cc:runs', 0) + 1;
   store.set('cc:runs', runs);
   const board = store.get('cc:board', []);
-  board.push({ days: cleared, peak: Math.round(S.peak), date: new Date().toLocaleDateString() });
+  const entry = { days: cleared, peak: Math.round(S.peak), date: new Date().toLocaleDateString(), bosses: S.bossesBeaten };
+  board.push(entry);
   board.sort((a, b) => b.days - a.days || b.peak - a.peak);
   store.set('cc:board', board.slice(0, 10));
-  const place = board.findIndex(e => e.peak === Math.round(S.peak) && e.days === cleared) + 1;
+  const place = board.indexOf(entry) + 1;
+  const wax = cleared * 3 + S.bossesBeaten * 8 + (cleared >= 10 ? 10 : 0);
+  meta.wax += wax; meta.totalWax += wax; saveMeta();
   showModal(`
     <div class="card pink">
       <div class="eyebrow">Run over</div>
@@ -707,12 +932,13 @@ function gameOver(reason) {
       <div class="summary">
         <div><b class="num">${money(S.peak)}</b><span>Peak net worth</span></div>
         <div><b class="num">${money(S.bestTrade)}</b><span>Best trade</span></div>
-        <div><b class="num">${S.trades}</b><span>Trades</span></div>
+        <div><b class="num">${S.bossesBeaten}</b><span>Bosses beaten</span></div>
         <div><b class="num">${place > 0 && place <= 10 ? '#' + place : '—'}</b><span>Leaderboard</span></div>
       </div>
     </div>
+    <div class="perk rarity-legendary"><span class="ic">🕯️</span><span><span class="rar">Earned</span><b class="num">+${wax} Wax</b><span>Spend it at the Trading Desk on the home screen for permanent upgrades.</span></span></div>
     <button class="big-btn" id="mAgain">New run →</button>
-    <button class="big-btn" id="mHome" style="background:#fff;color:var(--ink)">Home</button>`);
+    <button class="big-btn light" id="mHome">Trading Desk</button>`);
   $('mAgain').onclick = () => { closeModal(); tab = 'market'; newRun(); };
   $('mHome').onclick = () => { closeModal(); S = null; render(); };
 }
@@ -738,6 +964,8 @@ function toast(msg, kind) {
 const ICON_PAUSE = '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1.5"/><rect x="14" y="5" width="4" height="14" rx="1.5"/></svg>';
 const ICON_PLAY = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10-6.5a1 1 0 0 0 0-1.72l-10-6.5A1 1 0 0 0 8 5.5z"/></svg>';
 const ICON_ARROW = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+const ICON_SOUND = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg>';
+const ICON_MUTE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="m16 9 5 6M21 9l-5 6"/></svg>';
 
 function render() {
   const app = $('app');
@@ -746,7 +974,9 @@ function render() {
   document.querySelectorAll('#nav button').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
   app.innerHTML = headerHTML() + ({ market: marketHTML, portfolio: portfolioHTML, perks: perksHTML, ranks: ranksHTML }[tab])();
   $('pauseBtn').onclick = togglePause;
+  $('muteBtn').onclick = toggleMute;
   if (tab === 'market') bindMarket();
+  if (tab === 'portfolio' && $('closeAllBtn')) $('closeAllBtn').onclick = closeAll;
   if (tab === 'perks' && $('freezeBtn2')) $('freezeBtn2').onclick = useFreeze;
   renderLive();
 }
@@ -758,41 +988,70 @@ function homeHTML() {
   return `
     <div class="header">
       <div class="who"><h2>Hi, Trader 👋</h2><div class="sub">${new Date().toLocaleDateString('en-US', { weekday: 'short', day: 'numeric', month: 'long' })}</div></div>
+      <button class="round white" id="muteBtn" aria-label="${muted ? 'Unmute' : 'Mute'}">${muted ? ICON_MUTE : ICON_SOUND}</button>
       <div class="avatar">🦊</div>
     </div>
     <div class="card lav hero">
       <span class="deco" aria-hidden="true">🕯️</span>
       <div class="eyebrow">A trading roguelike</div>
       <h1>Candle Crawl</h1>
-      <p>The market never closes. Hit each day's goal, grab a perk, and see how deep you can go.</p>
+      <p>The market never closes. Hit each day's goal, beat a boss every ${BOSS_EVERY} days, and see how deep you can go.</p>
       <button class="hero-cta" id="startBtn"><span class="round dark">${ICON_ARROW}</span> Start a run</button>
     </div>
     <div class="stat-tiles">
-      <div class="stat"><div class="eyebrow">🏁 Best run</div><b class="num">${best}</b><span style="color:var(--muted);font-size:.85rem">days survived</span></div>
-      <div class="stat"><div class="eyebrow">🎲 Runs</div><b class="num">${runs}</b><span style="color:var(--muted);font-size:.85rem">played</span></div>
+      <div class="stat"><div class="eyebrow">🏁 Best</div><b class="num">${best}</b><span>days</span></div>
+      <div class="stat"><div class="eyebrow">🎲 Runs</div><b class="num">${runs}</b><span>played</span></div>
+      <div class="stat"><div class="eyebrow">👑 Bosses</div><b class="num">${meta.bosses}</b><span>beaten</span></div>
+    </div>
+    <div class="card ink">
+      <div class="desk-head"><div><div class="eyebrow" style="opacity:.8">Permanent upgrades</div><h3 style="font-size:1.35rem;margin-top:2px">Trading Desk</h3></div><span class="wax num">🕯️ ${meta.wax}</span></div>
+      <div class="list">
+        ${DESK.map(d => {
+          const l = meta.desk[d.id], maxed = l >= d.max, cost = deskCost(d, l);
+          return `<button class="desk-item" data-desk="${d.id}" ${maxed || meta.wax < cost ? 'disabled' : ''}>
+            <span class="ic">${d.icon}</span>
+            <span class="t"><b>${esc(d.name)}<span class="pips">${Array.from({ length: d.max }, (_, i) => `<i class="${i < l ? 'on' : ''}"></i>`).join('')}</span></b><span>${esc(maxed ? 'Fully upgraded.' : d.desc(l))}</span></span>
+            <span class="cost num">${maxed ? 'MAX' : '🕯️ ' + cost}</span>
+          </button>`;
+        }).join('')}
+      </div>
+      <p style="margin:12px 0 0;font-size:.8rem;opacity:.7">Earn Wax every run: 3 per day survived, 8 per boss beaten, +10 for reaching day 10.</p>
     </div>
     <div class="card cream">
       <h3 style="font-size:1.2rem">How to play</h3>
       <div class="how">
         <div><i>1</i><span>Each in-game day is 24 hours (about 100 seconds). Buy low, sell high, and beat the day's net-worth goal.</span></div>
-        <div><i>2</i><span>Watch the news. Rumors hint at what's coming, but they aren't always right.</span></div>
-        <div><i>3</i><span>Clear a day to pick a perk. Miss a goal and the run is over.</span></div>
+        <div><i>2</i><span>Check the calendar: earnings reports are posted ahead, and whispers hint how they'll go (not always right).</span></div>
+        <div><i>3</i><span>Clear a day to pick a perk. Every ${BOSS_EVERY}th day is a boss with a twist. Miss a goal and the run is over.</span></div>
       </div>
-      <p style="margin:14px 0 0;font-size:.8rem;color:var(--muted)">Keys: B buy · S sell · 1–5 pick stock · Space pause. All companies are made up.</p>
+      <p style="margin:14px 0 0;font-size:.8rem;color:var(--muted)">Keys: B buy · S sell · 1–5 pick stock · C chart style · Space pause. All companies are made up.</p>
     </div>
     ${ranksCard(board)}
-    <p style="text-align:center;font-size:.8rem;color:var(--ink-2)"><a href="../" style="color:inherit">Earshot</a> · <a href="../niche/" style="color:inherit">DeepCut</a></p>`;
+    <p style="text-align:center;font-size:.8rem;color:var(--ink-2)"><a href="../" style="color:inherit">Earshot</a> · <a href="../cards/" style="color:inherit">Holo Pull</a></p>`;
 }
-function bindHome() { $('startBtn').onclick = () => { tab = 'market'; newRun(); }; }
+function bindHome() {
+  $('startBtn').onclick = () => { tab = 'market'; sfx.tick(); newRun(); };
+  $('muteBtn').onclick = toggleMute;
+  document.querySelectorAll('[data-desk]').forEach(b => b.onclick = () => {
+    const d = DESK.find(x => x.id === b.dataset.desk);
+    const l = meta.desk[d.id], cost = deskCost(d, l);
+    if (l >= d.max || meta.wax < cost) return;
+    meta.wax -= cost; meta.desk[d.id]++; saveMeta();
+    sfx.clear(); buzz(15);
+    toast(`${d.icon} ${d.name} upgraded`, 'good');
+    render();
+  });
+}
 
 function headerHTML() {
   return `
-    <div class="card pink">
+    <div class="card ${S.boss ? 'ink' : 'pink'}">
       <div class="header">
-        <div class="avatar">🦊</div>
-        <div class="who"><h2>Day ${S.day} · <span id="hClock" class="num">--:--</span></h2>
-          <div class="sub live"><i></i> Open 24/7 · ${S.mood.icon} ${S.mood.name}</div></div>
-        <button class="round dark" id="pauseBtn" aria-label="Pause">${S.paused ? ICON_PLAY : ICON_PAUSE}</button>
+        <div class="avatar">${S.boss ? S.boss.icon : '🦊'}</div>
+        <div class="who"><h2>Day ${S.day}${S.boss ? ' <span class="boss-tag">BOSS</span>' : ''} · <span id="hClock" class="num">--:--</span></h2>
+          <div class="sub live"><i></i> Open 24/7 · ${S.mood.icon} ${esc(S.mood.name)}</div></div>
+        <button class="round white" id="muteBtn" aria-label="${muted ? 'Unmute' : 'Mute'}">${muted ? ICON_MUTE : ICON_SOUND}</button>
+        <button class="round ${S.boss ? 'white' : 'dark'}" id="pauseBtn" aria-label="Pause">${S.paused ? ICON_PLAY : ICON_PAUSE}</button>
       </div>
       <div class="daybar"><div id="dayBar"></div></div>
       <div class="daylabels"><span>Day ${S.day}</span><span id="hLeft" class="num"></span></div>
@@ -800,7 +1059,6 @@ function headerHTML() {
 }
 
 function marketHTML() {
-  const s = S.stocks[S.selected];
   return `
     <div id="frozenBanner" class="frozen-banner hidden">🧊 Market frozen: <span id="frozenLeft"></span>s</div>
     <div class="card cream">
@@ -818,11 +1076,18 @@ function marketHTML() {
 
     <div class="card cream" style="padding-bottom:14px">
       <div class="chart-head">
-        <div><h3 id="cName"></h3><span class="chg" id="cChg"></span></div>
+        <div class="left"><h3 id="cName"></h3><span class="chg" id="cChg"></span></div>
         <div class="price num" id="cPrice"></div>
       </div>
       <canvas id="chart" aria-label="Price chart"></canvas>
-      <div class="chart-x"><span id="cxLeft"></span><span>now</span></div>
+      <div class="chart-foot">
+        <span id="cxLeft"></span>
+        <div class="seg" role="group" aria-label="Chart style">
+          <button data-chart="candles" class="${chartMode === 'candles' ? 'on' : ''}">Candles</button>
+          <button data-chart="line" class="${chartMode === 'line' ? 'on' : ''}">Line</button>
+        </div>
+        <span>now</span>
+      </div>
     </div>
 
     <div class="card ink">
@@ -831,21 +1096,22 @@ function marketHTML() {
         <div class="info"><b id="trName"></b><div id="trPos"></div></div>
       </div>
       <div class="qty" role="group" aria-label="Quantity">
-        ${['1', '10', '100', 'max'].map(q => `<button data-q="${q}" class="${qtyMode === q ? 'on' : ''}">${q === 'max' ? 'Max' : q}</button>`).join('')}
+        ${[['1', '1'], ['10', '10'], ['half', 'Half'], ['max', 'Max']].map(([q, l]) => `<button data-q="${q}" class="${qtyMode === q ? 'on' : ''}">${l}</button>`).join('')}
       </div>
       <div class="trade-btns">
         <button class="buy" id="buyBtn">Buy<small id="buyInfo"></small></button>
         <button class="sell" id="sellBtn">Sell<small id="sellInfo"></small></button>
       </div>
-      ${has('freeze') ? '<button class="freeze-btn" id="freezeBtn">🧊 Freeze the market (8s)</button>' : ''}
+      <div class="halt-note hidden" id="haltNote"></div>
+      ${has('freeze') ? '<button class="ghost-btn" id="freezeBtn">🧊 Freeze the market (8s)</button>' : ''}
     </div>
 
     <div class="stocks" id="stocks">
       ${S.stocks.map((s, i) => `
         <button class="row" data-i="${i}" style="background:${s.color.bg}">
           <span class="ic">${s.icon}</span>
-          <span class="t"><b>${s.tk}${s.tk === S.memeTk ? '<span class="badge">MEME</span>' : ''}${s.tk === S.hotTk ? '<span class="badge">🔥 HOT</span>' : ''}</b><span class="sub"></span></span>
-          <svg class="spark" viewBox="0 0 64 28" preserveAspectRatio="none"><polyline fill="none" stroke="${s.color.line}" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" points=""/></svg>
+          <span class="t"><b>${s.tk}${s.tk === S.memeTk ? '<span class="badge">MEME</span>' : ''}${s.tk === S.hotTk ? '<span class="badge">🔥 HOT</span>' : ''}<span class="badge halt-b hidden">HALTED</span></b><span class="sub"></span></span>
+          <svg class="spark" viewBox="0 0 60 28" preserveAspectRatio="none"><polyline fill="none" stroke="${s.color.line}" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" points=""/></svg>
           <span class="pct num"></span>
         </button>`).join('')}
     </div>
@@ -853,6 +1119,7 @@ function marketHTML() {
     <div class="card pink news">
       <div class="tags" id="newsTags"></div>
       <h3 id="newsTitle"></h3>
+      <div class="upcoming" id="upcoming"></div>
       <div class="feed" id="feed"></div>
     </div>`;
 }
@@ -863,6 +1130,7 @@ function bindMarket() {
     document.querySelectorAll('[data-q]').forEach(x => x.classList.toggle('on', x === b));
     renderLive();
   });
+  document.querySelectorAll('[data-chart]').forEach(b => b.onclick = () => setChartMode(b.dataset.chart));
   document.querySelectorAll('#stocks .row').forEach(b => b.onclick = () => { S.selected = +b.dataset.i; renderLive(); });
   $('buyBtn').onclick = () => doTrade('buy');
   $('sellBtn').onclick = () => doTrade('sell');
@@ -870,11 +1138,22 @@ function bindMarket() {
   renderNews();
 }
 
+function setChartMode(m) {
+  chartMode = m;
+  store.set('cc:chart', m);
+  document.querySelectorAll('[data-chart]').forEach(x => x.classList.toggle('on', x.dataset.chart === m));
+  drawChart();
+}
+
 function renderNews() {
   if (!$('feed')) return;
   const top = S.feed[0];
   $('newsTags').innerHTML = (top ? top.tags : ['#News', '#Quiet']).map(t => `<span class="tag">${esc(t)}</span>`).join('');
-  $('newsTitle').textContent = top ? top.title : 'No headlines yet. Stay sharp.';
+  $('newsTitle').textContent = top ? top.title : 'No headlines yet. Check today\'s calendar below.';
+  const next = S.schedule.filter(e => !e.done).slice(0, 3);
+  $('upcoming').innerHTML = next.map(e => e.type === 'earn'
+    ? `<div class="ev"><span class="tm num">${clock(e.atMin)}</span>📅 ${e.s.tk} earnings<span class="wh" style="color:${e.hinted ? (e.hintUp ? 'var(--up)' : 'var(--down)') : 'var(--muted)'}">${e.hinted ? (e.hintUp ? 'whisper 📈' : 'whisper 📉') : 'no whisper yet'}</span></div>`
+    : `<div class="ev"><span class="tm num">${clock(e.atMin)}</span>⚡ Flash crash<span class="wh" style="color:var(--down)">get out first</span></div>`).join('');
   $('feed').innerHTML = S.feed.slice(1, 5).map(n => `<div><em class="num">${n.time}</em>${esc(n.title)}</div>`).join('');
 }
 
@@ -898,7 +1177,8 @@ function portfolioHTML() {
         return `<div class="hold"><div class="ic" style="background:${s.color.bg}">${s.icon}</div>
           <div class="t"><b>${s.tk}${s.qty < 0 ? ' <span class="badge">SHORT</span>' : ''}</b><span class="num">${Math.abs(s.qty)} @ ${money(s.avg)}</span></div>
           <div class="v num">${money(s.qty * s.price)}<span style="color:${pnl >= 0 ? 'var(--up)' : 'var(--down)'}">${pnl >= 0 ? '+' : ''}${money(pnl)} (${pct(p)})</span></div></div>`;
-      }).join('') : '<div class="empty">You don\'t own anything yet. Head to the market tab to buy.</div>'}
+      }).join('') + `<button class="big-btn" id="closeAllBtn" ${S.phase !== 'trading' ? 'disabled' : ''}>Close all positions</button>`
+      : '<div class="empty">You don\'t own anything yet. Head to the market tab to buy.</div>'}
     </div>`;
 }
 
@@ -908,7 +1188,7 @@ function perksHTML() {
     <div class="card teal">
       <div class="eyebrow">Your perks</div>
       <h2 style="font-size:1.8rem;margin:8px 0 2px">${owned.length} perk${owned.length === 1 ? '' : 's'}</h2>
-      <div style="opacity:.85">Clear a day to pick another.${S.lives ? ` ❤️ ×${S.lives} lives left.` : ''}</div>
+      <div style="opacity:.85">Clear a day to pick another.${S.lives ? ` ❤️ ×${S.lives} lives.` : ''}${S.rerolls ? ` 🎲 ×${S.rerolls} rerolls.` : ''}</div>
     </div>
     <div class="list">
       ${owned.length ? owned.map(p => `
@@ -927,12 +1207,12 @@ function ranksCard(board) {
     <div class="card teal">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px">
         <h2 style="font-size:1.6rem">Leaderboard</h2>
-        <div class="tabs"><span class="pill" style="background:#fff;color:var(--ink);padding:6px 14px">All time</span></div>
+        <span class="pill" style="background:#fff;color:var(--ink);padding:6px 14px">All time</span>
       </div>
       <div class="list">
         ${board.length ? board.slice(0, 5).map((e, i) => `
           <div class="rank">
-            <div class="bar" style="background:${colors[i]};color:var(--ink)"><span class="tr">🏆</span>#${i + 1}<small>${money(e.peak)} peak<br>${esc(e.date)}</small></div>
+            <div class="bar" style="background:${colors[i]};color:var(--ink)"><span class="tr">🏆</span>#${i + 1}<small>${money(e.peak)} peak${e.bosses ? ` · 👑${e.bosses}` : ''}<br>${esc(e.date)}</small></div>
             <div class="circ num" style="color:var(--ink)">${e.days}<small>days</small></div>
           </div>`).join('') : '<div style="opacity:.85">No runs yet. Your best runs will show up here.</div>'}
       </div>
@@ -951,18 +1231,13 @@ function renderLive() {
   if ($('dayBar')) $('dayBar').style.width = (elapsed / S.dayLength * 100) + '%';
   set('nw', money(nw));
   set('tCash', money(S.cash));
-  const invested = S.stocks.reduce((a, s) => a + s.qty * s.price, 0);
-  set('tHold', money(invested));
-  const startNW = S._dayStartNW ?? nw;
-  set('tDay', pct(nw / startNW - 1));
+  set('tHold', money(S.stocks.reduce((a, s) => a + s.qty * s.price, 0)));
+  if (S.phase === 'trading' && S._dayStartNW == null) S._dayStartNW = nw;
+  set('tDay', pct(nw / (S._dayStartNW ?? nw) - 1));
   const g = nw / S.target;
   set('goalPct', Math.floor(g * 100) + '%');
   if ($('goalBar')) { $('goalBar').firstElementChild.style.width = Math.min(100, g * 100) + '%'; $('goalBar').classList.toggle('done', g >= 1); }
-
-  if ($('frozenBanner')) {
-    $('frozenBanner').classList.toggle('hidden', !(S.frozen > 0));
-    set('frozenLeft', Math.ceil(S.frozen));
-  }
+  if ($('frozenBanner')) { $('frozenBanner').classList.toggle('hidden', !(S.frozen > 0)); set('frozenLeft', Math.ceil(S.frozen)); }
 
   const s = S.stocks[S.selected];
   if ($('cName')) {
@@ -979,109 +1254,136 @@ function renderLive() {
     const nb = qtyFor(s, 'buy'), ns = qtyFor(s, 'sell');
     set('buyInfo', nb ? `${nb} for ${money(nb * s.price)}` : 'not enough cash');
     set('sellInfo', ns ? `${ns} for ${money(ns * s.price)}` : (has('short') ? 'no short room' : 'none owned'));
-    const canTrade = S.phase === 'trading' && !S.paused;
+    const canTrade = S.phase === 'trading' && !S.paused && s.halt <= 0;
     $('buyBtn').disabled = !canTrade || !nb;
     $('sellBtn').disabled = !canTrade || !ns;
-    if ($('freezeBtn')) { $('freezeBtn').disabled = S.freezeUsed || !canTrade; $('freezeBtn').textContent = S.freezeUsed ? '🧊 Freeze used today' : '🧊 Freeze the market (8s)'; }
+    $('haltNote').classList.toggle('hidden', !(s.halt > 0));
+    if (s.halt > 0) $('haltNote').textContent = `🚦 ${s.tk} is halted for ${Math.ceil(s.halt)}s`;
+    if ($('freezeBtn')) { $('freezeBtn').disabled = S.freezeUsed || S.phase !== 'trading' || S.paused; $('freezeBtn').textContent = S.freezeUsed ? '🧊 Freeze used today' : '🧊 Freeze the market (8s)'; }
 
     document.querySelectorAll('#stocks .row').forEach((row, i) => {
       const st = S.stocks[i];
       const c = st.price / st.dayOpen - 1;
       row.classList.toggle('sel', i === S.selected);
+      row.querySelector('.halt-b').classList.toggle('hidden', !(st.halt > 0));
       row.querySelector('.sub').textContent = `${money(st.price)}${st.qty ? ` · ${st.qty > 0 ? 'own' : 'short'} ${Math.abs(st.qty)}` : ` · ${st.name}`}`;
       row.querySelector('.pct').innerHTML = `<span style="color:${c >= 0 ? 'var(--up)' : 'var(--down)'}">${pct(c)}<small>today</small></span>`;
       const pts = st.hist.slice(-60);
       const lo = Math.min(...pts), hi = Math.max(...pts), span = hi - lo || 1;
-      row.querySelector('polyline').setAttribute('points', pts.map((p, j) => `${(j / (pts.length - 1) * 64).toFixed(1)},${(26 - (p - lo) / span * 24).toFixed(1)}`).join(' '));
+      row.querySelector('polyline').setAttribute('points', pts.map((p, j) => `${(j / (pts.length - 1) * 60).toFixed(1)},${(26 - (p - lo) / span * 24).toFixed(1)}`).join(' '));
     });
     drawChart();
   }
   if ($('freezeBtn2')) $('freezeBtn2').disabled = S.freezeUsed || S.phase !== 'trading';
 }
 
+// ================= Chart =================
 function drawChart() {
   const cv = $('chart');
-  if (!cv) return;
+  if (!cv || !S) return;
   const s = S.stocks[S.selected];
   const dpr = window.devicePixelRatio || 1;
   const W = cv.clientWidth, H = cv.clientHeight;
-  if (cv.width !== Math.round(W * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
+  if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
   const ctx = cv.getContext('2d');
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.clearRect(0, 0, W, H);
   const N = 240;
   const pts = s.hist.slice(-N);
   if (pts.length < 2) return;
-  const lo = Math.min(...pts), hi = Math.max(...pts);
-  const pad = (hi - lo) * .15 || hi * .01;
-  const top = 34, bottom = H - 10, right = W - 34;
-  const x = (i) => i / (N - 1) * right;
-  const off = N - pts.length;
+  const first = S.tick - pts.length + 1;          // absolute tick of pts[0]
+  const top = 34, bottom = H - 8, right = W - 4;
+
+  // Group ticks into 30 in-game-minute candles, aligned to absolute tick numbers
+  const K = Math.max(3, Math.round(30 / minutesPerTick()));
+  const candles = [];
+  for (let i = 0; i < pts.length; i++) {
+    const g = Math.floor((first + i) / K);
+    let c = candles[candles.length - 1];
+    if (!c || c.g !== g) { c = { g, o: i > 0 ? pts[i - 1] : pts[i], h: -Infinity, l: Infinity, c: 0, i0: i }; candles.push(c); }
+    c.h = Math.max(c.h, pts[i], c.o); c.l = Math.min(c.l, pts[i], c.o); c.c = pts[i]; c.i1 = i;
+  }
+  let lo = Math.min(...pts), hi = Math.max(...pts);
+  if (s.qty && s.avg) { lo = Math.min(lo, s.avg); hi = Math.max(hi, s.avg); }
+  const pad = (hi - lo) * .12 || hi * .01;
   const y = (p) => bottom - (p - (lo - pad)) / ((hi + pad) - (lo - pad)) * (bottom - top);
+  const slots = Math.ceil(N / K) + 1;
+  const slotW = right / slots;
+  const xOfTick = (i) => {      // x position for pts index i
+    const ci = candles.findIndex(c => i >= c.i0 && i <= c.i1);
+    return (slots - candles.length + ci + .5) * slotW;
+  };
+  const xLine = (i) => (N - pts.length + i) / (N - 1) * right;
 
   // Dashed grid
-  ctx.strokeStyle = 'rgba(31,27,36,.08)';
-  ctx.setLineDash([4, 6]);
-  ctx.lineWidth = 1;
+  ctx.strokeStyle = 'rgba(31,27,36,.08)'; ctx.setLineDash([4, 6]); ctx.lineWidth = 1;
   for (let k = 0; k < 3; k++) { const gy = top + k * (bottom - top) / 2; ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(W, gy); ctx.stroke(); }
   ctx.setLineDash([]);
 
-  // Smooth line
-  const path = new Path2D();
-  path.moveTo(x(off), y(pts[0]));
-  for (let i = 1; i < pts.length; i++) {
-    const xm = (x(off + i - 1) + x(off + i)) / 2, ym = (y(pts[i - 1]) + y(pts[i])) / 2;
-    path.quadraticCurveTo(x(off + i - 1), y(pts[i - 1]), xm, ym);
+  if (chartMode === 'candles') {
+    const bw = Math.max(3, slotW * .62);
+    candles.forEach((c, ci) => {
+      const cx = (slots - candles.length + ci + .5) * slotW;
+      const up = c.c >= c.o;
+      const col = up ? '#23966a' : '#e0516c';
+      ctx.strokeStyle = col; ctx.lineWidth = 1.6;
+      ctx.beginPath(); ctx.moveTo(cx, y(c.h)); ctx.lineTo(cx, y(c.l)); ctx.stroke();
+      const yt = y(Math.max(c.o, c.c)), yb = y(Math.min(c.o, c.c));
+      ctx.fillStyle = up ? '#23966a' : '#e0516c';
+      roundRect(ctx, cx - bw / 2, yt, bw, Math.max(2, yb - yt), Math.min(3, bw / 3));
+      ctx.fill();
+    });
+  } else {
+    const path = new Path2D();
+    path.moveTo(xLine(0), y(pts[0]));
+    for (let i = 1; i < pts.length; i++) {
+      const xm = (xLine(i - 1) + xLine(i)) / 2, ym = (y(pts[i - 1]) + y(pts[i])) / 2;
+      path.quadraticCurveTo(xLine(i - 1), y(pts[i - 1]), xm, ym);
+    }
+    path.lineTo(xLine(pts.length - 1), y(pts[pts.length - 1]));
+    const area = new Path2D(path);
+    area.lineTo(xLine(pts.length - 1), H); area.lineTo(xLine(0), H); area.closePath();
+    const grad = ctx.createLinearGradient(0, top, 0, H);
+    grad.addColorStop(0, s.color.line + '55'); grad.addColorStop(1, s.color.line + '00');
+    ctx.fillStyle = grad; ctx.fill(area);
+    ctx.strokeStyle = s.color.line; ctx.lineWidth = 3; ctx.lineJoin = 'round'; ctx.stroke(path);
   }
-  path.lineTo(x(off + pts.length - 1), y(pts[pts.length - 1]));
-  const area = new Path2D(path);
-  area.lineTo(x(off + pts.length - 1), H);
-  area.lineTo(x(off), H);
-  area.closePath();
-  const grad = ctx.createLinearGradient(0, top, 0, H);
-  grad.addColorStop(0, s.color.line + '55');
-  grad.addColorStop(1, s.color.line + '00');
-  ctx.fillStyle = grad;
-  ctx.fill(area);
-  ctx.strokeStyle = s.color.line;
-  ctx.lineWidth = 3;
-  ctx.lineJoin = 'round';
-  ctx.stroke(path);
+  const xAt = chartMode === 'candles' ? xOfTick : xLine;
+
+  // Average entry price
+  if (s.qty && s.avg) {
+    const ay = y(s.avg);
+    ctx.strokeStyle = 'rgba(31,27,36,.55)'; ctx.setLineDash([5, 5]); ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(0, ay); ctx.lineTo(W, ay); ctx.stroke(); ctx.setLineDash([]);
+    ctx.font = '700 11px Outfit, system-ui, sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
+    ctx.fillStyle = 'rgba(31,27,36,.7)'; ctx.fillText(`${s.qty > 0 ? 'avg buy' : 'avg short'} ${money(s.avg)}`, 6, ay - 3);
+  }
 
   // Buy/sell markers
-  ctx.font = '700 11px Outfit, system-ui, sans-serif';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  const first = S.tick - pts.length + 1;
+  ctx.font = '700 11px Outfit, system-ui, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   for (const m of s.marks) {
     const i = m.t - first;
     if (i < 0 || i >= pts.length) continue;
-    const mx = x(off + i), my = y(pts[i]);
-    ctx.fillStyle = m.side === 'B' ? '#23966a' : '#e0516c';
-    ctx.beginPath(); ctx.arc(mx, my, 9, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = '#fff';
-    ctx.fillText(m.side, mx, my + .5);
+    const mx = xAt(i), my = y(pts[i]) + (m.side === 'B' ? 14 : -14);
+    ctx.fillStyle = m.side === 'B' ? '#1f1b24' : '#f07f98';
+    ctx.beginPath(); ctx.arc(mx, my, 8, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#fff'; ctx.fillText(m.side, mx, my + .5);
   }
 
   // Current price bubble
-  const lx = x(off + pts.length - 1), ly = y(pts[pts.length - 1]);
-  ctx.fillStyle = '#fff';
-  ctx.strokeStyle = '#1f1b24';
-  ctx.lineWidth = 3;
-  ctx.beginPath(); ctx.arc(lx, ly, 6, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+  const lx = xAt(pts.length - 1), ly = y(pts[pts.length - 1]);
+  ctx.fillStyle = '#fff'; ctx.strokeStyle = '#1f1b24'; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.arc(lx, ly, 5, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
   const label = money(s.price);
   ctx.font = '700 13px Outfit, system-ui, sans-serif';
   const tw = ctx.measureText(label).width + 20;
   const bx = Math.min(W - tw / 2 - 2, Math.max(tw / 2 + 2, lx));
   const by = Math.max(14, ly - 24);
-  ctx.fillStyle = '#1f1b24';
-  roundRect(ctx, bx - tw / 2, by - 13, tw, 26, 13); ctx.fill();
-  ctx.fillStyle = '#fff';
-  ctx.fillText(label, bx, by + .5);
+  ctx.fillStyle = '#1f1b24'; roundRect(ctx, bx - tw / 2, by - 13, tw, 26, 13); ctx.fill();
+  ctx.fillStyle = '#fff'; ctx.fillText(label, bx, by + .5);
 
-  // X axis label: how many in-game hours the chart covers
-  const hrs = (pts.length * TICK_MS / 1000) * 24 / S.dayLength;
-  const el = $('cxLeft'); if (el) el.textContent = `${Math.round(hrs)}h ago`;
+  const hrs = pts.length * minutesPerTick() / 60;
+  const el = $('cxLeft'); if (el) el.textContent = `${Math.round(hrs)}h ago${chartMode === 'candles' ? ' · 30m candles' : ''}`;
 }
 function roundRect(ctx, x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
 
@@ -1096,6 +1398,14 @@ function togglePause() {
     $('mResume').onclick = togglePause;
   } else closeModal();
   renderLive();
+}
+
+function toggleMute() {
+  muted = !muted;
+  store.set('cc:muted', muted);
+  const b = $('muteBtn');
+  if (b) { b.innerHTML = muted ? ICON_MUTE : ICON_SOUND; b.setAttribute('aria-label', muted ? 'Unmute' : 'Mute'); }
+  if (!muted) sfx.tick();
 }
 
 function useFreeze() {
@@ -1114,6 +1424,7 @@ document.addEventListener('keydown', e => {
   if (tab !== 'market' || $('modalRoot').innerHTML) return;
   if (e.key === 'b' || e.key === 'B') doTrade('buy');
   if (e.key === 's' || e.key === 'S') doTrade('sell');
+  if (e.key === 'c' || e.key === 'C') setChartMode(chartMode === 'candles' ? 'line' : 'candles');
   if (/^[1-5]$/.test(e.key) && S.stocks[+e.key - 1]) { S.selected = +e.key - 1; renderLive(); }
 });
 
@@ -1122,19 +1433,16 @@ document.addEventListener('visibilitychange', () => {
 });
 window.addEventListener('resize', () => drawChart());
 
-function frame(now) {
+let lastTime = performance.now();
+setInterval(() => {
+  const now = performance.now();
   const dt = Math.min(.5, (now - lastTime) / 1000);
   lastTime = now;
-  // Remember net worth at the opening bell for the "Today" tile
-  if (S && S.phase === 'trading' && S._dayStartNW == null) S._dayStartNW = netWorth();
-  if (S && S.phase !== 'trading') S._dayStartNW = null;
   update(dt);
-}
-lastTime = performance.now();
-loop = setInterval(() => frame(performance.now()), TICK_MS);
+}, TICK_MS);
 
 // Test hooks
-window.__cc = { get S() { return S; }, netWorth, goalFor, endDay: () => endDay(), setTimeLeft: (v) => { S.timeLeft = v; } };
+window.__cc = { get S() { return S; }, get meta() { return meta; }, netWorth, goalFor, endDay: () => endDay(), setTimeLeft: (v) => { S.timeLeft = v; }, setDay: (d) => { S.day = d - 1; } };
 
 render();
 })();

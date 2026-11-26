@@ -31,7 +31,14 @@ Needs your own Anthropic API key (console.anthropic.com), entered once on the pa
 
 # Candle Crawl 🕯️ (`/trader/`)
 
-A day-trading roguelike where the market never closes. Each in-game day is 24 hours (about 100 seconds of real time). Hit the day's net-worth goal to survive, pick 1 of 3 perks (short selling, margin, stop-loss bot, insider tips, extra lives…), and push as deep as you can. Every run has a random set of made-up companies, a daily market mood, and news and rumors that move prices.
+A day-trading roguelike where the market never closes. Each in-game day is 24 hours (about 100 seconds of real time). Hit the day's net-worth goal to survive, pick 1 of 3 perks, and push as deep as you can.
+
+- Candlestick or line charts, with buy/sell markers and your average entry price
+- An earnings calendar posted each morning, with whisper hints before each report
+- Boss days every 5th day (The Whale, Flash Crash, Circuit Breaker, Bear Lord) that guarantee a legendary perk
+- 17 perks, including short selling, margin, stop-loss bot, insider tips and extra lives
+- Wax earned every run buys permanent Trading Desk upgrades (starting cash, rerolls, head-start perk, better whispers, a 4th perk choice)
+- Sound effects, haptics, floating P/L numbers and confetti
 
 # Holo Pull ✨ (`/cards/`)
 

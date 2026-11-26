@@ -196,7 +196,7 @@
     background: radial-gradient(circle at 50% 30%, color-mix(in srgb, var(--el) 70%, #fff), color-mix(in srgb, var(--el) 35%, #000));
     box-shadow: 0 0 0 .5cqw rgba(255,255,255,.45), 0 2cqw 5cqw rgba(0,0,0,.35);
   }
-  .art img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 18%; display: block; }
+  .art img { position: relative; z-index: 1; width: 100%; height: 100%; object-fit: cover; object-position: 50% 18%; display: block; }
   .art .fallback { position: absolute; inset: 0; display: grid; place-items: center; font-family: var(--display); font-size: 22cqw; color: rgba(255,255,255,.8); }
   .top-row { position: absolute; top: 6.5cqw; left: 6.5cqw; right: 6.5cqw; display: flex; justify-content: space-between; z-index: 4; pointer-events: none; }
   .pip { background: rgba(20,18,52,.68); border-radius: 999px; padding: .8cqw 2.8cqw; font-family: var(--mono); font-weight: 700; font-size: 4.2cqw; color: #fff; display: flex; align-items: center; gap: 1cqw; border: .45cqw solid rgba(255,255,255,.4); }
@@ -434,6 +434,7 @@
   .scene:active { cursor: grabbing; }
   .v-card { position: relative; will-change: transform; }
   .v-card .back { transform: scaleX(-1); }
+  .v-shade { position: absolute; inset: 0; z-index: 10; border-radius: 7% / 5%; pointer-events: none; opacity: 0; background: linear-gradient(90deg, rgba(10,8,30,.85), rgba(10,8,30,.55)); }
   .v-card .card, .v-card .cardback { animation: none; }
   .v-shadow { width: 70%; height: 22px; margin: 26px auto 0; border-radius: 50%; background: radial-gradient(rgba(0,0,0,.6), transparent 70%); }
   .v-panel { width: 100%; max-width: 420px; }
@@ -1173,6 +1174,7 @@ function openViewer(key, instOverride) {
           <div class="v-card" id="vCard">
             <div class="front">${cardHTML(inst, { eager: true, lit: true })}</div>
             <div class="back hidden">${backHTML()}</div>
+            <div class="v-shade" id="vShade"></div>
           </div>
         </div>
         <div class="v-shadow"></div>
@@ -1207,6 +1209,7 @@ function openViewer(key, instOverride) {
   const backFace = card.querySelector('.cardback');
   const frontWrap = card.querySelector('.front'), backWrap = card.querySelector('.back');
   let showingBack = false;
+  const shade = $('vShade');
 
   const apply = () => {
     card.style.transform = `perspective(1100px) rotateX(${V.rx}deg) rotateY(${V.ry}deg)`;
@@ -1219,6 +1222,9 @@ function openViewer(key, instOverride) {
       frontWrap.classList.toggle('hidden', back);
       backWrap.classList.toggle('hidden', !back);
     }
+    // Darken the card as it turns edge-on (like light falling off a real card)
+    const facing = Math.abs(Math.cos(ry * Math.PI / 180));
+    shade.style.opacity = Math.max(0, 1 - facing * 2.2).toFixed(2);
     const mx = 50 + Math.sin(ry * Math.PI / 180) * 60;
     const my = 50 - Math.sin(V.rx * Math.PI / 180) * 80;
     front.style.setProperty('--mx', mx.toFixed(1) + '%');

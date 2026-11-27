@@ -1,6 +1,7 @@
 // Dayflow service worker: keeps the app on the phone so it opens instantly and works offline.
-const VERSION = 'dayflow-v6';
-const SHELL = ['./', './index.html', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png', './icons/maskable-512.png', './icons/apple-touch-icon.png', './icons/favicon-32.png'];
+const VERSION = 'dayflow-v7';
+const SHELL = ['./', './index.html', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png', './icons/maskable-512.png', './icons/apple-touch-icon.png', './icons/favicon-32.png',
+  './pet/poster.png', './pet/idle.webm', './pet/laugh.webm', './pet/angry.webm', './pet/sleepy.webm', './pet/wave.webm'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(VERSION).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));

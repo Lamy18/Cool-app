@@ -37,7 +37,7 @@ final class WidgetUtil {
         int dow = (now.get(Calendar.DAY_OF_WEEK) + 5) % 7;   // Monday = 0, like the web app
 
         int done = 0, total = 0, hp = 100, level = 1;
-        String mood = "content", petName = "Chomp", cdTitle = "", cdEmoji = "";
+        String mood = "content", petName = "Mimic", cdTitle = "", cdEmoji = "";
         long cdTarget = 0;
         boolean fainted = false, hasData = raw != null;
 
